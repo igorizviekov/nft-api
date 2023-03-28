@@ -2,11 +2,8 @@ import {
   ConflictException,
   InternalServerErrorException,
 } from "@nestjs/common";
-import { EntityRepository, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import { UserDto } from "./dto/user.dto";
-import { User } from "./users.entity";
-
-@EntityRepository(User)
 export class UsersRepository extends Repository<UserDto> {
   async getUsers(
     search: string,

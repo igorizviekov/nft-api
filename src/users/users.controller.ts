@@ -9,9 +9,7 @@ import {
   ApiUnauthorizedResponse,
 } from "@nestjs/swagger";
 import { NotFoundDto } from "./dto/user-notFoundError.dto";
-import { AuthUserDto } from "./dto/auth-user.dto";
 import { NotAuthorizedDto } from "./dto/unauthorized-error.dto";
-import { SignInDto } from "./dto/signin.dto";
 
 @Controller("users")
 export class UsersController {
@@ -43,31 +41,15 @@ export class UsersController {
   getById(@Param("id") id: string): Promise<UserDto> {
     return this.usersService.getById(id);
   }
-  //create a new record
-  @Post("/signup")
-  @ApiResponse({
-    status: 201,
-    description: "New user created",
-    isArray: false,
-    type: UserDto,
-  })
-  @ApiBody({ type: AuthUserDto })
-  createOne(@Body() userDto: UserDto): Promise<UserDto> {
-    return this.usersService.signUp(userDto);
-  }
 
   @Post("/signin")
   @ApiResponse({
     status: 201,
     description: "User signed in successfully",
-    type: SignInDto,
+    type: UserDto,
   })
-  @ApiUnauthorizedResponse({
-    description: "Invalid credentails",
-    type: NotAuthorizedDto,
-  })
-  @ApiBody({ type: AuthUserDto })
-  signIn(@Body() userDto: UserDto): Promise<{ accessToken: string }> {
+  @ApiBody({ type: UserDto })
+  signIn(@Body() userDto: UserDto): Promise<{ status: string } | UserDto> {
     return this.usersService.signIn(userDto);
   }
 }

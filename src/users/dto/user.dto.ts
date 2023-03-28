@@ -3,11 +3,14 @@ import { IsString, MaxLength, MinLength } from "class-validator";
 
 export class UserDto {
   @ApiProperty({ type: String, description: "User id", required: false })
-  id: string;
+  id?: string;
 
   @IsString()
   @MinLength(4)
   @MaxLength(20)
   @ApiProperty({ type: String, description: "User login", required: true })
   login: string;
+
+  @ApiProperty({ type: String, description: "User token", required: false })
+  token?: string;
 }

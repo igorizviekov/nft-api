@@ -1,16 +1,9 @@
-import {
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { UserDto } from "./dto/user.dto";
 import { UsersRepository } from "./users.repository";
-import { User } from "./users.entity";
-import * as bcrypt from "bcrypt";
 import { JwtService } from "@nestjs/jwt";
-import { JwtPayload } from "src/auth/jwt-payload.interface";
-import { AuthUserDto } from "./dto/auth-user.dto";
+import { In } from "typeorm";
 
 @Injectable()
 export class UsersService {
@@ -20,36 +13,31 @@ export class UsersService {
     private jwtService: JwtService
   ) {}
 
-  getUsers(search: string, limit: number, offset: number): Promise<User[]> {
+  getUsers(search: string, limit: number, offset: number): Promise<UserDto[]> {
     return this.usersRepo.getUsers(search, limit, offset);
   }
 
-  async getById(id: string): Promise<User> {
+  async getById(id: string): Promise<UserDto> {
     try {
-      const match = await this.usersRepo.findOne(id);
-      if (!match) {
+      const match = await this.usersRepo.findBy({ id: In([id]) });
+      if (!match.length) {
         throw new NotFoundException(`User with id ${id} not found.`);
       }
-      return match;
+      return match[0];
     } catch (e) {
       throw new NotFoundException(`User with id ${id} not found.`);
     }
   }
 
-  signUp(userDto: UserDto): Promise<User> {
-    return this.usersRepo.createUser(userDto);
-  }
-
-  async signIn(creadentials: UserDto): Promise<{ accessToken: string }> {
-    const { login } = creadentials;
-    const user = await this.usersRepo.findOne({ login });
-    //if user exist in db, sign a jwt token
-    if (user) {
-      const payload: JwtPayload = { login };
-      const accessToken: string = await this.jwtService.sign(payload);
-      return { accessToken };
+  async signIn(credentials: UserDto): Promise<{ status: string } | UserDto> {
+    const { login, token, id } = credentials;
+    await this.jwtService.verify(token);
+    const user = await this.usersRepo.findBy({ login: In([login]) });
+    //if user exist in db
+    if (user.length > 0) {
+      return { status: "Success" };
     } else {
-      throw new UnauthorizedException("Please check your login credentials.");
+      return this.usersRepo.createUser({ login, id, token });
     }
   }
 }

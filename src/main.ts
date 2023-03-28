@@ -11,16 +11,6 @@ async function bootstrap() {
     .setTitle("NFT API")
     .setDescription("NFT marketplace API")
     //security options swagger
-    .addBearerAuth(
-      {
-        type: "http",
-        scheme: "bearer",
-        description: "Enter JWT token",
-        bearerFormat: "Token",
-        name: "access-token",
-      },
-      "access-token"
-    )
     .build();
 
   const document = SwaggerModule.createDocument(app, options);

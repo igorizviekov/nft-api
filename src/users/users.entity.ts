@@ -9,4 +9,9 @@ export class User {
     unique: true,
   })
   login: string;
+
+  @Column({
+    unique: true,
+  })
+  token: string;
 }
