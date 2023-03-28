@@ -8,7 +8,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersModule = void 0;
 const common_1 = require("@nestjs/common");
+const config_1 = require("@nestjs/config");
 const typeorm_1 = require("@nestjs/typeorm");
+const google_auth_library_1 = require("google-auth-library");
 const users_controller_1 = require("./users.controller");
 const users_repository_1 = require("./users.repository");
 const users_service_1 = require("./users.service");
@@ -16,9 +18,9 @@ let UsersModule = class UsersModule {
 };
 UsersModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([users_repository_1.UsersRepository])],
+        imports: [typeorm_1.TypeOrmModule.forFeature([users_repository_1.UsersRepository]), config_1.ConfigModule],
         controllers: [users_controller_1.UsersController],
-        providers: [users_service_1.UsersService],
+        providers: [users_service_1.UsersService, google_auth_library_1.OAuth2Client],
     })
 ], UsersModule);
 exports.UsersModule = UsersModule;

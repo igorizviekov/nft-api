@@ -23,9 +23,10 @@ class UsersRepository extends typeorm_1.Repository {
         return users;
     }
     async createUser(userData) {
-        const { login } = userData;
+        const { login, email } = userData;
         const user = this.create({
             login,
+            email,
         });
         try {
             await this.save(user);

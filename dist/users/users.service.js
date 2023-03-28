@@ -16,9 +16,14 @@ exports.UsersService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const users_repository_1 = require("./users.repository");
+const google_auth_library_1 = require("google-auth-library");
+const config_1 = require("@nestjs/config");
 let UsersService = class UsersService {
-    constructor(usersRepo) {
+    constructor(usersRepo, configService, oAuth2Client) {
         this.usersRepo = usersRepo;
+        this.configService = configService;
+        this.oAuth2Client = oAuth2Client;
+        this.oAuth2Client = new google_auth_library_1.OAuth2Client(this.configService.get("GOOGLE_CLIENT_ID"));
     }
     async getUsers(search, limit, offset) {
         const match = await this.usersRepo.getUsers(search, limit, offset);
@@ -38,12 +43,21 @@ let UsersService = class UsersService {
     }
     async signIn(credentials) {
         const { login, token } = credentials;
-        const user = await this.usersRepo.findOne({ where: { login } });
+        const ticket = await this.oAuth2Client.verifyIdToken({
+            idToken: token,
+            audience: this.googleID,
+        });
+        const payload = ticket.getPayload();
+        if (payload === undefined) {
+            throw new common_1.NotFoundException(`User with login ${login} not found in the Google OAuth2`);
+        }
+        const { email } = payload;
+        const user = await this.usersRepo.findOne({ where: { email } });
         if (user) {
             return { status: "existing", record: user };
         }
         else {
-            const newUser = await this.usersRepo.createUser({ login, token });
+            const newUser = await this.usersRepo.createUser({ login, email });
             return { status: "new record created", record: newUser };
         }
     }
@@ -51,7 +65,9 @@ let UsersService = class UsersService {
 UsersService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(users_repository_1.UsersRepository)),
-    __metadata("design:paramtypes", [users_repository_1.UsersRepository])
+    __metadata("design:paramtypes", [users_repository_1.UsersRepository,
+        config_1.ConfigService,
+        google_auth_library_1.OAuth2Client])
 ], UsersService);
 exports.UsersService = UsersService;
 //# sourceMappingURL=users.service.js.map

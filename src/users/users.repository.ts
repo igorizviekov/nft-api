@@ -5,6 +5,7 @@ import {
 import { Repository } from "typeorm";
 import { UserDto } from "./dto/user.dto";
 import { User } from "./users.entity";
+
 export class UsersRepository extends Repository<User> {
   async getUsers(
     search: string,
@@ -32,11 +33,12 @@ export class UsersRepository extends Repository<User> {
     return users;
   }
 
-  async createUser(userData: UserDto): Promise<UserDto> {
-    const { login } = userData;
+  async createUser(userData: UserDto): Promise<User> {
+    const { login, email } = userData;
 
-    const user: UserDto = this.create({
+    const user: User = this.create({
       login,
+      email,
     });
 
     try {

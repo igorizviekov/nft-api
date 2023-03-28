@@ -12,5 +12,8 @@ export class UserDto {
   login: string;
 
   @ApiProperty({ type: String, description: "User token", required: false })
-  token: string;
+  token?: string;
+
+  @ApiProperty({ type: String, description: "User email", required: false })
+  email?: string;
 }

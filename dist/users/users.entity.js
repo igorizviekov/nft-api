@@ -19,7 +19,7 @@ __decorate([
 ], User.prototype, "id", void 0);
 __decorate([
     (0, typeorm_1.Column)({
-        unique: true,
+        unique: false,
     }),
     __metadata("design:type", String)
 ], User.prototype, "login", void 0);
@@ -28,7 +28,7 @@ __decorate([
         unique: true,
     }),
     __metadata("design:type", String)
-], User.prototype, "token", void 0);
+], User.prototype, "email", void 0);
 User = __decorate([
     (0, typeorm_1.Entity)()
 ], User);

@@ -29,5 +29,9 @@ __decorate([
     (0, swagger_1.ApiProperty)({ type: String, description: "User token", required: false }),
     __metadata("design:type", String)
 ], UserDto.prototype, "token", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: String, description: "User email", required: false }),
+    __metadata("design:type", String)
+], UserDto.prototype, "email", void 0);
 exports.UserDto = UserDto;
 //# sourceMappingURL=user.dto.js.map
