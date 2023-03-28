@@ -4,7 +4,8 @@ import {
 } from "@nestjs/common";
 import { Repository } from "typeorm";
 import { UserDto } from "./dto/user.dto";
-export class UsersRepository extends Repository<UserDto> {
+import { User } from "./users.entity";
+export class UsersRepository extends Repository<User> {
   async getUsers(
     search: string,
     limit: number,

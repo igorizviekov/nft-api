@@ -2,14 +2,9 @@ import { Body, Controller, Get, Param, Post, Query } from "@nestjs/common";
 import { UserDto } from "./dto/user.dto";
 import { FilterUsersDto } from "./dto/filter-users.dto";
 import { UsersService } from "./users.service";
-import {
-  ApiBody,
-  ApiNotFoundResponse,
-  ApiResponse,
-  ApiUnauthorizedResponse,
-} from "@nestjs/swagger";
+import { ApiBody, ApiNotFoundResponse, ApiResponse } from "@nestjs/swagger";
 import { NotFoundDto } from "./dto/user-notFoundError.dto";
-import { NotAuthorizedDto } from "./dto/unauthorized-error.dto";
+import { IResponse } from "src/app.types";
 
 @Controller("users")
 export class UsersController {
@@ -22,7 +17,7 @@ export class UsersController {
     type: UserDto,
     status: 200,
   })
-  getAll(@Query() query: FilterUsersDto): Promise<UserDto[]> {
+  getAll(@Query() query: FilterUsersDto): Promise<IResponse> {
     const { search, limit, offset } = query;
     return this.usersService.getUsers(search, Number(limit), Number(offset));
   }
@@ -38,7 +33,7 @@ export class UsersController {
     description: "User does not exist",
     type: NotFoundDto,
   })
-  getById(@Param("id") id: string): Promise<UserDto> {
+  getById(@Param("id") id: string): Promise<IResponse> {
     return this.usersService.getById(id);
   }
 
@@ -49,7 +44,7 @@ export class UsersController {
     type: UserDto,
   })
   @ApiBody({ type: UserDto })
-  signIn(@Body() userDto: UserDto): Promise<{ status: string } | UserDto> {
+  signIn(@Body() userDto: UserDto): Promise<IResponse> {
     return this.usersService.signIn(userDto);
   }
 }

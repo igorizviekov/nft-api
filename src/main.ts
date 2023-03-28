@@ -10,7 +10,6 @@ async function bootstrap() {
   const options = new DocumentBuilder()
     .setTitle("NFT API")
     .setDescription("NFT marketplace API")
-    //security options swagger
     .build();
 
   const document = SwaggerModule.createDocument(app, options);

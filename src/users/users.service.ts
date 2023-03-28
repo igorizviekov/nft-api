@@ -1,43 +1,46 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { IResponse } from "src/app.types";
 import { UserDto } from "./dto/user.dto";
 import { UsersRepository } from "./users.repository";
-import { JwtService } from "@nestjs/jwt";
-import { In } from "typeorm";
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(UsersRepository)
-    private usersRepo: UsersRepository,
-    private jwtService: JwtService
+    private usersRepo: UsersRepository
   ) {}
 
-  getUsers(search: string, limit: number, offset: number): Promise<UserDto[]> {
-    return this.usersRepo.getUsers(search, limit, offset);
+  async getUsers(
+    search: string,
+    limit: number,
+    offset: number
+  ): Promise<IResponse> {
+    const match = await this.usersRepo.getUsers(search, limit, offset);
+    return { status: "existing", records: match };
   }
 
-  async getById(id: string): Promise<UserDto> {
+  async getById(id: string): Promise<IResponse> {
     try {
-      const match = await this.usersRepo.findBy({ id: In([id]) });
-      if (!match.length) {
+      const match = await this.usersRepo.findOne({ where: { id } });
+      if (!match) {
         throw new NotFoundException(`User with id ${id} not found.`);
       }
-      return match[0];
+      return { status: "existing", record: match };
     } catch (e) {
       throw new NotFoundException(`User with id ${id} not found.`);
     }
   }
 
-  async signIn(credentials: UserDto): Promise<{ status: string } | UserDto> {
-    const { login, token, id } = credentials;
-    await this.jwtService.verify(token);
-    const user = await this.usersRepo.findBy({ login: In([login]) });
-    //if user exist in db
-    if (user.length > 0) {
-      return { status: "Success" };
+  // create a new user record or return existing record
+  async signIn(credentials: UserDto): Promise<IResponse> {
+    const { login, token } = credentials;
+    const user = await this.usersRepo.findOne({ where: { login } });
+    if (user) {
+      return { status: "existing", record: user };
     } else {
-      return this.usersRepo.createUser({ login, id, token });
+      const newUser = await this.usersRepo.createUser({ login, token });
+      return { status: "new record created", record: newUser };
     }
   }
 }
