@@ -1,4 +1,4 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 
 export class NotFoundDto {
   @ApiProperty({ type: Number, default: 404 })

@@ -9,8 +9,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersModule = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
+const jwt_1 = require("@nestjs/jwt");
+const passport_1 = require("@nestjs/passport");
 const typeorm_1 = require("@nestjs/typeorm");
-const google_auth_library_1 = require("google-auth-library");
+const jwt_strategy_1 = require("../auth/jwt.strategy");
 const users_controller_1 = require("./users.controller");
 const users_repository_1 = require("./users.repository");
 const users_service_1 = require("./users.service");
@@ -18,9 +20,26 @@ let UsersModule = class UsersModule {
 };
 UsersModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([users_repository_1.UsersRepository]), config_1.ConfigModule],
+        imports: [
+            config_1.ConfigModule,
+            passport_1.PassportModule.register({ defaultStrategy: "jwt" }),
+            jwt_1.JwtModule.registerAsync({
+                imports: [config_1.ConfigModule],
+                inject: [config_1.ConfigService],
+                useFactory: async (configService) => {
+                    return {
+                        secret: configService.get("JWT_SECRET"),
+                        signOptions: {
+                            expiresIn: configService.get("JWT_EXPIRES"),
+                        },
+                    };
+                },
+            }),
+            typeorm_1.TypeOrmModule.forFeature([users_repository_1.UsersRepository]),
+        ],
         controllers: [users_controller_1.UsersController],
-        providers: [users_service_1.UsersService, google_auth_library_1.OAuth2Client],
+        providers: [users_service_1.UsersService, jwt_strategy_1.JwtStrategy],
+        exports: [jwt_strategy_1.JwtStrategy, passport_1.PassportModule],
     })
 ], UsersModule);
 exports.UsersModule = UsersModule;

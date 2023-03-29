@@ -1,9 +1,13 @@
-import { UserDto } from "./users/dto/user.dto";
+import { User } from "./users/users.entity";
 
-export type StatusType = "new record created" | "existing";
+type StatusType = "success" | "delete success";
+type UsersResponseType = User | User[] | IAccessToken;
+
+interface IAccessToken {
+  accessToken: string;
+}
 
 export interface IResponse {
   status: StatusType;
-  record?: UserDto;
-  records?: UserDto[];
+  data?: UsersResponseType;
 }

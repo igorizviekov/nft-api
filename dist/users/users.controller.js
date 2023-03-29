@@ -17,8 +17,14 @@ const common_1 = require("@nestjs/common");
 const user_dto_1 = require("./dto/user.dto");
 const filter_users_dto_1 = require("./dto/filter-users.dto");
 const users_service_1 = require("./users.service");
+const passport_1 = require("@nestjs/passport");
 const swagger_1 = require("@nestjs/swagger");
+const auth_user_dto_1 = require("./dto/auth-user.dto");
+const user_deleted_dto_1 = require("./dto/user-deleted.dto");
 const user_notFoundError_dto_1 = require("./dto/user-notFoundError.dto");
+const unauthorized_error_dto_1 = require("./dto/unauthorized-error.dto");
+const weak_password_dto_1 = require("./dto/weak-password.dto");
+const signin_dto_1 = require("./dto/signin.dto");
 let UsersController = class UsersController {
     constructor(usersService) {
         this.usersService = usersService;
@@ -30,8 +36,17 @@ let UsersController = class UsersController {
     getById(id) {
         return this.usersService.getById(id);
     }
+    createOne(userDto) {
+        return this.usersService.signUp(userDto);
+    }
     signIn(userDto) {
         return this.usersService.signIn(userDto);
+    }
+    update(body, id) {
+        return this.usersService.update(id, body);
+    }
+    remove(id) {
+        return this.usersService.remove(id);
     }
 };
 __decorate([
@@ -65,20 +80,92 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "getById", null);
 __decorate([
+    (0, common_1.Post)("/signup"),
+    (0, swagger_1.ApiResponse)({
+        status: 201,
+        description: "New user created",
+        isArray: false,
+        type: user_dto_1.UserDto,
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 400,
+        description: "Password is too weak",
+        isArray: false,
+        type: weak_password_dto_1.WeakPasswordDto,
+    }),
+    (0, swagger_1.ApiBody)({ type: auth_user_dto_1.AuthUserDto }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [user_dto_1.UserDto]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "createOne", null);
+__decorate([
     (0, common_1.Post)("/signin"),
     (0, swagger_1.ApiResponse)({
         status: 201,
         description: "User signed in successfully",
-        type: user_dto_1.UserDto,
+        type: signin_dto_1.SignInDto,
     }),
-    (0, swagger_1.ApiBody)({ type: user_dto_1.UserDto }),
+    (0, swagger_1.ApiUnauthorizedResponse)({
+        description: "Invalid credentails",
+        type: unauthorized_error_dto_1.NotAuthorizedDto,
+    }),
+    (0, swagger_1.ApiBody)({ type: auth_user_dto_1.AuthUserDto }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [user_dto_1.UserDto]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "signIn", null);
+__decorate([
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)()),
+    (0, common_1.Patch)("/:id"),
+    (0, swagger_1.ApiOkResponse)({
+        description: "User updated successfully",
+        isArray: false,
+        type: user_dto_1.UserDto,
+    }),
+    (0, swagger_1.ApiBearerAuth)("access-token"),
+    (0, swagger_1.ApiBody)({ type: auth_user_dto_1.AuthUserDto }),
+    (0, swagger_1.ApiNotFoundResponse)({
+        description: "User does not exist",
+        type: user_notFoundError_dto_1.NotFoundDto,
+    }),
+    (0, swagger_1.ApiUnauthorizedResponse)({
+        description: "Invalid credentails",
+        type: unauthorized_error_dto_1.NotAuthorizedDto,
+    }),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Param)("id")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [auth_user_dto_1.AuthUserDto, String]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "update", null);
+__decorate([
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)()),
+    (0, common_1.Delete)("/:id"),
+    (0, swagger_1.ApiBearerAuth)("access-token"),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: "User Deleted",
+        isArray: false,
+        type: user_deleted_dto_1.DeletedUserDto,
+    }),
+    (0, swagger_1.ApiUnauthorizedResponse)({
+        description: "Invalid credentails",
+        type: unauthorized_error_dto_1.NotAuthorizedDto,
+    }),
+    (0, swagger_1.ApiNotFoundResponse)({
+        description: "User does not exist",
+        type: user_notFoundError_dto_1.NotFoundDto,
+    }),
+    __param(0, (0, common_1.Param)("id")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "remove", null);
 UsersController = __decorate([
     (0, common_1.Controller)("users"),
+    (0, swagger_1.ApiTags)("Users"),
     __metadata("design:paramtypes", [users_service_1.UsersService])
 ], UsersController);
 exports.UsersController = UsersController;

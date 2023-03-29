@@ -19,7 +19,7 @@ __decorate([
     (0, class_validator_1.IsString)(),
     (0, swagger_1.ApiProperty)({
         type: String,
-        description: "Search by login",
+        description: 'Search by login',
         required: false,
     }),
     __metadata("design:type", String)
@@ -27,13 +27,13 @@ __decorate([
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
-    (0, swagger_1.ApiProperty)({ type: String, description: "Record limit", required: false }),
+    (0, swagger_1.ApiProperty)({ type: String, description: 'Record limit', required: false }),
     __metadata("design:type", Number)
 ], FilterUsersDto.prototype, "limit", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
-    (0, swagger_1.ApiProperty)({ type: String, description: "Record offset", required: false }),
+    (0, swagger_1.ApiProperty)({ type: String, description: 'Record offset', required: false }),
     __metadata("design:type", Number)
 ], FilterUsersDto.prototype, "offset", void 0);
 exports.FilterUsersDto = FilterUsersDto;

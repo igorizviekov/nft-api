@@ -1,7 +1,6 @@
 import { Repository } from "typeorm";
 import { UserDto } from "./dto/user.dto";
-import { User } from "./users.entity";
-export declare class UsersRepository extends Repository<User> {
+export declare class UsersRepository extends Repository<UserDto> {
     getUsers(search: string, limit: number, offset: number): Promise<UserDto[]>;
-    createUser(userData: UserDto): Promise<User>;
+    createUser(userData: UserDto): Promise<UserDto>;
 }

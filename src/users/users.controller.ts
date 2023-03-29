@@ -1,12 +1,37 @@
-import { Body, Controller, Get, Param, Post, Query } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Delete,
+  Param,
+  Query,
+  Patch,
+  UseGuards,
+} from "@nestjs/common";
 import { UserDto } from "./dto/user.dto";
 import { FilterUsersDto } from "./dto/filter-users.dto";
 import { UsersService } from "./users.service";
-import { ApiBody, ApiNotFoundResponse, ApiResponse } from "@nestjs/swagger";
+import { AuthGuard } from "@nestjs/passport";
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from "@nestjs/swagger";
+import { AuthUserDto } from "./dto/auth-user.dto";
+import { DeletedUserDto } from "./dto/user-deleted.dto";
 import { NotFoundDto } from "./dto/user-notFoundError.dto";
+import { NotAuthorizedDto } from "./dto/unauthorized-error.dto";
+import { WeakPasswordDto } from "./dto/weak-password.dto";
+import { SignInDto } from "./dto/signin.dto";
 import { IResponse } from "src/app.types";
 
 @Controller("users")
+@ApiTags("Users")
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
@@ -37,14 +62,82 @@ export class UsersController {
     return this.usersService.getById(id);
   }
 
+  //create a new record
+  @Post("/signup")
+  @ApiResponse({
+    status: 201,
+    description: "New user created",
+    isArray: false,
+    type: UserDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: "Password is too weak",
+    isArray: false,
+    type: WeakPasswordDto,
+  })
+  @ApiBody({ type: AuthUserDto })
+  createOne(@Body() userDto: UserDto): Promise<IResponse> {
+    return this.usersService.signUp(userDto);
+  }
+
   @Post("/signin")
   @ApiResponse({
     status: 201,
     description: "User signed in successfully",
-    type: UserDto,
+    type: SignInDto,
   })
-  @ApiBody({ type: UserDto })
+  @ApiUnauthorizedResponse({
+    description: "Invalid credentails",
+    type: NotAuthorizedDto,
+  })
+  @ApiBody({ type: AuthUserDto })
   signIn(@Body() userDto: UserDto): Promise<IResponse> {
     return this.usersService.signIn(userDto);
+  }
+
+  @UseGuards(AuthGuard())
+  @Patch("/:id")
+  @ApiOkResponse({
+    description: "User updated successfully",
+    isArray: false,
+    type: UserDto,
+  })
+  @ApiBearerAuth("access-token")
+  @ApiBody({ type: AuthUserDto })
+  @ApiNotFoundResponse({
+    description: "User does not exist",
+    type: NotFoundDto,
+  })
+  @ApiUnauthorizedResponse({
+    description: "Invalid credentails",
+    type: NotAuthorizedDto,
+  })
+  update(
+    @Body() body: AuthUserDto,
+    @Param("id") id: string
+  ): Promise<IResponse> {
+    return this.usersService.update(id, body);
+  }
+
+  @UseGuards(AuthGuard())
+  @Delete("/:id")
+  @ApiBearerAuth("access-token")
+  @ApiResponse({
+    status: 200,
+    description: "User Deleted",
+    isArray: false,
+    type: DeletedUserDto,
+  })
+  @ApiUnauthorizedResponse({
+    description: "Invalid credentails",
+    type: NotAuthorizedDto,
+  })
+  @ApiNotFoundResponse({
+    description: "User does not exist",
+    type: NotFoundDto,
+  })
+  remove(@Param("id") id: string): Promise<IResponse> {
+    return this.usersService.remove(id);
   }
 }

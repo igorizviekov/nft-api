@@ -14,13 +14,13 @@ const swagger_1 = require("@nestjs/swagger");
 class DeletedUserDto {
 }
 __decorate([
-    (0, swagger_1.ApiProperty)({ type: String, description: "Success message" }),
+    (0, swagger_1.ApiProperty)({ type: String, description: 'Success message' }),
     __metadata("design:type", String)
 ], DeletedUserDto.prototype, "result", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
         type: String,
-        description: "Number of entries affected. Must be 1",
+        description: 'Number of entries affected. Must be 1',
     }),
     __metadata("design:type", String)
 ], DeletedUserDto.prototype, "affected", void 0);

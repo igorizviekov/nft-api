@@ -1,71 +1,85 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { IResponse } from "src/app.types";
 import { UserDto } from "./dto/user.dto";
 import { UsersRepository } from "./users.repository";
-import { OAuth2Client } from "google-auth-library";
-import { ConfigService } from "@nestjs/config";
+import { User } from "./users.entity";
+import * as bcrypt from "bcrypt";
+import { JwtService } from "@nestjs/jwt";
+import { JwtPayload } from "src/auth/jwt-payload.interface";
+import { AuthUserDto } from "./dto/auth-user.dto";
+import { IResponse } from "src/app.types";
 
 @Injectable()
 export class UsersService {
-  private readonly googleID: string;
-
   constructor(
     @InjectRepository(UsersRepository)
     private usersRepo: UsersRepository,
-    private readonly configService: ConfigService,
-    private readonly oAuth2Client: OAuth2Client
-  ) {
-    this.oAuth2Client = new OAuth2Client(
-      this.configService.get("GOOGLE_CLIENT_ID")
-    );
-  }
+    private jwtService: JwtService
+  ) {}
 
   async getUsers(
     search: string,
     limit: number,
     offset: number
   ): Promise<IResponse> {
-    const match = await this.usersRepo.getUsers(search, limit, offset);
-    return { status: "existing", records: match };
+    const users = await this.usersRepo.getUsers(search, limit, offset);
+    return { status: "success", data: users };
   }
 
   async getById(id: string): Promise<IResponse> {
     try {
-      const match = await this.usersRepo.findOne({ where: { id } });
+      const match = await this.usersRepo.findOne(id);
       if (!match) {
         throw new NotFoundException(`User with id ${id} not found.`);
       }
-      return { status: "existing", record: match };
+      return { status: "success", data: match };
     } catch (e) {
       throw new NotFoundException(`User with id ${id} not found.`);
     }
   }
 
-  // create a new user record or return existing record
-  async signIn(credentials: UserDto): Promise<IResponse> {
-    const { login, token } = credentials;
+  async signUp(userDto: UserDto): Promise<IResponse> {
+    const newUser = await this.usersRepo.createUser(userDto);
+    return { status: "success", data: newUser };
+  }
 
-    const ticket = await this.oAuth2Client.verifyIdToken({
-      idToken: token,
-      audience: this.googleID,
-    });
-
-    const payload = ticket.getPayload();
-
-    if (payload === undefined) {
-      throw new NotFoundException(
-        `User with login ${login} not found in the Google OAuth2`
-      );
-    }
-    const { email } = payload;
-
-    const user = await this.usersRepo.findOne({ where: { email } });
-    if (user) {
-      return { status: "existing", record: user };
+  async signIn(creadentials: UserDto): Promise<IResponse> {
+    const { login, password } = creadentials;
+    const user = await this.usersRepo.findOne({ login });
+    //if user exist in db, sign a jwt token
+    if (user && (await bcrypt.compare(password, user.password))) {
+      const payload: JwtPayload = { login };
+      const accessToken: string = this.jwtService.sign(payload);
+      return { status: "success", data: { accessToken } };
     } else {
-      const newUser = await this.usersRepo.createUser({ login, email });
-      return { status: "new record created", record: newUser };
+      throw new UnauthorizedException("Please check your login credentials.");
+    }
+  }
+
+  async update(id: string, UserToUpdate: AuthUserDto): Promise<IResponse> {
+    const { data } = await this.getById(id);
+    Object.keys(UserToUpdate).forEach((key) => {
+      data[key] = UserToUpdate[key];
+    });
+    await this.usersRepo.update(id, data as User);
+    return { status: "success", data };
+  }
+
+  async remove(id: string): Promise<IResponse> {
+    try {
+      const res = await this.usersRepo.delete(id);
+      if (res.affected === 0) {
+        throw new NotFoundException(`User with ${id} not found.`);
+      }
+      return {
+        status: "delete success",
+      };
+    } catch (e) {
+      throw new NotFoundException(`User with ${id} not found.`);
     }
   }
 }

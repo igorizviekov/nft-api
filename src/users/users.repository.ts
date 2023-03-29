@@ -2,11 +2,13 @@ import {
   ConflictException,
   InternalServerErrorException,
 } from "@nestjs/common";
-import { Repository } from "typeorm";
+import { EntityRepository, Repository } from "typeorm";
 import { UserDto } from "./dto/user.dto";
 import { User } from "./users.entity";
+import * as bcrypt from "bcrypt";
 
-export class UsersRepository extends Repository<User> {
+@EntityRepository(User)
+export class UsersRepository extends Repository<UserDto> {
   async getUsers(
     search: string,
     limit: number,
@@ -33,12 +35,16 @@ export class UsersRepository extends Repository<User> {
     return users;
   }
 
-  async createUser(userData: UserDto): Promise<User> {
-    const { login, email } = userData;
+  async createUser(userData: UserDto): Promise<UserDto> {
+    const { login, password } = userData;
 
-    const user: User = this.create({
+    //hash user password (salt + user input)
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const user: UserDto = this.create({
       login,
-      email,
+      password: hashedPassword,
     });
 
     try {
