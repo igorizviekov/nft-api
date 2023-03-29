@@ -31,6 +31,8 @@ export class UsersRepository extends Repository<UserDto> {
       query.offset(offset);
     }
 
+    query.select(["user.id", "user.login"]);
+
     const users = await query.getMany();
     return users;
   }

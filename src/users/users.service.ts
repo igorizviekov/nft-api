@@ -32,7 +32,9 @@ export class UsersService {
 
   async getById(id: string): Promise<IResponse> {
     try {
-      const match = await this.usersRepo.findOne(id);
+      const match = await this.usersRepo.findOne(id, {
+        select: ["id", "login"],
+      });
       if (!match) {
         throw new NotFoundException(`User with id ${id} not found.`);
       }
@@ -49,6 +51,7 @@ export class UsersService {
 
   async signIn(creadentials: UserDto): Promise<IResponse> {
     const { login, password } = creadentials;
+
     const user = await this.usersRepo.findOne({ login });
     //if user exist in db, sign a jwt token
     if (user && (await bcrypt.compare(password, user.password))) {

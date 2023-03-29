@@ -27,6 +27,7 @@ let UsersRepository = class UsersRepository extends typeorm_1.Repository {
             offset = offset ? offset : 0;
             query.offset(offset);
         }
+        query.select(["user.id", "user.login"]);
         const users = await query.getMany();
         return users;
     }

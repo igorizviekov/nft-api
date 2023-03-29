@@ -15,14 +15,14 @@ const class_validator_1 = require("class-validator");
 class UserDto {
 }
 __decorate([
-    (0, swagger_1.ApiProperty)({ type: String, description: 'User id', required: false }),
+    (0, swagger_1.ApiProperty)({ type: String, description: "User id", required: false }),
     __metadata("design:type", String)
 ], UserDto.prototype, "id", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MinLength)(4),
     (0, class_validator_1.MaxLength)(20),
-    (0, swagger_1.ApiProperty)({ type: String, description: 'User login', required: true }),
+    (0, swagger_1.ApiProperty)({ type: String, description: "User login", required: true }),
     __metadata("design:type", String)
 ], UserDto.prototype, "login", void 0);
 __decorate([
@@ -30,9 +30,9 @@ __decorate([
     (0, class_validator_1.MinLength)(8),
     (0, class_validator_1.MaxLength)(32),
     (0, class_validator_1.Matches)(/((?=.*d)|(?=.*W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
-        message: 'Password is too weak.',
+        message: "Password is too weak.",
     }),
-    (0, swagger_1.ApiProperty)({ type: String, description: 'User password', required: true }),
+    (0, swagger_1.ApiProperty)({ type: String, description: "User password", required: true }),
     __metadata("design:type", String)
 ], UserDto.prototype, "password", void 0);
 exports.UserDto = UserDto;

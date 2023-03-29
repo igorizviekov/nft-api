@@ -29,7 +29,9 @@ let UsersService = class UsersService {
     }
     async getById(id) {
         try {
-            const match = await this.usersRepo.findOne(id);
+            const match = await this.usersRepo.findOne(id, {
+                select: ["id", "login"],
+            });
             if (!match) {
                 throw new common_1.NotFoundException(`User with id ${id} not found.`);
             }
