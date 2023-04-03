@@ -12,6 +12,7 @@ const config_1 = require("@nestjs/config");
 const typeorm_1 = require("@nestjs/typeorm");
 const config_schema_1 = require("./config.schema");
 const users_module_1 = require("./users/users.module");
+const nft_module_1 = require("./nft/nft.module");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -22,6 +23,7 @@ AppModule = __decorate([
                 validationSchema: config_schema_1.ConfigValidationSchema,
             }),
             users_module_1.UsersModule,
+            nft_module_1.NftModule,
             typeorm_1.TypeOrmModule.forRootAsync({
                 imports: [config_1.ConfigModule],
                 inject: [config_1.ConfigService],

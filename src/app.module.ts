@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { ConfigValidationSchema } from "./config.schema";
 import { UsersModule } from "./users/users.module";
+import { NftModule } from "./nft/nft.module";
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { UsersModule } from "./users/users.module";
       validationSchema: ConfigValidationSchema,
     }),
     UsersModule,
+    NftModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
