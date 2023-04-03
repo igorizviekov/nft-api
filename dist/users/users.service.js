@@ -16,7 +16,6 @@ exports.UsersService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const users_repository_1 = require("./users.repository");
-const bcrypt = require("bcrypt");
 const jwt_1 = require("@nestjs/jwt");
 let UsersService = class UsersService {
     constructor(usersRepo, jwtService) {
@@ -30,7 +29,7 @@ let UsersService = class UsersService {
     async getById(id) {
         try {
             const match = await this.usersRepo.findOne(id, {
-                select: ["id", "login"],
+                select: ["id", "wallet"],
             });
             if (!match) {
                 throw new common_1.NotFoundException(`User with id ${id} not found.`);
@@ -45,11 +44,11 @@ let UsersService = class UsersService {
         const newUser = await this.usersRepo.createUser(userDto);
         return { status: "success", data: newUser };
     }
-    async signIn(creadentials) {
-        const { login, password } = creadentials;
-        const user = await this.usersRepo.findOne({ login });
-        if (user && (await bcrypt.compare(password, user.password))) {
-            const payload = { login };
+    async signIn(credentials) {
+        const { wallet } = credentials;
+        const user = await this.usersRepo.findOne({ wallet });
+        if (user) {
+            const payload = { wallet };
             const accessToken = this.jwtService.sign(payload);
             return { status: "success", data: { accessToken } };
         }

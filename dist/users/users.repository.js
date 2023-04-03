@@ -10,12 +10,11 @@ exports.UsersRepository = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("typeorm");
 const users_entity_1 = require("./users.entity");
-const bcrypt = require("bcrypt");
 let UsersRepository = class UsersRepository extends typeorm_1.Repository {
     async getUsers(search, limit, offset) {
         const query = this.createQueryBuilder("user");
         if (search) {
-            query.andWhere("(LOWER(user.login) LIKE LOWER(:search))", {
+            query.andWhere("(LOWER(user.wallet) LIKE LOWER(:search))", {
                 search: `%${search}%`,
             });
         }
@@ -27,17 +26,14 @@ let UsersRepository = class UsersRepository extends typeorm_1.Repository {
             offset = offset ? offset : 0;
             query.offset(offset);
         }
-        query.select(["user.id", "user.login"]);
+        query.select(["user.id", "user.wallet"]);
         const users = await query.getMany();
         return users;
     }
     async createUser(userData) {
-        const { login, password } = userData;
-        const salt = await bcrypt.genSalt();
-        const hashedPassword = await bcrypt.hash(password, salt);
+        const { wallet } = userData;
         const user = this.create({
-            login,
-            password: hashedPassword,
+            wallet,
         });
         try {
             await this.save(user);

@@ -7,7 +7,6 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { UserDto } from "./dto/user.dto";
 import { UsersRepository } from "./users.repository";
 import { User } from "./users.entity";
-import * as bcrypt from "bcrypt";
 import { JwtService } from "@nestjs/jwt";
 import { JwtPayload } from "src/auth/jwt-payload.interface";
 import { AuthUserDto } from "./dto/auth-user.dto";
@@ -33,7 +32,7 @@ export class UsersService {
   async getById(id: string): Promise<IResponse> {
     try {
       const match = await this.usersRepo.findOne(id, {
-        select: ["id", "login"],
+        select: ["id", "wallet"],
       });
       if (!match) {
         throw new NotFoundException(`User with id ${id} not found.`);
@@ -49,13 +48,13 @@ export class UsersService {
     return { status: "success", data: newUser };
   }
 
-  async signIn(creadentials: UserDto): Promise<IResponse> {
-    const { login, password } = creadentials;
+  async signIn(credentials: UserDto): Promise<IResponse> {
+    const { wallet } = credentials;
 
-    const user = await this.usersRepo.findOne({ login });
+    const user = await this.usersRepo.findOne({ wallet });
     //if user exist in db, sign a jwt token
-    if (user && (await bcrypt.compare(password, user.password))) {
-      const payload: JwtPayload = { login };
+    if (user) {
+      const payload: JwtPayload = { wallet };
       const accessToken: string = this.jwtService.sign(payload);
       return { status: "success", data: { accessToken } };
     } else {

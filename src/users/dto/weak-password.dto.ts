@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty } from "@nestjs/swagger";
 
 export class WeakPasswordDto {
   @ApiProperty({ type: Number, default: 400 })
@@ -11,7 +11,7 @@ export class WeakPasswordDto {
 
   @ApiProperty({
     type: String,
-    default: 'Bad request',
+    default: "Bad request",
   })
   error: string;
 }

@@ -22,11 +22,7 @@ __decorate([
         unique: true,
     }),
     __metadata("design:type", String)
-], User.prototype, "login", void 0);
-__decorate([
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
-], User.prototype, "password", void 0);
+], User.prototype, "wallet", void 0);
 User = __decorate([
     (0, typeorm_1.Entity)()
 ], User);

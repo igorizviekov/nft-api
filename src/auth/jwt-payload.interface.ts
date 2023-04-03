@@ -1,3 +1,3 @@
 export interface JwtPayload {
-  login: string;
+  wallet: string;
 }

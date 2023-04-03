@@ -8,8 +8,5 @@ export class User {
   @Column({
     unique: true,
   })
-  login: string;
-
-  @Column()
-  password: string;
+  wallet: string;
 }

@@ -72,7 +72,7 @@ export class UsersController {
   })
   @ApiResponse({
     status: 400,
-    description: "Password is too weak",
+    description: "Invalid wallet address",
     isArray: false,
     type: WeakPasswordDto,
   })

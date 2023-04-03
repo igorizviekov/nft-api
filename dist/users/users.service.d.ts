@@ -10,7 +10,7 @@ export declare class UsersService {
     getUsers(search: string, limit: number, offset: number): Promise<IResponse>;
     getById(id: string): Promise<IResponse>;
     signUp(userDto: UserDto): Promise<IResponse>;
-    signIn(creadentials: UserDto): Promise<IResponse>;
+    signIn(credentials: UserDto): Promise<IResponse>;
     update(id: string, UserToUpdate: AuthUserDto): Promise<IResponse>;
     remove(id: string): Promise<IResponse>;
 }

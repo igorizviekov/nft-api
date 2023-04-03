@@ -20,20 +20,13 @@ __decorate([
 ], UserDto.prototype, "id", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.MinLength)(4),
-    (0, class_validator_1.MaxLength)(20),
-    (0, swagger_1.ApiProperty)({ type: String, description: "User login", required: true }),
-    __metadata("design:type", String)
-], UserDto.prototype, "login", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.MinLength)(8),
-    (0, class_validator_1.MaxLength)(32),
-    (0, class_validator_1.Matches)(/((?=.*d)|(?=.*W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
-        message: "Password is too weak.",
+    (0, class_validator_1.Matches)(/^0x[a-fA-F0-9]{40}$/),
+    (0, swagger_1.ApiProperty)({
+        type: String,
+        description: "User wallet address",
+        required: true,
     }),
-    (0, swagger_1.ApiProperty)({ type: String, description: "User password", required: true }),
     __metadata("design:type", String)
-], UserDto.prototype, "password", void 0);
+], UserDto.prototype, "wallet", void 0);
 exports.UserDto = UserDto;
 //# sourceMappingURL=user.dto.js.map

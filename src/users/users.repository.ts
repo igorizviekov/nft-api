@@ -5,7 +5,6 @@ import {
 import { EntityRepository, Repository } from "typeorm";
 import { UserDto } from "./dto/user.dto";
 import { User } from "./users.entity";
-import * as bcrypt from "bcrypt";
 
 @EntityRepository(User)
 export class UsersRepository extends Repository<UserDto> {
@@ -15,9 +14,9 @@ export class UsersRepository extends Repository<UserDto> {
     offset: number
   ): Promise<UserDto[]> {
     const query = this.createQueryBuilder("user");
-    //TODO: extend search parameters
+
     if (search) {
-      query.andWhere("(LOWER(user.login) LIKE LOWER(:search))", {
+      query.andWhere("(LOWER(user.wallet) LIKE LOWER(:search))", {
         search: `%${search}%`,
       });
     }
@@ -31,22 +30,17 @@ export class UsersRepository extends Repository<UserDto> {
       query.offset(offset);
     }
 
-    query.select(["user.id", "user.login"]);
+    query.select(["user.id", "user.wallet"]);
 
     const users = await query.getMany();
     return users;
   }
 
   async createUser(userData: UserDto): Promise<UserDto> {
-    const { login, password } = userData;
-
-    //hash user password (salt + user input)
-    const salt = await bcrypt.genSalt();
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const { wallet } = userData;
 
     const user: UserDto = this.create({
-      login,
-      password: hashedPassword,
+      wallet,
     });
 
     try {

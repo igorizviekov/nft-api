@@ -89,7 +89,7 @@ __decorate([
     }),
     (0, swagger_1.ApiResponse)({
         status: 400,
-        description: "Password is too weak",
+        description: "Invalid wallet address",
         isArray: false,
         type: weak_password_dto_1.WeakPasswordDto,
     }),
