@@ -40,21 +40,15 @@ let UsersService = class UsersService {
             throw new common_1.NotFoundException(`User with id ${id} not found.`);
         }
     }
-    async signUp(userDto) {
-        const newUser = await this.usersRepo.createUser(userDto);
-        return { status: "success", data: newUser };
-    }
     async signIn(credentials) {
         const { wallet } = credentials;
         const user = await this.usersRepo.findOne({ wallet });
-        if (user) {
-            const payload = { wallet };
-            const accessToken = this.jwtService.sign(payload);
-            return { status: "success", data: { accessToken } };
+        if (!user) {
+            await this.usersRepo.createUser(credentials);
         }
-        else {
-            throw new common_1.UnauthorizedException("Please check your login credentials.");
-        }
+        const payload = { wallet };
+        const accessToken = this.jwtService.sign(payload);
+        return { status: "success", data: { accessToken } };
     }
     async update(id, UserToUpdate) {
         const { data } = await this.getById(id);

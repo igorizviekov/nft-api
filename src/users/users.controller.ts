@@ -26,7 +26,6 @@ import { AuthUserDto } from "./dto/auth-user.dto";
 import { DeletedUserDto } from "./dto/user-deleted.dto";
 import { NotFoundDto } from "./dto/user-notFoundError.dto";
 import { NotAuthorizedDto } from "./dto/unauthorized-error.dto";
-import { WeakPasswordDto } from "./dto/weak-password.dto";
 import { SignInDto } from "./dto/signin.dto";
 import { IResponse } from "src/app.types";
 
@@ -62,34 +61,11 @@ export class UsersController {
     return this.usersService.getById(id);
   }
 
-  //create a new record
-  @Post("/signup")
-  @ApiResponse({
-    status: 201,
-    description: "New user created",
-    isArray: false,
-    type: UserDto,
-  })
-  @ApiResponse({
-    status: 400,
-    description: "Invalid wallet address",
-    isArray: false,
-    type: WeakPasswordDto,
-  })
-  @ApiBody({ type: AuthUserDto })
-  createOne(@Body() userDto: UserDto): Promise<IResponse> {
-    return this.usersService.signUp(userDto);
-  }
-
   @Post("/signin")
   @ApiResponse({
     status: 201,
     description: "User signed in successfully",
     type: SignInDto,
-  })
-  @ApiUnauthorizedResponse({
-    description: "Invalid credentails",
-    type: NotAuthorizedDto,
   })
   @ApiBody({ type: AuthUserDto })
   signIn(@Body() userDto: UserDto): Promise<IResponse> {

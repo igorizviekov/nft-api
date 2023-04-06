@@ -1,21 +1,12 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Transform } from "class-transformer";
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty } from "class-validator";
 
 export class MintNftDto {
-  @IsString()
-  @IsNotEmpty()
   @ApiProperty({
-    type: String,
-    description: "Nft description",
-    required: true,
+    description: "Nft metadata",
   })
-  description: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty({ type: String, description: "Nft title", required: true })
-  name: string;
+  metadata: string;
 
   @ApiProperty({ type: Number, description: "NFT price", required: true })
   @IsNotEmpty()

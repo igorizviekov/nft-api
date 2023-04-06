@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { UserDto } from "./dto/user.dto";
 import { UsersRepository } from "./users.repository";
@@ -43,23 +39,16 @@ export class UsersService {
     }
   }
 
-  async signUp(userDto: UserDto): Promise<IResponse> {
-    const newUser = await this.usersRepo.createUser(userDto);
-    return { status: "success", data: newUser };
-  }
-
   async signIn(credentials: UserDto): Promise<IResponse> {
     const { wallet } = credentials;
 
     const user = await this.usersRepo.findOne({ wallet });
-    //if user exist in db, sign a jwt token
-    if (user) {
-      const payload: JwtPayload = { wallet };
-      const accessToken: string = this.jwtService.sign(payload);
-      return { status: "success", data: { accessToken } };
-    } else {
-      throw new UnauthorizedException("Please check your login credentials.");
+    if (!user) {
+      await this.usersRepo.createUser(credentials);
     }
+    const payload: JwtPayload = { wallet };
+    const accessToken: string = this.jwtService.sign(payload);
+    return { status: "success", data: { accessToken } };
   }
 
   async update(id: string, UserToUpdate: AuthUserDto): Promise<IResponse> {

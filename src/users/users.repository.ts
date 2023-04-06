@@ -1,7 +1,4 @@
-import {
-  ConflictException,
-  InternalServerErrorException,
-} from "@nestjs/common";
+import { InternalServerErrorException } from "@nestjs/common";
 import { EntityRepository, Repository } from "typeorm";
 import { UserDto } from "./dto/user.dto";
 import { User } from "./users.entity";
@@ -46,12 +43,7 @@ export class UsersRepository extends Repository<UserDto> {
     try {
       await this.save(user);
     } catch (e) {
-      //duplicate record
-      if (e.code === "23505") {
-        throw new ConflictException("This user already exists");
-      } else {
-        throw new InternalServerErrorException();
-      }
+      throw new InternalServerErrorException();
     }
     return user;
   }

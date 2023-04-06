@@ -5,6 +5,7 @@ import {
   UploadedFile,
   UseGuards,
   UseInterceptors,
+  Headers,
 } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import {
@@ -45,7 +46,7 @@ export class NftController {
     @UploadedFile() file,
     @Body() body: MintNftDto
   ): Promise<IResponse> {
-    const { description, price, name } = body;
-    return this.nftService.mintNft(name, description, Number(price), file);
+    const { price, metadata } = body;
+    return this.nftService.mintNft(file, Number(price), metadata);
   }
 }
