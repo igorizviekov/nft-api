@@ -5,7 +5,6 @@ import {
   UploadedFile,
   UseGuards,
   UseInterceptors,
-  Headers,
 } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import {
