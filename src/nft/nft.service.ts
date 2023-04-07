@@ -4,7 +4,7 @@ import { create as ipfsClient } from "ipfs-http-client";
 import { ethers } from "ethers";
 import { fetchContract } from "src/utils";
 import { Nft } from "./nft.entity";
-import { MarketAddress } from "src/constants/constants";
+import { MarketAddress, MarketAddressABI } from "src/constants/constants";
 import { IResponse } from "src/app.types";
 import { HttpException, HttpStatus } from "@nestjs/common";
 
@@ -69,35 +69,10 @@ export class NftService {
         "INFURA_PROJECT_NAME"
       )}.infura-ipfs.io/ipfs/${addedNFT.path}`;
 
-      const provider = new ethers.providers.JsonRpcProvider();
-
-      /**
-       * Person who is creating an NFT
-       */
-      const signer = provider.getSigner();
-
-      /**
-       * Get access to the Solidity Smart Contract api
-       */
-      const contract = fetchContract(signer);
-
-      /**
-       * Convert price value from the form input to the blockchain readable format
-       */
-      const bPrice = ethers.utils.parseUnits(price.toString(), "ether");
-      const listingPrice = await contract.getListingPrice();
-      const transaction = await contract.createToken(bPrice, nftURL, {
-        value: listingPrice,
-      });
-
-      await transaction.wait();
-      const nft = new Nft();
-
-      nft.price = price;
-      nft.contractAddress = MarketAddress;
-      nft.metadata = metadata as unknown as string;
-
-      return { status: "success", data: nft };
+      return {
+        status: "success",
+        data: { MarketAddress, MarketAddressABI, nftURL },
+      };
     } catch (e) {
       console.log(e);
       throw new HttpException(
