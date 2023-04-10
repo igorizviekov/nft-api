@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -47,5 +49,37 @@ export class NftController {
   ): Promise<IResponse> {
     const { price, metadata } = body;
     return this.nftService.mintNft(file, Number(price), metadata);
+  }
+
+  @UseGuards(AuthGuard())
+  @Get("/contract")
+  @ApiOkResponse({
+    description: "Get contract",
+    isArray: false,
+    //  type: UserDto,
+  })
+  @ApiBearerAuth("access-token")
+  @ApiUnauthorizedResponse({
+    description: "Invalid credentials",
+    type: NotAuthorizedDto,
+  })
+  async getContract(@Query("chain") chain: string): Promise<IResponse> {
+    return this.nftService.getContract(chain);
+  }
+
+  @UseGuards(AuthGuard())
+  @Get("/all")
+  @ApiOkResponse({
+    description: "Get Nfts",
+    isArray: false,
+    //  type: UserDto,
+  })
+  @ApiBearerAuth("access-token")
+  @ApiUnauthorizedResponse({
+    description: "Invalid credentials",
+    type: NotAuthorizedDto,
+  })
+  async getNfts(@Query("chain") chain: string): Promise<IResponse> {
+    return this.nftService.getNfts(chain);
   }
 }
