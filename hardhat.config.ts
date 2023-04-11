@@ -7,6 +7,11 @@ const config: HardhatUserConfig = {
     hardhat: {
       chainId: 1337,
     },
+    "shimmerevm-testnet": {
+      url: process.env.SHIMMER_RPC_URL,
+      chainId: 1071,
+      accounts: [process.env.SHIMMER_TEST_ACCOUNT_KEY],
+    },
   },
   solidity: "0.8.4",
 };

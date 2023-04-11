@@ -1,7 +1,11 @@
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { create as ipfsClient } from "ipfs-http-client";
-import { MarketAddress, MarketAddressABI } from "src/constants/constants";
+import {
+  MarketAddress,
+  ShimerMarketAddress,
+  MarketAddressABI,
+} from "src/constants/constants";
 import { IResponse } from "src/app.types";
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { ethers } from "ethers";
@@ -12,7 +16,12 @@ import axios from "axios";
 export class NftService {
   constructor(private configService: ConfigService) {}
 
-  async mintNft(file, price: number, metadata): Promise<IResponse> {
+  async mintNft(
+    file,
+    price: number,
+    metadata,
+    chain: string
+  ): Promise<IResponse> {
     try {
       const { buffer } = file;
 
@@ -69,9 +78,11 @@ export class NftService {
         "INFURA_PROJECT_NAME"
       )}.infura-ipfs.io/ipfs/${addedNFT.path}`;
 
+      const contractAddress =
+        chain === "MATIC" ? MarketAddress : ShimerMarketAddress;
       return {
         status: "success",
-        data: { MarketAddress, MarketAddressABI, nftURL },
+        data: { contractAddress, MarketAddressABI, nftURL },
       };
     } catch (e) {
       console.log(e);
@@ -84,8 +95,21 @@ export class NftService {
 
   async getNfts(chain: string): Promise<IResponse> {
     try {
-      const provider = new ethers.providers.JsonRpcProvider();
+      const provider = new ethers.providers.JsonRpcProvider(
+        chain === "MATIC"
+          ? this.configService.get("POLYGON_RPC_URL")
+          : this.configService.get("SHIMMER_RPC_URL")
+      );
+
       const contract = fetchContract(provider, chain);
+
+      if (!contract) {
+        throw new HttpException(
+          "Error fetching NFTs",
+          HttpStatus.INTERNAL_SERVER_ERROR
+        );
+      }
+
       const nftData = await contract.getActiveCocktails();
       const items = await Promise.all(
         nftData.map(async ({ tokenId, seller, owner, price }) => {
@@ -114,7 +138,7 @@ export class NftService {
     } catch (e) {
       console.log(e);
       throw new HttpException(
-        "Error creating new NFT",
+        "Error fetching NFTs",
         HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
@@ -127,10 +151,15 @@ export class NftService {
         data: { MarketAddress, MarketAddressABI },
       };
     }
-
-    return {
-      status: "success",
-      data: { MarketAddress, MarketAddressABI },
-    };
+    if (chain === "SMR") {
+      return {
+        status: "success",
+        data: { ShimerMarketAddress, MarketAddressABI },
+      };
+    }
+    throw new HttpException(
+      "Error fetching NFTs",
+      HttpStatus.INTERNAL_SERVER_ERROR
+    );
   }
 }

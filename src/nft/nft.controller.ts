@@ -45,10 +45,11 @@ export class NftController {
   @ApiConsumes("multipart/form-data")
   async mint(
     @UploadedFile() file,
+    @Query("chain") chain: string,
     @Body() body: MintNftDto
   ): Promise<IResponse> {
     const { price, metadata } = body;
-    return this.nftService.mintNft(file, Number(price), metadata);
+    return this.nftService.mintNft(file, Number(price), metadata, chain);
   }
 
   @UseGuards(AuthGuard())
