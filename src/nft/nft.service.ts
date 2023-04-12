@@ -122,11 +122,11 @@ export class NftService {
           // get NFT metadata and image
           const res = await axios.get(tokenURI);
           return {
+            ...res.data,
             price: formattedPrice,
             tokenId: Number(tokenId),
             seller,
             owner,
-            ...res.data,
           };
         })
       );
@@ -145,16 +145,18 @@ export class NftService {
   }
 
   async getContract(chain: string): Promise<IResponse> {
+    const contractAddress =
+      chain === "MATIC" ? MarketAddress : ShimerMarketAddress;
     if (chain === "MATIC") {
       return {
         status: "success",
-        data: { MarketAddress, MarketAddressABI },
+        data: { contractAddress, MarketAddressABI },
       };
     }
     if (chain === "SMR") {
       return {
         status: "success",
-        data: { ShimerMarketAddress, MarketAddressABI },
+        data: { contractAddress, MarketAddressABI },
       };
     }
     throw new HttpException(

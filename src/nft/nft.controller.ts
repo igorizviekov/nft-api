@@ -52,7 +52,6 @@ export class NftController {
     return this.nftService.mintNft(file, Number(price), metadata, chain);
   }
 
-  @UseGuards(AuthGuard())
   @Get("/contract")
   @ApiOkResponse({
     description: "Get contract",
@@ -60,15 +59,10 @@ export class NftController {
     //  type: UserDto,
   })
   @ApiBearerAuth("access-token")
-  @ApiUnauthorizedResponse({
-    description: "Invalid credentials",
-    type: NotAuthorizedDto,
-  })
   async getContract(@Query("chain") chain: string): Promise<IResponse> {
     return this.nftService.getContract(chain);
   }
 
-  @UseGuards(AuthGuard())
   @Get("/all")
   @ApiOkResponse({
     description: "Get Nfts",
@@ -76,10 +70,6 @@ export class NftController {
     //  type: UserDto,
   })
   @ApiBearerAuth("access-token")
-  @ApiUnauthorizedResponse({
-    description: "Invalid credentials",
-    type: NotAuthorizedDto,
-  })
   async getNfts(@Query("chain") chain: string): Promise<IResponse> {
     return this.nftService.getNfts(chain);
   }
