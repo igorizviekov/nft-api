@@ -58,6 +58,7 @@ export interface NFTMarketplaceInterface extends utils.Interface {
     "balanceOf(address)": FunctionFragment;
     "createMarketSale(uint256)": FunctionFragment;
     "createToken(uint256,string)": FunctionFragment;
+    "createTokens(uint256,string,uint256)": FunctionFragment;
     "getActiveCocktails()": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "getListingPrice()": FunctionFragment;
@@ -83,6 +84,7 @@ export interface NFTMarketplaceInterface extends utils.Interface {
       | "balanceOf"
       | "createMarketSale"
       | "createToken"
+      | "createTokens"
       | "getActiveCocktails"
       | "getApproved"
       | "getListingPrice"
@@ -117,6 +119,14 @@ export interface NFTMarketplaceInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "createToken",
     values: [PromiseOrValue<BigNumberish>, PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "createTokens",
+    values: [
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<string>,
+      PromiseOrValue<BigNumberish>
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "getActiveCocktails",
@@ -202,6 +212,10 @@ export interface NFTMarketplaceInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "createToken",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "createTokens",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -374,6 +388,13 @@ export interface NFTMarketplace extends BaseContract {
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
+    createTokens(
+      price: PromiseOrValue<BigNumberish>,
+      tokenURI: PromiseOrValue<string>,
+      numOfCopies: PromiseOrValue<BigNumberish>,
+      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     getActiveCocktails(
       overrides?: CallOverrides
     ): Promise<[NFTMarketplace.MarketItemStructOutput[]]>;
@@ -477,6 +498,13 @@ export interface NFTMarketplace extends BaseContract {
   createToken(
     price: PromiseOrValue<BigNumberish>,
     tokenURI: PromiseOrValue<string>,
+    overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  createTokens(
+    price: PromiseOrValue<BigNumberish>,
+    tokenURI: PromiseOrValue<string>,
+    numOfCopies: PromiseOrValue<BigNumberish>,
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -585,6 +613,13 @@ export interface NFTMarketplace extends BaseContract {
       tokenURI: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    createTokens(
+      price: PromiseOrValue<BigNumberish>,
+      tokenURI: PromiseOrValue<string>,
+      numOfCopies: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber[]>;
 
     getActiveCocktails(
       overrides?: CallOverrides
@@ -743,6 +778,13 @@ export interface NFTMarketplace extends BaseContract {
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
+    createTokens(
+      price: PromiseOrValue<BigNumberish>,
+      tokenURI: PromiseOrValue<string>,
+      numOfCopies: PromiseOrValue<BigNumberish>,
+      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     getActiveCocktails(overrides?: CallOverrides): Promise<BigNumber>;
 
     getApproved(
@@ -841,6 +883,13 @@ export interface NFTMarketplace extends BaseContract {
     createToken(
       price: PromiseOrValue<BigNumberish>,
       tokenURI: PromiseOrValue<string>,
+      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    createTokens(
+      price: PromiseOrValue<BigNumberish>,
+      tokenURI: PromiseOrValue<string>,
+      numOfCopies: PromiseOrValue<BigNumberish>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 

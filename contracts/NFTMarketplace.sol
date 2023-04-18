@@ -79,6 +79,30 @@ contract NFTMarketplace is ERC721URIStorage {
     }
 
     /**
+        Convert image to an NFT with duplicates
+    */
+    function createTokens(
+        uint256 price,
+        string memory tokenURI,
+        uint256 numOfCopies
+    ) public payable returns (uint256[] memory) {
+        require(numOfCopies > 0, "Number of copies must be greater than 0");
+
+        uint256[] memory newTokenIds = new uint256[](numOfCopies);
+
+        for (uint256 i = 0; i < numOfCopies; i++) {
+            _tokenIds.increment();
+            uint256 newTokenId = _tokenIds.current();
+            _mint(msg.sender, newTokenId);
+            _setTokenURI(newTokenId, tokenURI);
+            createMarketItem(newTokenId, price);
+            newTokenIds[i] = newTokenId;
+        }
+
+        return newTokenIds;
+    }
+
+    /**
        List NFT in a marketplace
     */
     function createMarketItem(uint256 tokenId, uint256 price) private {
