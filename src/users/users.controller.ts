@@ -89,10 +89,7 @@ export class UsersController {
     description: "Invalid credentails",
     type: NotAuthorizedDto,
   })
-  update(
-    @Body() body: AuthUserDto,
-    @Param("id") id: string
-  ): Promise<IResponse> {
+  update(@Body() body: UserDto, @Param("id") id: string): Promise<IResponse> {
     return this.usersService.update(id, body);
   }
 

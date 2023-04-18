@@ -2,6 +2,7 @@ import { InternalServerErrorException } from "@nestjs/common";
 import { EntityRepository, Repository } from "typeorm";
 import { UserDto } from "./dto/user.dto";
 import { User } from "./users.entity";
+import { AuthUserDto } from "./dto/auth-user.dto";
 
 @EntityRepository(User)
 export class UsersRepository extends Repository<UserDto> {
@@ -27,13 +28,21 @@ export class UsersRepository extends Repository<UserDto> {
       query.offset(offset);
     }
 
-    query.select(["user.id", "user.wallet"]);
+    query.select([
+      "user.id",
+      "user.wallet",
+      "user.discord",
+      "user.email",
+      "user.location",
+      "user.website",
+      "user.name",
+    ]);
 
     const users = await query.getMany();
     return users;
   }
 
-  async createUser(userData: UserDto): Promise<UserDto> {
+  async createUser(userData: AuthUserDto): Promise<UserDto> {
     const { wallet } = userData;
 
     const user: UserDto = this.create({

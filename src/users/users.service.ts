@@ -28,7 +28,15 @@ export class UsersService {
   async getById(id: string): Promise<IResponse> {
     try {
       const match = await this.usersRepo.findOne(id, {
-        select: ["id", "wallet"],
+        select: [
+          "id",
+          "wallet",
+          "discord",
+          "email",
+          "location",
+          "website",
+          "name",
+        ],
       });
       if (!match) {
         throw new NotFoundException(`User with id ${id} not found.`);
@@ -39,23 +47,24 @@ export class UsersService {
     }
   }
 
-  async signIn(credentials: UserDto): Promise<IResponse> {
+  async signIn(credentials: AuthUserDto): Promise<IResponse> {
     const { wallet } = credentials;
 
     const user = await this.usersRepo.findOne({ wallet });
     if (!user) {
-      await this.usersRepo.createUser(credentials);
+      await this.usersRepo.createUser({ wallet });
     }
     const payload: JwtPayload = { wallet };
     const accessToken: string = this.jwtService.sign(payload);
     return { status: "success", data: { accessToken } };
   }
 
-  async update(id: string, UserToUpdate: AuthUserDto): Promise<IResponse> {
+  async update(id: string, UserToUpdate: UserDto): Promise<IResponse> {
     const { data } = await this.getById(id);
     Object.keys(UserToUpdate).forEach((key) => {
       data[key] = UserToUpdate[key];
     });
+
     await this.usersRepo.update(id, data as User);
     return { status: "success", data };
   }
