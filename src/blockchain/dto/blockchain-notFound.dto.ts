@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 
-export class NotFoundDto {
+export class ChainNotFoundDto {
   @ApiProperty({ type: Number, default: 404 })
   statusCode: number;
 

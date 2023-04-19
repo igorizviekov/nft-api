@@ -4,6 +4,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { ConfigValidationSchema } from "./config.schema";
 import { UsersModule } from "./users/users.module";
 import { NftModule } from "./nft/nft.module";
+import { BlockchainModule } from "./blockchain/blockchain.module";
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { NftModule } from "./nft/nft.module";
     }),
     UsersModule,
     NftModule,
+    BlockchainModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
