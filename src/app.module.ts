@@ -5,6 +5,7 @@ import { ConfigValidationSchema } from "./config.schema";
 import { UsersModule } from "./users/users.module";
 import { NftModule } from "./nft/nft.module";
 import { BlockchainModule } from "./blockchain/blockchain.module";
+import { WalletModule } from "./user-wallets/wallet.module";
 
 @Module({
   imports: [
@@ -15,10 +16,10 @@ import { BlockchainModule } from "./blockchain/blockchain.module";
     UsersModule,
     NftModule,
     BlockchainModule,
+    WalletModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-
       useFactory: async (configService: ConfigService) => {
         //database env variables
         return {

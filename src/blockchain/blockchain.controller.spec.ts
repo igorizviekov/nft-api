@@ -1,7 +1,7 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { BlockchainController } from "./blockchain.controller";
 
-describe("UsersController", () => {
+describe("BlockchainController", () => {
   let controller: BlockchainController;
 
   beforeEach(async () => {
