@@ -6,13 +6,8 @@ export class User {
   id: string;
 
   @Column({
-    unique: true,
-  })
-  wallet: string;
-
-  @Column({
     nullable: true,
-    unique: true,
+    unique: false,
   })
   email: string;
 

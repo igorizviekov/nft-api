@@ -1,9 +1,24 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEmail, IsOptional, IsString, IsUrl } from "class-validator";
+import { IsEmail, IsOptional, IsString, IsUrl, Matches } from "class-validator";
 
-export class UserDto {
-  @ApiProperty({ type: String, description: "User id", required: false })
-  id: string;
+export class RegisterUserDto {
+  @IsString()
+  @Matches(/^0x[a-fA-F0-9]{40}$/)
+  @ApiProperty({
+    type: String,
+    description: "User wallet address",
+    required: true,
+  })
+  wallet: string;
+
+  @IsString()
+  @ApiProperty({
+    type: String,
+    description:
+      "Blockchain id (e.g., Polygon mainnet, Polygon testnet, Shimmer mainnet, Shimmer testnet)",
+    required: true,
+  })
+  blockchain_id: string;
 
   @IsOptional()
   @IsEmail()

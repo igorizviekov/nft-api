@@ -2,7 +2,6 @@ import { InternalServerErrorException } from "@nestjs/common";
 import { EntityRepository, Repository } from "typeorm";
 import { UserDto } from "./dto/user.dto";
 import { User } from "./users.entity";
-import { AuthUserDto } from "./dto/auth-user.dto";
 
 @EntityRepository(User)
 export class UsersRepository extends Repository<UserDto> {
@@ -14,7 +13,7 @@ export class UsersRepository extends Repository<UserDto> {
     const query = this.createQueryBuilder("user");
 
     if (search) {
-      query.andWhere("(LOWER(user.wallet) LIKE LOWER(:search))", {
+      query.andWhere("(LOWER(user.name) LIKE LOWER(:search))", {
         search: `%${search}%`,
       });
     }
@@ -30,7 +29,6 @@ export class UsersRepository extends Repository<UserDto> {
 
     query.select([
       "user.id",
-      "user.wallet",
       "user.discord",
       "user.email",
       "user.location",
@@ -42,13 +40,8 @@ export class UsersRepository extends Repository<UserDto> {
     return users;
   }
 
-  async createUser(userData: AuthUserDto): Promise<UserDto> {
-    const { wallet } = userData;
-
-    const user: UserDto = this.create({
-      wallet,
-    });
-
+  async createUser(userData: UserDto): Promise<UserDto> {
+    const user: UserDto = this.create(userData);
     try {
       await this.save(user);
     } catch (e) {

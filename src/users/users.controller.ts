@@ -28,6 +28,7 @@ import { NotFoundDto } from "./dto/user-notFoundError.dto";
 import { NotAuthorizedDto } from "./dto/unauthorized-error.dto";
 import { SignInDto } from "./dto/signin.dto";
 import { IResponse } from "src/app.types";
+import { RegisterUserDto } from "./dto/register-user.dto";
 
 @Controller("users")
 @ApiTags("Users")
@@ -61,6 +62,19 @@ export class UsersController {
     return this.usersService.getById(id);
   }
 
+  //create a new record
+  @Post("/signup")
+  @ApiResponse({
+    status: 201,
+    description: "New user created",
+    isArray: false,
+    type: UserDto,
+  })
+  @ApiBody({ type: RegisterUserDto })
+  createOne(@Body() user: RegisterUserDto): Promise<UserDto> {
+    return this.usersService.signUp(user);
+  }
+
   @Post("/signin")
   @ApiResponse({
     status: 201,
@@ -68,8 +82,8 @@ export class UsersController {
     type: SignInDto,
   })
   @ApiBody({ type: AuthUserDto })
-  signIn(@Body() userDto: UserDto): Promise<IResponse> {
-    return this.usersService.signIn(userDto);
+  signIn(@Body() user: AuthUserDto): Promise<IResponse> {
+    return this.usersService.signIn(user);
   }
 
   @UseGuards(AuthGuard())

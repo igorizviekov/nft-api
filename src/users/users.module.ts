@@ -7,6 +7,8 @@ import { JwtStrategy } from "src/auth/jwt.strategy";
 import { UsersController } from "./users.controller";
 import { UsersRepository } from "./users.repository";
 import { UsersService } from "./users.service";
+import { WalletRepository } from "src/user-wallets/wallet.repository";
+import { BlockchainRepository } from "src/blockchain/blockchain.repository";
 
 @Module({
   imports: [
@@ -24,7 +26,11 @@ import { UsersService } from "./users.service";
         };
       },
     }),
-    TypeOrmModule.forFeature([UsersRepository]),
+    TypeOrmModule.forFeature([
+      UsersRepository,
+      WalletRepository,
+      BlockchainRepository,
+    ]),
   ],
   controllers: [UsersController],
   providers: [UsersService, JwtStrategy],
