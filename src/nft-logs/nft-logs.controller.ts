@@ -1,5 +1,4 @@
 import { Controller, Get, Param, Query } from "@nestjs/common";
-import { NftLogsDto } from "./dto/nft-logs.dto";
 import { NftLogsService } from "./nft-logs.service";
 import { TransactionType } from "./nft-logs.enum";
 import { ApiTags } from "@nestjs/swagger";

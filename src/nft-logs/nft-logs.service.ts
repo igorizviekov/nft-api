@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { NftLogsDto } from "./dto/nft-logs.dto";
 import { NftLogsRepository } from "./nft-logs.repository";
 import { TransactionType } from "./nft-logs.enum";
 import { InjectRepository } from "@nestjs/typeorm";
