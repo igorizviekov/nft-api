@@ -1,7 +1,7 @@
 import { Controller, Get, Param, Query } from "@nestjs/common";
 import { NftLogsService } from "./nft-logs.service";
 import { TransactionType } from "./nft-logs.enum";
-import { ApiTags } from "@nestjs/swagger";
+import { ApiParam, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { IResponse } from "src/app.types";
 
 @Controller("nft-logs")
@@ -9,19 +9,32 @@ import { IResponse } from "src/app.types";
 export class NftLogsController {
   constructor(private readonly nftLogsService: NftLogsService) {}
 
-  @Get("/nft-logs/:wallet/")
+  @Get("/:wallet_address/")
+  @ApiParam({
+    name: "wallet",
+    type: String,
+    description: "User wallet address",
+  })
   async getLogsForUser(
     @Param("wallet") userWallet: string
   ): Promise<IResponse> {
     return this.nftLogsService.getLogsForUser(userWallet);
   }
 
-  @Get("/nft-logs/:nft/")
+  @Get("/:nft_id/")
+  @ApiParam({
+    name: "id",
+    type: String,
+    description: "Unique id from the NFT database",
+  })
   async getLogsForNft(@Param("id") id: string): Promise<IResponse> {
     return this.nftLogsService.getLogsForNft(id);
   }
 
   @Get()
+  @ApiQuery({ name: "transactionType", enum: TransactionType, required: false })
+  @ApiQuery({ name: "startDate", type: Date, required: false })
+  @ApiQuery({ name: "endDate", type: Date, required: false })
   async getAllLogs(
     @Query("transactionType") transactionType?: TransactionType,
     @Query("startDate") startDate?: string,
