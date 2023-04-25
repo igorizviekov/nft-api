@@ -6,12 +6,13 @@ import { JwtStrategy } from "src/auth/jwt.strategy";
 import { NftController } from "./nft.controller";
 import { NftService } from "./nft.service";
 import { WalletRepository } from "src/user-wallets/wallet.repository";
+import { NftRepository } from "./nft.repository";
 
 @Module({
   imports: [
     ConfigModule,
     PassportModule.register({ defaultStrategy: "jwt" }),
-    TypeOrmModule.forFeature([WalletRepository]),
+    TypeOrmModule.forFeature([WalletRepository, NftRepository]),
   ],
   controllers: [NftController],
   providers: [NftService, JwtStrategy],

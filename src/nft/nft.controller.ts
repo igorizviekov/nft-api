@@ -28,49 +28,49 @@ import { FileInterceptor } from "@nestjs/platform-express";
 export class NftController {
   constructor(private nftService: NftService) {}
 
-  @UseGuards(AuthGuard())
-  @Post("/mint")
-  @ApiOkResponse({
-    description: "Mint success",
-    isArray: false,
-    //  type: UserDto,
-  })
-  @ApiBearerAuth("access-token")
-  @ApiBody({ type: MintNftDto })
-  @ApiUnauthorizedResponse({
-    description: "Invalid credentials",
-    type: NotAuthorizedDto,
-  })
-  @UseInterceptors(FileInterceptor("file"))
-  @ApiConsumes("multipart/form-data")
-  async mint(
-    @UploadedFile() file,
-    @Query("chain") chain: string,
-    @Body() body: MintNftDto
-  ): Promise<IResponse> {
-    const { price, metadata } = body;
-    return this.nftService.mintNft(file, Number(price), metadata, chain);
-  }
+  // @UseGuards(AuthGuard())
+  // @Post("/mint")
+  // @ApiOkResponse({
+  //   description: "Mint success",
+  //   isArray: false,
+  //   //  type: UserDto,
+  // })
+  // @ApiBearerAuth("access-token")
+  // @ApiBody({ type: MintNftDto })
+  // @ApiUnauthorizedResponse({
+  //   description: "Invalid credentials",
+  //   type: NotAuthorizedDto,
+  // })
+  // @UseInterceptors(FileInterceptor("file"))
+  // @ApiConsumes("multipart/form-data")
+  // async mint(
+  //   @UploadedFile() file,
+  //   @Query("chain") chain: string,
+  //   @Body() body: MintNftDto
+  // ): Promise<IResponse> {
+  //   const { price, metadata } = body;
+  //   return this.nftService.mintNft(file, Number(price), metadata, chain);
+  // }
 
-  @Get("/contract")
-  @ApiOkResponse({
-    description: "Get contract",
-    isArray: false,
-    //  type: UserDto,
-  })
-  @ApiBearerAuth("access-token")
-  async getContract(@Query("chain") chain: string): Promise<IResponse> {
-    return this.nftService.getContract(chain);
-  }
+  // @Get("/contract")
+  // @ApiOkResponse({
+  //   description: "Get contract",
+  //   isArray: false,
+  //   //  type: UserDto,
+  // })
+  // @ApiBearerAuth("access-token")
+  // async getContract(@Query("chain") chain: string): Promise<IResponse> {
+  //   return this.nftService.getContract(chain);
+  // }
 
-  @Get("/all")
-  @ApiOkResponse({
-    description: "Get Nfts",
-    isArray: false,
-    //  type: UserDto,
-  })
-  @ApiBearerAuth("access-token")
-  async getNfts(@Query("chain") chain: string): Promise<IResponse> {
-    return this.nftService.getNfts(chain);
-  }
+  // @Get("/all")
+  // @ApiOkResponse({
+  //   description: "Get Nfts",
+  //   isArray: false,
+  //   //  type: UserDto,
+  // })
+  // @ApiBearerAuth("access-token")
+  // async getNfts(@Query("chain") chain: string): Promise<IResponse> {
+  //   return this.nftService.getNfts(chain);
+  // }
 }

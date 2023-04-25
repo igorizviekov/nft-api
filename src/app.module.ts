@@ -6,6 +6,7 @@ import { UsersModule } from "./users/users.module";
 import { NftModule } from "./nft/nft.module";
 import { BlockchainModule } from "./blockchain/blockchain.module";
 import { WalletModule } from "./user-wallets/wallet.module";
+import { NftLogsModule } from "./nft-logs/nft-logs.module";
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { WalletModule } from "./user-wallets/wallet.module";
     }),
     UsersModule,
     NftModule,
+    NftLogsModule,
     BlockchainModule,
     WalletModule,
     TypeOrmModule.forRootAsync({
