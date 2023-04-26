@@ -1,27 +1,31 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsOptional, IsString } from "class-validator";
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 
 export class BlockchainDto {
-  @IsOptional()
-  @ApiProperty({ type: String, description: "Blockchain id", required: false })
-  id: string;
-
-  @IsOptional()
-  @IsString()
+  @IsNumber()
+  @IsNotEmpty()
   @ApiProperty({
-    type: String,
-    description: "Blockchain name",
+    type: Number,
+    description: "Blockchain id (e.g., 1071 / 137)",
     required: true,
   })
-  name: string;
+  chain_id: number;
 
-  @IsOptional()
   @IsString()
+  @IsNotEmpty()
   @ApiProperty({
     type: String,
-    description:
-      "Blockchain id (e.g., Polygon mainnet, Polygon testnet, Shimmer mainnet, Shimmer testnet)",
-    required: false,
+    description: "Blockchain token symbol (e.g., ETH / MATIC)",
+    required: true,
   })
-  network_id: string;
+  currency_symbol: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    type: String,
+    description: "rpc URL",
+    required: true,
+  })
+  rpc_url: string;
 }

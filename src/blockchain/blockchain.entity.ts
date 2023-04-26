@@ -6,12 +6,13 @@ export class Blockchain {
   id: string;
 
   @Column({
-    unique: false,
-  })
-  name: string;
-
-  @Column({
     unique: true,
   })
-  network_id: string;
+  chain_id: number;
+
+  @Column()
+  currency_symbol: string;
+
+  @Column()
+  rpc_url: string;
 }

@@ -20,9 +20,7 @@ export class BlockchainService {
 
   async getById(id: string): Promise<IResponse> {
     try {
-      const match = await this.chainsRepo.findOne(id, {
-        select: ["id", "name", "network_id"],
-      });
+      const match = await this.chainsRepo.findOne(id);
       if (!match) {
         throw new NotFoundException(`Blockchain with id ${id} not found.`);
       }

@@ -7,9 +7,6 @@ import { BlockchainDto } from "./dto/blockchain.dto";
 export class BlockchainRepository extends Repository<BlockchainDto> {
   async getAll(): Promise<BlockchainDto[]> {
     const query = this.createQueryBuilder("blockchain");
-
-    query.select(["blockchain.id", "blockchain.name", "blockchain.network_id"]);
-
     const blockchains = await query.getMany();
     return blockchains;
   }
