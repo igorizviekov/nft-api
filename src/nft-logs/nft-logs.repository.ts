@@ -53,4 +53,14 @@ export class NftLogsRepository extends Repository<NftLogsEntity> {
     }
     return nftLog;
   }
+
+  async createLogs(logs: NftLogsEntity[]): Promise<NftLogsEntity[]> {
+    const nftLogs: NftLogsEntity[] = logs.map((log) => this.create(log));
+    try {
+      await this.save(nftLogs);
+    } catch (e) {
+      throw new InternalServerErrorException();
+    }
+    return nftLogs;
+  }
 }
