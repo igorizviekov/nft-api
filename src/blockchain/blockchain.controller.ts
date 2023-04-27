@@ -24,6 +24,7 @@ import { BlockchainDto } from "./dto/blockchain.dto";
 import { ChainNotFoundDto } from "./dto/blockchain-notFound.dto";
 import { DeletedChainDto } from "./dto/chain-deleted.dto";
 import { BlockchainService } from "./blockchain.service";
+import { UpdateBlockchainDto } from "./dto/update-blockchain.dto";
 
 @Controller("blockchain")
 @ApiTags("Blockchains")
@@ -80,7 +81,7 @@ export class BlockchainController {
     type: BlockchainDto,
   })
   @ApiBearerAuth("access-token")
-  @ApiBody({ type: BlockchainDto })
+  @ApiBody({ type: UpdateBlockchainDto })
   @ApiNotFoundResponse({
     description: "Chain does not exist",
     type: ChainNotFoundDto,
@@ -90,7 +91,7 @@ export class BlockchainController {
     type: NotAuthorizedDto,
   })
   update(
-    @Body() body: BlockchainDto,
+    @Body() body: UpdateBlockchainDto,
     @Param("id") id: string
   ): Promise<IResponse> {
     return this.blockchainService.update(id, body);

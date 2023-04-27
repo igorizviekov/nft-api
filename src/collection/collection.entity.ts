@@ -30,12 +30,12 @@ export class Collection extends BaseEntity {
   @Column({ nullable: true })
   description?: string;
 
+  @Column()
+  image: string;
+
   @Column({ nullable: true })
   website?: string;
 
   @Column({ nullable: true })
   royalties?: string;
-
-  @Column({ nullable: true })
-  image?: string;
 }

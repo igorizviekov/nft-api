@@ -15,6 +15,8 @@ import {
   ApiNotFoundResponse,
   ApiBody,
   ApiUnauthorizedResponse,
+  ApiQuery,
+  ApiOkResponse,
 } from "@nestjs/swagger";
 import { CollectionDto } from "./dto/collection.dto";
 import { IResponse } from "src/app.types";
@@ -24,6 +26,9 @@ import { GetUser } from "src/users/get-user.decorator";
 import { CollectionService } from "./collection.service";
 import { User } from "src/users/users.entity";
 import { NotAuthorizedDto } from "src/users/dto/unauthorized-error.dto";
+import { UpdateCollectionDto } from "./dto/update-collection.dto";
+import { Collection } from "./collection.entity";
+import { DeletedCollectionDto } from "./dto/collection-deleted.dto";
 
 @ApiTags("Collections")
 @Controller("collection")
@@ -31,6 +36,26 @@ export class CollectionController {
   constructor(private readonly collectionService: CollectionService) {}
 
   @Get()
+  @ApiOkResponse({
+    description: "All Collections",
+    isArray: true,
+    type: Collection,
+  })
+  @ApiQuery({
+    name: "category",
+    enum: CollectionCategory,
+    required: false,
+  })
+  @ApiQuery({
+    name: "limit",
+    type: Number,
+    required: false,
+  })
+  @ApiQuery({
+    name: "offset",
+    type: Number,
+    required: false,
+  })
   async getAll(
     @Query("limit") limit?: number,
     @Query("offset") offset?: number,
@@ -44,6 +69,10 @@ export class CollectionController {
   }
 
   @Get("/:id")
+  @ApiOkResponse({
+    description: "Collection details",
+    type: Collection,
+  })
   @ApiNotFoundResponse({
     description: "Collection does not exist",
   })
@@ -51,7 +80,12 @@ export class CollectionController {
     return this.collectionService.getById(id);
   }
 
-  @Get("users/:userId")
+  @Get("user/:userId")
+  @ApiOkResponse({
+    description: "Users Collections",
+    isArray: true,
+    type: Collection,
+  })
   async getByUserId(@Param("userId") userId: string): Promise<IResponse> {
     return this.collectionService.getByUserId(userId);
   }
@@ -59,22 +93,29 @@ export class CollectionController {
   @UseGuards(AuthGuard())
   @ApiBearerAuth("access-token")
   @Post()
-  @ApiBody({ type: CollectionDto })
+  @ApiOkResponse({
+    description: "Add a Collection",
+    type: Collection,
+  })
   @ApiUnauthorizedResponse({
-    description: "Invalid credentails",
+    description: "Invalid credentials",
     type: NotAuthorizedDto,
   })
+  @ApiBody({ type: CollectionDto })
   async add(
     @GetUser() user: User,
     @Body() collection: CollectionDto
   ): Promise<IResponse> {
-    console.log({ user });
-    return this.collectionService.add(collection, user.id);
+    return this.collectionService.add(collection, user["user_id"]);
   }
 
   @UseGuards(AuthGuard())
   @ApiBearerAuth("access-token")
   @Patch("/:id")
+  @ApiOkResponse({
+    description: "Collection update",
+    type: Collection,
+  })
   @ApiUnauthorizedResponse({
     description: "Invalid credentials",
     type: NotAuthorizedDto,
@@ -83,7 +124,7 @@ export class CollectionController {
     description: "Collection does not exist",
   })
   async update(
-    @Body() collection: CollectionDto,
+    @Body() collection: UpdateCollectionDto,
     @Param("id") id: string
   ): Promise<IResponse> {
     return this.collectionService.update(id, collection);
@@ -91,11 +132,15 @@ export class CollectionController {
 
   @UseGuards(AuthGuard())
   @ApiBearerAuth("access-token")
+  @Delete("/:id")
+  @ApiOkResponse({
+    description: "Delete a Collection",
+    type: DeletedCollectionDto,
+  })
   @ApiUnauthorizedResponse({
-    description: "Invalid credentails",
+    description: "Invalid credentials",
     type: NotAuthorizedDto,
   })
-  @Delete("/:id")
   async remove(@Param("id") id: string): Promise<IResponse> {
     return this.collectionService.remove(id);
   }

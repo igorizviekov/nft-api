@@ -1,28 +1,21 @@
 import { ApiProperty } from "@nestjs/swagger";
-import {
-  IsEnum,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  IsUUID,
-  IsUrl,
-} from "class-validator";
+import { IsEnum, IsOptional, IsString, IsUUID, IsUrl } from "class-validator";
 import { CollectionCategory } from "../collection.enum";
 
-export class CollectionDto {
+export class UpdateCollectionDto {
   @ApiProperty({ description: "Collection title" })
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   name: string;
 
   @ApiProperty({ description: "Short symbol, f.e. PHO" })
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   symbol: string;
 
   @ApiProperty({ description: "mapping to the Blockchain DB" })
   @IsUUID()
-  @IsNotEmpty()
+  @IsOptional()
   blockchain_id: string;
 
   @ApiProperty({
@@ -30,7 +23,7 @@ export class CollectionDto {
     enum: CollectionCategory,
   })
   @IsEnum(CollectionCategory)
-  @IsNotEmpty()
+  @IsOptional()
   categoryPrimary: CollectionCategory;
 
   @ApiProperty({
@@ -58,6 +51,6 @@ export class CollectionDto {
 
   @ApiProperty({ description: "Collection image", required: false })
   @IsUrl()
-  @IsNotEmpty()
+  @IsOptional()
   image: string;
 }

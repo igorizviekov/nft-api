@@ -22,7 +22,6 @@ export class CollectionService {
       );
       return { status: "success", data: newCollection };
     } catch (e) {
-      console.log({ addError: e });
       throw new InternalServerErrorException();
     }
   }
@@ -67,7 +66,6 @@ export class CollectionService {
       const userCollections = await this.collectionRepo.getByUserId(userId);
       return { status: "success", data: userCollections };
     } catch (e) {
-      console.log({ getByUserIdError: e });
       throw new InternalServerErrorException();
     }
   }

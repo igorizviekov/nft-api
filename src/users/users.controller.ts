@@ -94,13 +94,13 @@ export class UsersController {
     type: UserDto,
   })
   @ApiBearerAuth("access-token")
-  @ApiBody({ type: AuthUserDto })
+  @ApiBody({ type: UserDto })
   @ApiNotFoundResponse({
     description: "User does not exist",
     type: NotFoundDto,
   })
   @ApiUnauthorizedResponse({
-    description: "Invalid credentials",
+    description: "Invalid credentails",
     type: NotAuthorizedDto,
   })
   update(@Body() body: UserDto, @Param("id") id: string): Promise<IResponse> {
