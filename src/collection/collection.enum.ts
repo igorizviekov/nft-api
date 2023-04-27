@@ -1,7 +1,9 @@
 export enum CollectionCategory {
   ART = "art",
   GAMES = "games",
-  LAND = "land",
   COLLECTIBLES = "collectibles",
-  UTILITY = "utility",
+  VIRTUAL_WORLDS = "virtual_worlds",
+  MUSIC = "music",
+  SPORTS = "sports",
+  PFPS = "pfps",
 }
