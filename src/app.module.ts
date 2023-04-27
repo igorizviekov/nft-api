@@ -7,6 +7,7 @@ import { NftModule } from "./nft/nft.module";
 import { BlockchainModule } from "./blockchain/blockchain.module";
 import { WalletModule } from "./user-wallets/wallet.module";
 import { NftLogsModule } from "./nft-logs/nft-logs.module";
+import { CollectionModule } from "./collection/collection.module";
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { NftLogsModule } from "./nft-logs/nft-logs.module";
     NftLogsModule,
     BlockchainModule,
     WalletModule,
+    CollectionModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

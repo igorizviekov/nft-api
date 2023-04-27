@@ -100,7 +100,7 @@ export class UsersController {
     type: NotFoundDto,
   })
   @ApiUnauthorizedResponse({
-    description: "Invalid credentails",
+    description: "Invalid credentials",
     type: NotAuthorizedDto,
   })
   update(@Body() body: UserDto, @Param("id") id: string): Promise<IResponse> {
