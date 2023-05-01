@@ -2,6 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import {
   IsEnum,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
   IsUUID,
@@ -51,13 +52,13 @@ export class CollectionDto {
   @IsUrl()
   website?: string;
 
-  @ApiProperty({ description: "Royalties percentage", required: false })
-  @IsOptional()
-  @IsString()
-  royalties?: string;
-
   @ApiProperty({ description: "Collection image", required: false })
   @IsUrl()
   @IsNotEmpty()
   image: string;
+
+  @ApiProperty({ description: "Royalties percentage", required: false })
+  @IsOptional()
+  @IsNumber()
+  royalties?: number;
 }

@@ -1,5 +1,12 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEnum, IsOptional, IsString, IsUUID, IsUrl } from "class-validator";
+import {
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUUID,
+  IsUrl,
+} from "class-validator";
 import { CollectionCategory } from "../collection.enum";
 
 export class UpdateCollectionDto {
@@ -46,8 +53,8 @@ export class UpdateCollectionDto {
 
   @ApiProperty({ description: "Royalties percentage", required: false })
   @IsOptional()
-  @IsString()
-  royalties?: string;
+  @IsNumber()
+  royalties?: number;
 
   @ApiProperty({ description: "Collection image", required: false })
   @IsUrl()

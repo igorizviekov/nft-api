@@ -9,7 +9,7 @@ import { IResponse } from "src/app.types";
 export class NftLogsController {
   constructor(private readonly nftLogsService: NftLogsService) {}
 
-  @Get("/:wallet_address/")
+  @Get("/users/:wallet_address/")
   @ApiParam({
     name: "wallet",
     type: String,
@@ -19,16 +19,6 @@ export class NftLogsController {
     @Param("wallet") userWallet: string
   ): Promise<IResponse> {
     return this.nftLogsService.getLogsForUser(userWallet);
-  }
-
-  @Get("/:nft_id/")
-  @ApiParam({
-    name: "id",
-    type: String,
-    description: "Unique id from the NFT database",
-  })
-  async getLogsForNft(@Param("id") id: string): Promise<IResponse> {
-    return this.nftLogsService.getLogsForNft(id);
   }
 
   @Get()

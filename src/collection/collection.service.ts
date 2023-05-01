@@ -47,20 +47,6 @@ export class CollectionService {
     return { status: "success", data };
   }
 
-  async remove(id: string): Promise<IResponse> {
-    try {
-      const res = await this.collectionRepo.delete(id);
-      if (res.affected === 0) {
-        throw new NotFoundException(`Collection with ${id} not found.`);
-      }
-      return {
-        status: "delete success",
-      };
-    } catch (e) {
-      throw new NotFoundException(`Collection with ${id} not found.`);
-    }
-  }
-
   async getByUserId(userId: string): Promise<IResponse> {
     try {
       const userCollections = await this.collectionRepo.getByUserId(userId);

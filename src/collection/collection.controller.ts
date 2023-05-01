@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Param,
   Patch,
@@ -28,7 +27,6 @@ import { User } from "src/users/users.entity";
 import { NotAuthorizedDto } from "src/users/dto/unauthorized-error.dto";
 import { UpdateCollectionDto } from "./dto/update-collection.dto";
 import { Collection } from "./collection.entity";
-import { DeletedCollectionDto } from "./dto/collection-deleted.dto";
 
 @ApiTags("Collections")
 @Controller("collection")
@@ -128,20 +126,5 @@ export class CollectionController {
     @Param("id") id: string
   ): Promise<IResponse> {
     return this.collectionService.update(id, collection);
-  }
-
-  @UseGuards(AuthGuard())
-  @ApiBearerAuth("access-token")
-  @Delete("/:id")
-  @ApiOkResponse({
-    description: "Delete a Collection",
-    type: DeletedCollectionDto,
-  })
-  @ApiUnauthorizedResponse({
-    description: "Invalid credentials",
-    type: NotAuthorizedDto,
-  })
-  async remove(@Param("id") id: string): Promise<IResponse> {
-    return this.collectionService.remove(id);
   }
 }

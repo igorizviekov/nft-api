@@ -14,12 +14,6 @@ export class NftLogsRepository extends Repository<NftLogsEntity> {
       .getMany();
   }
 
-  async getLogsForNft(nftId: string): Promise<NftLogsEntity[]> {
-    return this.createQueryBuilder("nftLogs")
-      .where("nftLogs.nft_id = :nftId", { nftId })
-      .getMany();
-  }
-
   async getAllLogs(
     transactionType?: TransactionType,
     startDate?: string,

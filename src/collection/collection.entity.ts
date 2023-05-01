@@ -37,5 +37,5 @@ export class Collection extends BaseEntity {
   website?: string;
 
   @Column({ nullable: true })
-  royalties?: string;
+  royalties?: number;
 }
