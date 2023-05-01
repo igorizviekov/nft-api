@@ -1,4 +1,6 @@
 import {
+  HttpException,
+  HttpStatus,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -7,7 +9,8 @@ import { CollectionDto } from "./dto/collection.dto";
 import { IResponse } from "src/app.types";
 import { CollectionRepository } from "./collection.repository";
 import { CollectionCategory } from "./collection.enum";
-
+import * as path from "path";
+import * as fs from "fs";
 @Injectable()
 export class CollectionService {
   constructor(private readonly collectionRepo: CollectionRepository) {}
@@ -23,6 +26,38 @@ export class CollectionService {
       return { status: "success", data: newCollection };
     } catch (e) {
       throw new InternalServerErrorException();
+    }
+  }
+
+  async ipfs(
+    file: Express.Multer.File,
+    userId: string,
+    collectionId: string
+  ): Promise<IResponse> {
+    // Check if the file is a zip file
+    if (file.mimetype !== "application/zip") {
+      throw new HttpException(
+        "Invalid file format. Please upload a zip file.",
+        HttpStatus.BAD_REQUEST
+      );
+    }
+    const collectionFolderPath = path.join("collections", userId, collectionId);
+    try {
+      // Create the folder structure if it doesn't exist
+      if (!fs.existsSync(collectionFolderPath)) {
+        fs.mkdirSync(collectionFolderPath, { recursive: true });
+      }
+
+      // Save the zip file to the server
+      const zipFilePath = path.join(collectionFolderPath, file.originalname);
+      fs.writeFileSync(zipFilePath, file.buffer);
+      return { status: "success" };
+    } catch (error) {
+      console.error("Error processing zip file:", error);
+      throw new HttpException(
+        "An error occurred while processing the zip file.",
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
     }
   }
 

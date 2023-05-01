@@ -7,6 +7,9 @@ import {
   Post,
   Query,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
+  HttpStatus,
 } from "@nestjs/common";
 import {
   ApiTags,
@@ -16,7 +19,10 @@ import {
   ApiUnauthorizedResponse,
   ApiQuery,
   ApiOkResponse,
+  ApiOperation,
+  ApiResponse,
 } from "@nestjs/swagger";
+import { FileInterceptor } from "@nestjs/platform-express";
 import { CollectionDto } from "./dto/collection.dto";
 import { IResponse } from "src/app.types";
 import { CollectionCategory } from "./collection.enum";
@@ -105,6 +111,33 @@ export class CollectionController {
     @Body() collection: CollectionDto
   ): Promise<IResponse> {
     return this.collectionService.add(collection, user["user_id"]);
+  }
+
+  @UseGuards(AuthGuard())
+  @ApiBearerAuth("access-token")
+  @Post("/ipfs/:id")
+  @UseInterceptors(FileInterceptor("file"))
+  @ApiOperation({
+    summary: "Upload a zip file containing images and JSON files",
+  })
+  @ApiUnauthorizedResponse({
+    description: "Invalid credentials",
+    type: NotAuthorizedDto,
+  })
+  @ApiOkResponse({
+    status: HttpStatus.CREATED,
+    description: "The zip file has been successfully uploaded and processed.",
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: "Invalid file format.",
+  })
+  async ipfs(
+    @UploadedFile() file: Express.Multer.File,
+    @GetUser() user: User,
+    @Param("id") id: string
+  ): Promise<IResponse> {
+    return this.collectionService.ipfs(file, user["user_id"], id);
   }
 
   @UseGuards(AuthGuard())
