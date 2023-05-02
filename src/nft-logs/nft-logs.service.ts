@@ -15,7 +15,6 @@ export class NftLogsService {
   async getLogsForUser(userWallet: string): Promise<IResponse> {
     try {
       const logs = await this.nftLogsRepo.getLogsForUser(userWallet);
-      console.log({ getLogsForUser: logs });
       return { status: "success", data: logs };
     } catch (e) {
       console.log({ e });
@@ -37,7 +36,6 @@ export class NftLogsService {
         startDate,
         endDate
       );
-      console.log({ getAllLogs: logs });
       return { status: "success", data: logs };
     } catch (e) {
       console.log({ e });

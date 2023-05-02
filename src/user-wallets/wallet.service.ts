@@ -24,9 +24,7 @@ export class WalletService {
 
   async getById(id: string): Promise<IResponse> {
     try {
-      const match = await this.walletsRepo.findOne(id, {
-        select: ["id", "user_id", "blockchain_id", "wallet_address"],
-      });
+      const match = await this.walletsRepo.findOne(id);
       if (!match) {
         throw new NotFoundException(`User Wallet with id ${id} not found.`);
       }

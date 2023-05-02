@@ -12,6 +12,7 @@ import { CollectionRepository } from "./collection.repository";
 import { CollectionCategory } from "./collection.enum";
 import * as path from "path";
 import * as fs from "fs";
+import stream from "stream";
 @Injectable()
 export class CollectionService {
   constructor(private readonly collectionRepo: CollectionRepository) {}
@@ -34,14 +35,54 @@ export class CollectionService {
     file: Express.Multer.File,
     collectionId: string
   ): Promise<IResponse> {
-    // Check if the file is a zip file
-    if (file.mimetype !== "application/zip") {
+    if (!file || file.mimetype !== "application/zip") {
       throw new HttpException(
         "Invalid file format. Please upload a zip file.",
         HttpStatus.BAD_REQUEST
       );
     }
-    const collectionFolderPath = path.join("collections", collectionId);
+    try {
+      await this.getById(collectionId);
+
+      const collectionFolderPath = path.join("collections", collectionId);
+      if (!fs.existsSync(collectionFolderPath)) {
+        fs.mkdirSync(collectionFolderPath, { recursive: true });
+      }
+      // Save the zip file to the server
+      const zipFilePath = path.join(collectionFolderPath, file.originalname);
+      const writeStream = fs.createWriteStream(zipFilePath);
+      const readStream = new stream.PassThrough();
+      readStream.end(file.buffer);
+      readStream.pipe(writeStream);
+
+      // Wait for the stream to finish before continuing
+      await new Promise((resolve, reject) => {
+        writeStream.on("finish", resolve);
+        writeStream.on("error", reject);
+      });
+      return { status: "success" };
+    } catch (e) {
+      console.log({ e });
+      throw new NotFoundException(
+        `Collection with id ${collectionId} not found.`
+      );
+    }
+  }
+
+  async getById(id: string): Promise<IResponse> {
+    try {
+      const match = await this.collectionRepo.findOne(id);
+      if (!match) {
+        throw new NotFoundException(`Collection with id ${id} not found.`);
+      }
+      return { status: "success", data: match };
+    } catch (e) {
+      console.log(e);
+      throw new NotFoundException(`Collection with id ${id} not found.`);
+    }
+  }
+
+  async getABI(collectionId: string, res: Response) {
     try {
       const match = await this.collectionRepo.findOne(collectionId);
       if (!match) {
@@ -49,45 +90,23 @@ export class CollectionService {
           `Collection with id ${collectionId} not found.`
         );
       }
-      // Create the folder structure if it doesn't exist
-      if (!fs.existsSync(collectionFolderPath)) {
-        fs.mkdirSync(collectionFolderPath, { recursive: true });
-      }
-
-      // Save the zip file to the server
-      const zipFilePath = path.join(collectionFolderPath, file.originalname);
-      fs.writeFileSync(zipFilePath, file.buffer);
-      return { status: "success" };
-    } catch (error) {
-      console.error("Error processing zip file:", error);
-      throw new HttpException(
-        "An error occurred while processing the zip file.",
-        HttpStatus.INTERNAL_SERVER_ERROR
-      );
-    }
-  }
-
-  async getById(id: string, res: Response): Promise<IResponse> {
-    try {
-      const match = await this.collectionRepo.findOne(id);
-      if (!match) {
-        throw new NotFoundException(`Collection with id ${id} not found.`);
-      }
       // TODO: attach collection contract ABI instead of a file
-      const collectionFolderPath = path.join("collections", id);
-      const files = fs.readdirSync(collectionFolderPath);
-      if (files.length > 0) {
-        const filePath = path.join(collectionFolderPath, files[0]);
-        res.setHeader(
-          "Content-Disposition",
-          `attachment; filename=${files[0]}`
+      const collectionFolderPath = path.join("collections", collectionId);
+      if (!fs.existsSync(collectionFolderPath)) {
+        throw new NotFoundException(
+          `A not found for collection with id ${collectionId}.`
         );
-        res.setHeader("Content-Type", "application/zip");
-        fs.createReadStream(filePath).pipe(res);
       }
-      return { status: "success", data: match };
+      const files = fs.readdirSync(collectionFolderPath);
+      const filePath = path.join(collectionFolderPath, files[0]);
+      res.setHeader("Content-Disposition", `attachment; filename=${files[0]}`);
+      res.setHeader("Content-Type", "application/zip");
+      fs.createReadStream(filePath).pipe(res);
     } catch (e) {
-      throw new NotFoundException(`Collection with id ${id} not found.`);
+      console.log(e);
+      throw new NotFoundException(
+        `ABI for collection  ${collectionId} not found.`
+      );
     }
   }
 

@@ -1,5 +1,5 @@
 import { InternalServerErrorException } from "@nestjs/common";
-import { EntityRepository, Repository } from "typeorm";
+import { EntityRepository, Repository, Brackets } from "typeorm";
 import { UserDto } from "./dto/user.dto";
 import { User } from "./users.entity";
 
@@ -13,9 +13,16 @@ export class UsersRepository extends Repository<UserDto> {
     const query = this.createQueryBuilder("user");
 
     if (search) {
-      query.andWhere("(LOWER(user.name) LIKE LOWER(:search))", {
-        search: `%${search}%`,
-      });
+      query.andWhere(
+        new Brackets((qb) => {
+          qb.where("LOWER(user.name) LIKE LOWER(:search)")
+            .orWhere("LOWER(user.email) LIKE LOWER(:search)")
+            .orWhere("LOWER(user.location) LIKE LOWER(:search)")
+            .orWhere("LOWER(user.discord) LIKE LOWER(:search)")
+            .orWhere("LOWER(user.website) LIKE LOWER(:search)");
+        }),
+        { search: `%${search}%` }
+      );
     }
 
     if (limit) {

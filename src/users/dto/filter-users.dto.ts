@@ -6,7 +6,7 @@ export class FilterUsersDto {
   @IsString()
   @ApiProperty({
     type: String,
-    description: "Search by user wallet",
+    description: "Search by name, website, discord, location or email",
     required: false,
   })
   search: string;

@@ -1,10 +1,4 @@
-import {
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  IsEnum,
-  IsDate,
-} from "class-validator";
+import { IsNotEmpty, IsOptional, IsString, IsEnum } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
 import { TransactionType } from "../nft-logs.enum";
 
@@ -50,6 +44,6 @@ export class NftLogsDto {
 
   @ApiProperty({ description: "Date of the transaction" })
   @IsNotEmpty()
-  @IsDate()
+  @IsString()
   date: string;
 }

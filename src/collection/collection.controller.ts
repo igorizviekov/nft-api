@@ -22,6 +22,7 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiResponse,
+  ApiConsumes,
 } from "@nestjs/swagger";
 import { Response } from "express";
 import { FileInterceptor } from "@nestjs/platform-express";
@@ -81,11 +82,23 @@ export class CollectionController {
   @ApiNotFoundResponse({
     description: "Collection does not exist",
   })
-  async getById(
-    @Param("id") id: string,
-    @Res() res: Response
-  ): Promise<IResponse> {
-    return this.collectionService.getById(id, res);
+  async getById(@Param("id") id: string): Promise<IResponse> {
+    return this.collectionService.getById(id);
+  }
+
+  @Get("/abi/:id")
+  @ApiOkResponse({
+    description: "Collection ABI",
+    type: Collection,
+  })
+  @ApiNotFoundResponse({
+    description: "Collection does not exist",
+  })
+  @ApiOperation({
+    summary: "Get collection ABI file",
+  })
+  async getABI(@Param("id") id: string, @Res() res: Response): Promise<void> {
+    return this.collectionService.getABI(id, res);
   }
 
   @Get("user/:userId")
@@ -120,7 +133,19 @@ export class CollectionController {
   @UseGuards(AuthGuard())
   @ApiBearerAuth("access-token")
   @Post("/ipfs/:id")
-  @UseInterceptors(FileInterceptor("file"))
+  @UseInterceptors(FileInterceptor("media"))
+  @ApiConsumes("multipart/form-data")
+  @ApiBody({
+    schema: {
+      type: "object",
+      properties: {
+        media: {
+          type: "string",
+          format: "binary",
+        },
+      },
+    },
+  })
   @ApiOperation({
     summary: "Upload a zip file containing images and JSON files",
   })
