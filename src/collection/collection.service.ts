@@ -5,6 +5,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from "@nestjs/common";
+import { Response } from "express";
 import { CollectionDto } from "./dto/collection.dto";
 import { IResponse } from "src/app.types";
 import { CollectionRepository } from "./collection.repository";
@@ -66,11 +67,23 @@ export class CollectionService {
     }
   }
 
-  async getById(id: string): Promise<IResponse> {
+  async getById(id: string, res: Response): Promise<IResponse> {
     try {
       const match = await this.collectionRepo.findOne(id);
       if (!match) {
         throw new NotFoundException(`Collection with id ${id} not found.`);
+      }
+      // TODO: attach collection contract ABI instead of a file
+      const collectionFolderPath = path.join("collections", id);
+      const files = fs.readdirSync(collectionFolderPath);
+      if (files.length > 0) {
+        const filePath = path.join(collectionFolderPath, files[0]);
+        res.setHeader(
+          "Content-Disposition",
+          `attachment; filename=${files[0]}`
+        );
+        res.setHeader("Content-Type", "application/zip");
+        fs.createReadStream(filePath).pipe(res);
       }
       return { status: "success", data: match };
     } catch (e) {
@@ -79,12 +92,15 @@ export class CollectionService {
   }
 
   async update(id: string, collectionData: CollectionDto): Promise<IResponse> {
-    const { data } = await this.getById(id);
+    const collection = await this.collectionRepo.findOne(id);
+    if (!collection) {
+      throw new NotFoundException(`Collection with id ${id} not found.`);
+    }
     Object.keys(collectionData).forEach((key) => {
-      data[key] = collectionData[key];
+      collection[key] = collectionData[key];
     });
-    await this.collectionRepo.update(id, data);
-    return { status: "success", data };
+    await this.collectionRepo.update(id, collection);
+    return { status: "success", data: collection };
   }
 
   async getByUserId(userId: string): Promise<IResponse> {

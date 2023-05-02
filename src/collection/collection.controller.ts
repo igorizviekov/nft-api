@@ -10,6 +10,7 @@ import {
   UseInterceptors,
   UploadedFile,
   HttpStatus,
+  Res,
 } from "@nestjs/common";
 import {
   ApiTags,
@@ -22,6 +23,7 @@ import {
   ApiOperation,
   ApiResponse,
 } from "@nestjs/swagger";
+import { Response } from "express";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { CollectionDto } from "./dto/collection.dto";
 import { IResponse } from "src/app.types";
@@ -33,7 +35,6 @@ import { User } from "src/users/users.entity";
 import { NotAuthorizedDto } from "src/users/dto/unauthorized-error.dto";
 import { UpdateCollectionDto } from "./dto/update-collection.dto";
 import { Collection } from "./collection.entity";
-
 @ApiTags("Collections")
 @Controller("collection")
 export class CollectionController {
@@ -80,8 +81,11 @@ export class CollectionController {
   @ApiNotFoundResponse({
     description: "Collection does not exist",
   })
-  async getById(@Param("id") id: string): Promise<IResponse> {
-    return this.collectionService.getById(id);
+  async getById(
+    @Param("id") id: string,
+    @Res() res: Response
+  ): Promise<IResponse> {
+    return this.collectionService.getById(id, res);
   }
 
   @Get("user/:userId")
