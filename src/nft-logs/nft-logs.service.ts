@@ -1,8 +1,9 @@
-import { Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { NftLogsRepository } from "./nft-logs.repository";
 import { TransactionType } from "./nft-logs.enum";
 import { InjectRepository } from "@nestjs/typeorm";
 import { IResponse } from "src/app.types";
+import { NftLogsDto } from "./dto/nft-logs.dto";
 
 @Injectable()
 export class NftLogsService {
@@ -12,10 +13,17 @@ export class NftLogsService {
   ) {}
 
   async getLogsForUser(userWallet: string): Promise<IResponse> {
-    const logs = await this.nftLogsRepo.getLogsForUser(userWallet);
-    console.log({ getLogsForUser: logs });
-    return { status: "success", data: logs };
-    // return logs.map((log) => NftLogsDto.fromEntity(log));
+    try {
+      const logs = await this.nftLogsRepo.getLogsForUser(userWallet);
+      console.log({ getLogsForUser: logs });
+      return { status: "success", data: logs };
+    } catch (e) {
+      console.log({ e });
+      throw new HttpException(
+        "An error occurred while getting Logs for a user",
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
   }
 
   async getAllLogs(
@@ -23,13 +31,46 @@ export class NftLogsService {
     startDate?: string,
     endDate?: string
   ): Promise<IResponse> {
-    const logs = await this.nftLogsRepo.getAllLogs(
-      transactionType,
-      startDate,
-      endDate
-    );
-    console.log({ getAllLogs: logs });
-    return { status: "success", data: logs };
-    // return logs.map((log) => NftLogsDto.fromEntity(log));
+    try {
+      const logs = await this.nftLogsRepo.getAllLogs(
+        transactionType,
+        startDate,
+        endDate
+      );
+      console.log({ getAllLogs: logs });
+      return { status: "success", data: logs };
+    } catch (e) {
+      console.log({ e });
+      throw new HttpException(
+        "An error occurred while getting all Logs",
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async addOne(log: NftLogsDto): Promise<IResponse> {
+    try {
+      const res = await this.nftLogsRepo.createLog(log);
+      return { status: "success", data: res };
+    } catch (e) {
+      console.log({ e });
+      throw new HttpException(
+        "An error occurred while adding a Log",
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async addMultiple(logs: NftLogsDto[]): Promise<IResponse> {
+    try {
+      const res = await this.nftLogsRepo.createLogs(logs);
+      return { status: "success", data: res };
+    } catch (e) {
+      console.log({ e });
+      throw new HttpException(
+        "An error occurred while adding Logs",
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
   }
 }

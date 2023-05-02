@@ -132,12 +132,14 @@ export class CollectionController {
     status: HttpStatus.BAD_REQUEST,
     description: "Invalid file format.",
   })
+  @ApiNotFoundResponse({
+    description: "Collection does not exist",
+  })
   async ipfs(
     @UploadedFile() file: Express.Multer.File,
-    @GetUser() user: User,
     @Param("id") id: string
   ): Promise<IResponse> {
-    return this.collectionService.ipfs(file, user["user_id"], id);
+    return this.collectionService.ipfs(file, id);
   }
 
   @UseGuards(AuthGuard())

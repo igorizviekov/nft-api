@@ -31,7 +31,6 @@ export class CollectionService {
 
   async ipfs(
     file: Express.Multer.File,
-    userId: string,
     collectionId: string
   ): Promise<IResponse> {
     // Check if the file is a zip file
@@ -41,8 +40,14 @@ export class CollectionService {
         HttpStatus.BAD_REQUEST
       );
     }
-    const collectionFolderPath = path.join("collections", userId, collectionId);
+    const collectionFolderPath = path.join("collections", collectionId);
     try {
+      const match = await this.collectionRepo.findOne(collectionId);
+      if (!match) {
+        throw new NotFoundException(
+          `Collection with id ${collectionId} not found.`
+        );
+      }
       // Create the folder structure if it doesn't exist
       if (!fs.existsSync(collectionFolderPath)) {
         fs.mkdirSync(collectionFolderPath, { recursive: true });

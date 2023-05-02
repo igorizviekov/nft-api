@@ -2,6 +2,7 @@ import { EntityRepository, Repository } from "typeorm";
 import { NftLogsEntity } from "./nft-logs.entity";
 import { TransactionType } from "./nft-logs.enum";
 import { InternalServerErrorException } from "@nestjs/common";
+import { NftLogsDto } from "./dto/nft-logs.dto";
 
 @EntityRepository(NftLogsEntity)
 export class NftLogsRepository extends Repository<NftLogsEntity> {
@@ -38,7 +39,7 @@ export class NftLogsRepository extends Repository<NftLogsEntity> {
     return query.getMany();
   }
 
-  async createLog(log: NftLogsEntity): Promise<NftLogsEntity> {
+  async createLog(log: NftLogsDto): Promise<NftLogsEntity> {
     const nftLog: NftLogsEntity = this.create(log);
     try {
       await this.save(nftLog);
@@ -48,7 +49,7 @@ export class NftLogsRepository extends Repository<NftLogsEntity> {
     return nftLog;
   }
 
-  async createLogs(logs: NftLogsEntity[]): Promise<NftLogsEntity[]> {
+  async createLogs(logs: NftLogsDto[]): Promise<NftLogsEntity[]> {
     const nftLogs: NftLogsEntity[] = logs.map((log) => this.create(log));
     try {
       await this.save(nftLogs);
