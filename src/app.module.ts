@@ -3,7 +3,6 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { ConfigValidationSchema } from "./config.schema";
 import { UsersModule } from "./users/users.module";
-import { NftModule } from "./nft/nft.module";
 import { BlockchainModule } from "./blockchain/blockchain.module";
 import { WalletModule } from "./user-wallets/wallet.module";
 import { NftLogsModule } from "./nft-logs/nft-logs.module";
@@ -16,7 +15,6 @@ import { CollectionModule } from "./collection/collection.module";
       validationSchema: ConfigValidationSchema,
     }),
     UsersModule,
-    NftModule,
     NftLogsModule,
     BlockchainModule,
     WalletModule,
