@@ -101,7 +101,13 @@ export class CollectionController {
     return this.collectionService.getABI(id, res);
   }
 
+  @UseGuards(AuthGuard())
+  @ApiBearerAuth("access-token")
   @Get("user/:userId")
+  @ApiUnauthorizedResponse({
+    description: "Invalid credentials",
+    type: NotAuthorizedDto,
+  })
   @ApiOkResponse({
     description: "Users Collections",
     isArray: true,

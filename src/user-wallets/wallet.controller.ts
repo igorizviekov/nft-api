@@ -29,7 +29,13 @@ import { WalletDeletedDto } from "./dto/wallet-deleted.dto";
 export class WalletsController {
   constructor(private walletService: WalletService) {}
 
+  @UseGuards(AuthGuard())
+  @ApiBearerAuth("access-token")
   @Get()
+  @ApiUnauthorizedResponse({
+    description: "Invalid credentials",
+    type: NotAuthorizedDto,
+  })
   @ApiOkResponse({
     description: "Get all wallets",
     isArray: false,

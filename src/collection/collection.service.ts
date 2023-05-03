@@ -5,6 +5,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
 import { Response } from "express";
 import { CollectionDto } from "./dto/collection.dto";
 import { IResponse } from "src/app.types";
@@ -12,10 +13,13 @@ import { CollectionRepository } from "./collection.repository";
 import { CollectionCategory } from "./collection.enum";
 import * as path from "path";
 import * as fs from "fs";
-import stream from "stream";
+
 @Injectable()
 export class CollectionService {
-  constructor(private readonly collectionRepo: CollectionRepository) {}
+  constructor(
+    @InjectRepository(CollectionRepository)
+    private collectionRepo: CollectionRepository
+  ) {}
 
   async add(collection: CollectionDto, userId: string): Promise<IResponse> {
     try {
@@ -50,15 +54,17 @@ export class CollectionService {
       }
       // Save the zip file to the server
       const zipFilePath = path.join(collectionFolderPath, file.originalname);
-      const writeStream = fs.createWriteStream(zipFilePath);
-      const readStream = new stream.PassThrough();
-      readStream.end(file.buffer);
-      readStream.pipe(writeStream);
 
-      // Wait for the stream to finish before continuing
-      await new Promise((resolve, reject) => {
-        writeStream.on("finish", resolve);
-        writeStream.on("error", reject);
+      // Copy the file to the desired location
+      await fs.promises.copyFile(file.path, zipFilePath);
+
+      // Optional: Delete the temporary file in the 'uploads' folder after saving it to the new location
+      fs.unlink(file.path, (err) => {
+        if (err) {
+          console.error(`Error deleting temporary file ${file.path}:`, err);
+        } else {
+          console.log(`Temporary file ${file.path} deleted successfully`);
+        }
       });
       return { status: "success" };
     } catch (e) {
@@ -97,7 +103,9 @@ export class CollectionService {
           `A not found for collection with id ${collectionId}.`
         );
       }
-      const files = fs.readdirSync(collectionFolderPath);
+      const files = fs
+        .readdirSync(collectionFolderPath)
+        .filter((file) => file !== ".DS_Store");
       const filePath = path.join(collectionFolderPath, files[0]);
       res.setHeader("Content-Disposition", `attachment; filename=${files[0]}`);
       res.setHeader("Content-Type", "application/zip");
