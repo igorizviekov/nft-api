@@ -11,7 +11,9 @@ import { CollectionModule } from "./collection/collection.module";
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: [`.env.stage.${process.env.STAGE}`],
+      isGlobal: true,
+      envFilePath:
+        process.env.STAGE === "prod" ? ".env.prod" : ".env.stage.dev",
       validationSchema: ConfigValidationSchema,
     }),
     UsersModule,
@@ -26,11 +28,7 @@ import { CollectionModule } from "./collection/collection.module";
         //database env variables
         return {
           type: "postgres",
-          host: configService.get("DB_HOST"),
-          port: configService.get("DB_PORT"),
-          username: configService.get("DB_USERNAME"),
-          password: configService.get("DB_PASSWORD"),
-          database: configService.get("DB_DATABASE"),
+          url: configService.get("DATABASE_URL"),
           autoLoadEntities: true,
           synchronize: true,
         };
