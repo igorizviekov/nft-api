@@ -35,10 +35,7 @@ export class CollectionService {
     }
   }
 
-  async ipfs(
-    file: Express.Multer.File,
-    collectionId: string
-  ): Promise<IResponse> {
+  async ipfs(file: any, collectionId: string): Promise<IResponse> {
     if (!file || file.mimetype !== "application/zip") {
       throw new HttpException(
         "Invalid file format. Please upload a zip file.",

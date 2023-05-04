@@ -171,7 +171,7 @@ export class CollectionController {
     description: "Collection does not exist",
   })
   async ipfs(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() file: any,
     @Param("id") id: string
   ): Promise<IResponse> {
     return this.collectionService.ipfs(file, id);
