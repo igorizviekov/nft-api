@@ -20,5 +20,8 @@ RUN yarn build
 # Expose the port the application will run on
 EXPOSE 3000
 
+# Add this line to list the contents of the dist folder
+RUN ls -la /usr/src/app/dist
+
 # Start the application
 CMD ls -la /usr/src/app && yarn run start:prod
