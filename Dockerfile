@@ -21,4 +21,4 @@ RUN yarn build
 EXPOSE 3000
 
 # Start the application
-CMD ["yarn", "start:prod"]
+CMD ls -la /usr/src/app && yarn run start:prod
