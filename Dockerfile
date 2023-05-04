@@ -26,4 +26,4 @@ RUN ls -la /usr/src/app/dist
 EXPOSE 3000
 
 # Start the application
-CMD yarn run start:prod
+CMD ["node", "dist/main"]
