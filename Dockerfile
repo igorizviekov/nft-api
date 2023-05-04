@@ -10,6 +10,9 @@ COPY package.json yarn.lock ./
 # Install dependencies
 RUN yarn install --production --frozen-lockfile
 
+# Install NestJS CLI globally
+RUN yarn global add @nestjs/cli
+
 # Copy the source code
 COPY . .
 
