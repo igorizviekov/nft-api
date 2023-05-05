@@ -171,11 +171,11 @@ export class CollectionController {
     description: "Collection does not exist",
   })
   async ipfs(
-    @UploadedFile() file: any,
+    // @UploadedFile() file: any,
     @Param("id") id: string
   ): Promise<IResponse> {
-    return { status: file };
-    return this.collectionService.ipfs(file, id);
+    return { status: "success", data: id };
+    // return this.collectionService.ipfs(file, id);
   }
 
   @UseGuards(AuthGuard())
