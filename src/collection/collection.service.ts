@@ -36,8 +36,6 @@ export class CollectionService {
   }
 
   async ipfs(file: any, collectionId: string): Promise<IResponse> {
-    return { status: "success", data: file };
-
     if (!file || file.mimetype !== "application/zip") {
       throw new HttpException(
         "Invalid file format. Please upload a zip file.",
@@ -46,7 +44,11 @@ export class CollectionService {
     }
     try {
       await this.getById(collectionId);
-      const collectionFolderPath = path.join("/tmp/collections", collectionId);
+      const collectionFolderPath = path.join(
+        "tmp",
+        "collections",
+        collectionId
+      );
       console.log({ collectionFolderPath });
 
       if (!fs.existsSync(collectionFolderPath)) {
