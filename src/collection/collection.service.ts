@@ -48,7 +48,7 @@ export class CollectionService {
 
       const collectionFolderPath = path.join("collections", collectionId);
       console.log({ collectionFolderPath });
-
+      return { status: "success", data: collectionFolderPath };
       if (!fs.existsSync(collectionFolderPath)) {
         fs.mkdirSync(collectionFolderPath, { recursive: true });
       }
