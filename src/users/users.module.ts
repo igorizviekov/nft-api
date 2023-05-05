@@ -21,7 +21,7 @@ import { BlockchainRepository } from "src/blockchain/blockchain.repository";
         return {
           secret: configService.get("JWT_SECRET"),
           signOptions: {
-            expiresIn: configService.get("JWT_EXPIRES"),
+            expiresIn: parseInt(configService.get("JWT_EXPIRES"), 10) || 21600,
           },
         };
       },
