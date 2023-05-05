@@ -42,7 +42,7 @@ export class CollectionService {
         HttpStatus.BAD_REQUEST
       );
     }
-    console.log(file);
+    return { status: "success", data: file };
     try {
       await this.getById(collectionId);
       const collectionFolderPath = path.join("/tmp/collections", collectionId);
@@ -98,7 +98,7 @@ export class CollectionService {
         );
       }
       // TODO: attach collection contract ABI instead of a file
-      const collectionFolderPath = path.join("/tmp/collections", collectionId);
+      const collectionFolderPath = path.join("collections", collectionId);
       if (!fs.existsSync(collectionFolderPath)) {
         throw new NotFoundException(
           `A not found for collection with id ${collectionId}.`
