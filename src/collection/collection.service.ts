@@ -45,7 +45,7 @@ export class CollectionService {
     console.log(file);
     try {
       await this.getById(collectionId);
-      const collectionFolderPath = path.join("collections", collectionId);
+      const collectionFolderPath = path.join("/tmp/collections", collectionId);
       console.log({ collectionFolderPath });
 
       if (!fs.existsSync(collectionFolderPath)) {
@@ -98,7 +98,7 @@ export class CollectionService {
         );
       }
       // TODO: attach collection contract ABI instead of a file
-      const collectionFolderPath = path.join("collections", collectionId);
+      const collectionFolderPath = path.join("/tmp/collections", collectionId);
       if (!fs.existsSync(collectionFolderPath)) {
         throw new NotFoundException(
           `A not found for collection with id ${collectionId}.`
