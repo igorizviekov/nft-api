@@ -19,8 +19,6 @@ COPY . .
 # Build the application
 RUN yarn build
 
-# Log the contents of the dist folder
-RUN ls -la /usr/src/app/dist
 
 # Expose the application port
 EXPOSE 3000
