@@ -174,6 +174,7 @@ export class CollectionController {
     @UploadedFile() file: any,
     @Param("id") id: string
   ): Promise<IResponse> {
+    return { status: file };
     return this.collectionService.ipfs(file, id);
   }
 
