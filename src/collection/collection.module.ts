@@ -17,7 +17,7 @@ import * as multer from "multer";
     MulterModule.register({
       storage: multer.diskStorage({
         destination: (req, file, cb) => {
-          cb(null, "./collections"); // specify the destination folder for uploads
+          cb(null, "/tmp/collections");
         },
       }),
     }),

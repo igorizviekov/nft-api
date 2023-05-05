@@ -139,8 +139,8 @@ export class CollectionController {
   @UseGuards(AuthGuard())
   @ApiBearerAuth("access-token")
   @Post("/ipfs/:id")
-  @UseInterceptors(FileInterceptor("media"))
-  @ApiConsumes("multipart/form-data")
+  // @UseInterceptors(FileInterceptor("media"))
+  //  @ApiConsumes("multipart/form-data")
   @ApiBody({
     schema: {
       type: "object",
