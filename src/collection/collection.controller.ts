@@ -139,8 +139,8 @@ export class CollectionController {
   @UseGuards(AuthGuard())
   @ApiBearerAuth("access-token")
   @Post("/ipfs/:id")
-  // @UseInterceptors(FileInterceptor("media"))
-  //  @ApiConsumes("multipart/form-data")
+  @UseInterceptors(FileInterceptor("media"))
+  @ApiConsumes("multipart/form-data")
   @ApiBody({
     schema: {
       type: "object",
@@ -171,11 +171,10 @@ export class CollectionController {
     description: "Collection does not exist",
   })
   async ipfs(
-    // @UploadedFile() file: any,
+    @UploadedFile() file: any,
     @Param("id") id: string
   ): Promise<IResponse> {
-    return { status: "success", data: id };
-    // return this.collectionService.ipfs(file, id);
+    return this.collectionService.ipfs(file, id);
   }
 
   @UseGuards(AuthGuard())
