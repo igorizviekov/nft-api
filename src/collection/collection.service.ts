@@ -45,10 +45,10 @@ export class CollectionService {
     console.log(file);
     try {
       await this.getById(collectionId);
-
+      return { status: "success", data: collectionId };
       const collectionFolderPath = path.join("collections", collectionId);
       console.log({ collectionFolderPath });
-      return { status: "success", data: collectionFolderPath };
+
       if (!fs.existsSync(collectionFolderPath)) {
         fs.mkdirSync(collectionFolderPath, { recursive: true });
       }
