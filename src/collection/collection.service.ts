@@ -47,6 +47,14 @@ export class CollectionService {
     }
     try {
       await this.getById(collectionId);
+<<<<<<< HEAD
+=======
+      const collectionFolderPath = path.join(
+        "tmp",
+        "collections",
+        collectionId
+      );
+>>>>>>> 466e694 (fix: file upload)
 
       const collectionFolderPath = path.join("collections", collectionId);
       if (!fs.existsSync(collectionFolderPath)) {
@@ -58,7 +66,7 @@ export class CollectionService {
       // Copy the file to the desired location
       await fs.promises.copyFile(file.path, zipFilePath);
 
-      // Optional: Delete the temporary file in the 'uploads' folder after saving it to the new location
+      // Delete the temporary file in the 'uploads' folder after saving it to the new location
       fs.unlink(file.path, (err) => {
         if (err) {
           console.error(`Error deleting temporary file ${file.path}:`, err);
@@ -97,7 +105,11 @@ export class CollectionService {
         );
       }
       // TODO: attach collection contract ABI instead of a file
-      const collectionFolderPath = path.join("collections", collectionId);
+      const collectionFolderPath = path.join(
+        "tmp",
+        "collections",
+        collectionId
+      );
       if (!fs.existsSync(collectionFolderPath)) {
         throw new NotFoundException(
           `A not found for collection with id ${collectionId}.`
