@@ -42,18 +42,23 @@ export class CollectionService {
         HttpStatus.BAD_REQUEST
       );
     }
+    console.log(file);
     try {
       await this.getById(collectionId);
 
       const collectionFolderPath = path.join("collections", collectionId);
+      console.log({ collectionFolderPath });
+
       if (!fs.existsSync(collectionFolderPath)) {
         fs.mkdirSync(collectionFolderPath, { recursive: true });
       }
       // Save the zip file to the server
       const zipFilePath = path.join(collectionFolderPath, file.originalname);
+      console.log({ zipFilePath });
 
       // Copy the file to the desired location
       await fs.promises.copyFile(file.path, zipFilePath);
+      console.log(1);
 
       // Optional: Delete the temporary file in the 'uploads' folder after saving it to the new location
       fs.unlink(file.path, (err) => {
