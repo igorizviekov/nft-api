@@ -9,7 +9,13 @@ import { CollectionController } from "./collection.controller";
 import { CollectionService } from "./collection.service";
 import { MulterModule } from "@nestjs/platform-express";
 import * as multer from "multer";
+import * as fs from "fs";
+import * as path from "path";
 
+const collectionsPath = path.join(process.cwd(), "tmp", "collections");
+if (!fs.existsSync(collectionsPath)) {
+  fs.mkdirSync(collectionsPath, { recursive: true });
+}
 @Module({
   imports: [
     ConfigModule,
@@ -17,7 +23,7 @@ import * as multer from "multer";
     MulterModule.register({
       storage: multer.diskStorage({
         destination: (req, file, cb) => {
-          cb(null, "/tmp/collections");
+          cb(null, collectionsPath);
         },
       }),
     }),

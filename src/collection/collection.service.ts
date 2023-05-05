@@ -36,13 +36,14 @@ export class CollectionService {
   }
 
   async ipfs(file: any, collectionId: string): Promise<IResponse> {
+    return { status: "success", data: file };
+
     if (!file || file.mimetype !== "application/zip") {
       throw new HttpException(
         "Invalid file format. Please upload a zip file.",
         HttpStatus.BAD_REQUEST
       );
     }
-    return { status: "success", data: file };
     try {
       await this.getById(collectionId);
       const collectionFolderPath = path.join("/tmp/collections", collectionId);
