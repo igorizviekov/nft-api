@@ -28,4 +28,9 @@ export class WalletRepository extends Repository<WalletDto> {
     }
     return userWallet;
   }
+
+  async walletExists(walletAddress: string): Promise<boolean> {
+    const wallet = await this.findOne({ wallet_address: walletAddress });
+    return !!wallet;
+  }
 }
