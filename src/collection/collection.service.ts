@@ -47,16 +47,12 @@ export class CollectionService {
     }
     try {
       await this.getById(collectionId);
-<<<<<<< HEAD
-=======
       const collectionFolderPath = path.join(
         "tmp",
         "collections",
         collectionId
       );
->>>>>>> 466e694 (fix: file upload)
 
-      const collectionFolderPath = path.join("collections", collectionId);
       if (!fs.existsSync(collectionFolderPath)) {
         fs.mkdirSync(collectionFolderPath, { recursive: true });
       }
