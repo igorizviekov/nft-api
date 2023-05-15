@@ -60,6 +60,10 @@ export class UsersService {
           `Blockchain with id ${blockchain_id} not found.`
         );
       }
+      const isWalletExists = await this.walletRepo.walletExists(wallet);
+      if (isWalletExists) {
+        throw new UnauthorizedException(`Wallet ${wallet} already exits`);
+      }
       const user = await this.usersRepo.createUser(userData as User);
 
       await this.walletRepo.createWallet({
@@ -71,7 +75,10 @@ export class UsersService {
       return user;
     } catch (e) {
       console.log({ e });
-      throw new UnauthorizedException("Please check your credentials.");
+      const error = e as Error;
+      throw new UnauthorizedException(
+        `Please check your credentials: ${error?.message}`
+      );
     }
   }
 
