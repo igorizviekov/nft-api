@@ -1,333 +1,57 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.4;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
 
-// Using ERC721 standard
-import "@openzeppelin/contracts/utils/Counters.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "hardhat/console.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract NFTMarketplace is ERC721URIStorage {
-    using Counters for Counters.Counter;
+interface IERC721Collections is IERC721 {
+    function getPrice(uint256 tokenId) external view returns (uint256 price);
 
-    Counters.Counter private _tokenIds;
-    Counters.Counter private _itemsSold;
+    function setPrice(uint256 tokenId, uint256 price) external;
+}
 
-    uint256 listingPrice = 0.001 ether;
-    address payable owner;
+contract NFTMarketplace is Ownable {
+    IERC721Collections private _nftContract;
 
-    mapping(uint256 => MarketItem) private idToMarketItem;
+    mapping(uint256 => bool) private _listedTokens;
 
-    /**
-        Market item object
-     */
-    struct MarketItem {
-        uint256 tokenId;
-        address payable seller;
-        address payable owner;
-        uint256 price;
-        bool sold;
+    constructor(address nftContractAddress) {
+        _nftContract = IERC721Collections(nftContractAddress);
     }
 
-    /**
-        Event, triggered when new item created
-     */
-    event MerketItemCreated(
-        uint256 indexed tokenId,
-        address seller,
-        address owner,
-        uint256 price,
-        bool sold
-    );
-
-    constructor() ERC721("Stirred Tokens", "STR") {
-        owner = payable(msg.sender);
-    }
-
-    function updateListingPrice(uint256 _newListingPrice) public payable {
+    function listNFT(uint256 tokenId) public {
         require(
-            owner == msg.sender,
-            "Only marketplace owner can update the price"
+            msg.sender == _nftContract.ownerOf(tokenId),
+            "Caller is not owner of NFT"
         );
-        listingPrice = _newListingPrice;
+        require(!_listedTokens[tokenId], "NFT already listed");
+
+        _listedTokens[tokenId] = true;
+        _nftContract.approve(address(this), tokenId);
     }
 
-    function getListingPrice() public view returns (uint256) {
-        return listingPrice;
-    }
-
-    /**
-        Convert image to an NFT 
-    */
-    function createToken(
-        uint256 price,
-        string memory tokenURI
-    ) public payable returns (uint256) {
-        // update count
-        _tokenIds.increment();
-
-        // new token id var
-        uint256 newTokenId = _tokenIds.current();
-
-        // create token
-        _mint(msg.sender, newTokenId);
-        _setTokenURI(newTokenId, tokenURI);
-
-        // next
-        createMarketItem(newTokenId, price);
-        return newTokenId;
-    }
-
-    /**
-        Convert image to an NFT with duplicates
-    */
-    function createTokens(
-        uint256 price,
-        string memory tokenURI,
-        uint256 numOfCopies
-    ) public payable returns (uint256[] memory) {
-        require(numOfCopies > 0, "Number of copies must be greater than 0");
-
-        uint256[] memory newTokenIds = new uint256[](numOfCopies);
-
-        for (uint256 i = 0; i < numOfCopies; i++) {
-            _tokenIds.increment();
-            uint256 newTokenId = _tokenIds.current();
-            _mint(msg.sender, newTokenId);
-            _setTokenURI(newTokenId, tokenURI);
-            createMarketItem(newTokenId, price);
-            newTokenIds[i] = newTokenId;
-        }
-
-        return newTokenIds;
-    }
-
-    /**
-       List NFT in a marketplace
-    */
-    function createMarketItem(uint256 tokenId, uint256 price) private {
-        require(price > 0, "Price must be greater than 0");
-
-        // amount of eth must be equal to the transaction value
+    function delistNFT(uint256 tokenId) public {
         require(
-            msg.value == listingPrice,
-            "Price must be euqal to Listing`s price"
+            msg.sender == _nftContract.ownerOf(tokenId),
+            "Caller is not owner of NFT"
         );
+        require(_listedTokens[tokenId], "NFT not listed");
 
-        // add new market item to the mapping
-        idToMarketItem[tokenId] = MarketItem(
-            tokenId,
-            payable(msg.sender), // address of the seller
-            payable(address(this)), // address of the owner, a person who is trying to create a market item
-            price,
-            false // sold flag
-        );
-
-        /**
-            Transfer ownership of NFT to the contract
-            _transfer(from owner, to new owner, tokenId);
-            address(this) - address of the current contract
-        */
-        _transfer(msg.sender, address(this), tokenId);
-
-        /**
-            Send notification to the contract users that the ownership of NFT has been transferred
-            emit MerketItemCreated(tokenId, seller, owner, price, sold);
-        */
-        emit MerketItemCreated(
-            tokenId,
-            msg.sender,
-            address(this), // owner is a marketplace
-            price,
-            false
-        );
+        _listedTokens[tokenId] = false;
+        _nftContract.approve(address(0), tokenId);
     }
 
-    /**
-        Put item on a marketplace
-    */
-    function resellToken(uint256 tokenId, uint256 price) public payable {
-        /**
-            Person who aiming to re-sell a token must be a token owner        
-         */
+    function buyNFT(uint256 tokenId) public payable {
+        require(_listedTokens[tokenId], "NFT not listed for sale");
         require(
-            idToMarketItem[tokenId].owner == msg.sender,
-            "Only item owner can perform this operation"
+            msg.value == _nftContract.getPrice(tokenId),
+            "Sent value does not match the NFT price"
         );
 
-        // amount of eth must be equal to the transaction value
-        require(
-            msg.value == listingPrice,
-            "Price must be euqal to Listing`s price"
-        );
-        idToMarketItem[tokenId].sold = false;
-        idToMarketItem[tokenId].price = price;
-        idToMarketItem[tokenId].seller = payable(msg.sender);
-        idToMarketItem[tokenId].owner = payable(address(this)); // this nft marketplace
+        address nftOwner = _nftContract.ownerOf(tokenId);
+        payable(nftOwner).transfer(msg.value);
 
-        _itemsSold.decrement();
-
-        /**
-            From sender to our marketplace
-         */
-        _transfer(msg.sender, address(this), tokenId);
-    }
-
-    /**
-        Transiton the ownership of the NFT from marketplace to a buyer
-    */
-    function createMarketSale(uint256 tokenId) public payable {
-        uint256 price = idToMarketItem[tokenId].price;
-        uint256 creatorCut = (msg.value * 85) / 100;
-        uint256 charityCut = (msg.value * 5) / 100;
-        address seller = idToMarketItem[tokenId].seller;
-
-        // amount of eth must be equal to the transaction value
-        require(
-            msg.value == price,
-            "Please submit the asking price to complete the purchase"
-        );
-
-        idToMarketItem[tokenId].sold = true;
-        idToMarketItem[tokenId].seller = payable(address(0)); // empty address == does not have a seller after purchase
-        idToMarketItem[tokenId].owner = payable(msg.sender); // buyer becomes an owner
-
-        _itemsSold.increment();
-
-        /**
-            Transfer the ownership from the marketplace to the buyer
-         */
-        _transfer(address(this), msg.sender, tokenId);
-
-        payable(owner).transfer(listingPrice); // fee of the marketplace
-        payable(seller).transfer(creatorCut); // transfer price of the NFT
-
-        payable(0xfc0b52E020223c98a546F814cdA6d7872D74b386).transfer(
-            charityCut
-        ); // donate to https://helpingtoleave.org/
-        payable(0xa1b1bbB8070Df2450810b8eB2425D543cfCeF79b).transfer(
-            charityCut
-        ); // donate to https://savelife.in.ua/
-        payable(0xfc0b52E020223c98a546F814cdA6d7872D74b386).transfer(
-            charityCut
-        ); // donate to https://prytulafoundation.org/
-    }
-
-    /**
-        Get unsold items, which are listed on the markewtplace and do not belong to any specific wallets
-        ps. It is not just cocktails. Snacks included as well =)
-    */
-    function getActiveCocktails() public view returns (MarketItem[] memory) {
-        uint256 totalCount = _tokenIds.current();
-        uint256 unsoldCount = _tokenIds.current() - _itemsSold.current();
-        uint256 currIndex = 0;
-
-        /**
-            Loop over all NFTs and check if the address is empty. Empty address is an address of a marketplace, which holds an unsold NFT
-        */
-
-        // array "cocktails", which consists data of MarketItem obj`s with the length of unsold items count
-        MarketItem[] memory cocktails = new MarketItem[](unsoldCount);
-
-        for (uint256 i = 0; i < totalCount; i++) {
-            // check if NFT owner has emty address
-            if (idToMarketItem[i + 1].owner == address(this)) {
-                // id of a contract
-                uint256 currentId = i + 1;
-
-                // Gets the reference to the market item by mapping ID to market item obj
-                MarketItem storage currentItem = idToMarketItem[currentId];
-
-                // update array
-                cocktails[currIndex] = currentItem;
-
-                currIndex = currIndex + 1;
-            }
-        }
-
-        return cocktails;
-    }
-
-    /**
-        Get my items, which was bought by your wallet. 
-    */
-    function getMyCocktails() public view returns (MarketItem[] memory) {
-        uint256 totalCount = _tokenIds.current();
-        uint256 cocktailCount = 0;
-        uint256 currIndex = 0;
-
-        for (uint256 i = 0; i < totalCount; i++) {
-            if (idToMarketItem[i + 1].owner == msg.sender) {
-                cocktailCount = cocktailCount + 1;
-            }
-        }
-
-        /**
-            Loop over all NFTs and build an array of NFT, which are bought by your wallet
-        */
-
-        // array "cocktails", which consists data of MarketItem obj`s with the length of number of NFTs, which were bought by your wallet
-        MarketItem[] memory cocktails = new MarketItem[](cocktailCount);
-
-        for (uint256 i = 0; i < totalCount; i++) {
-            // check if NFT owner is the same with your wallet address
-            if (idToMarketItem[i + 1].owner == msg.sender) {
-                // id of a contract
-                uint256 currentId = i + 1;
-
-                // Gets the reference to the market item by mapping ID to market item obj
-                MarketItem storage currentItem = idToMarketItem[currentId];
-
-                // update array
-                cocktails[currIndex] = currentItem;
-
-                currIndex = currIndex + 1;
-            }
-        }
-
-        return cocktails;
-    }
-
-    /**
-        Get NFTs, which was listed by your wallet on a marketplace 
-    */
-    function getMyCocktailsListed() public view returns (MarketItem[] memory) {
-        uint256 totalCount = _tokenIds.current();
-        uint256 cocktailListedCount = 0;
-        uint256 currIndex = 0;
-
-        // get the count of items which were listed by your wallet
-        for (uint256 i = 0; i < totalCount; i++) {
-            if (idToMarketItem[i + 1].seller == msg.sender) {
-                cocktailListedCount = cocktailListedCount + 1;
-            }
-        }
-
-        /**
-            Loop over all NFTs and build an array of NFT, which are listed on a marketplace by your wallet
-        */
-
-        // array "cocktails", which consists data of MarketItem obj`s with the length of number of NFTs, which were listed by your wallet
-        MarketItem[] memory listedCocktails = new MarketItem[](
-            cocktailListedCount
-        );
-
-        for (uint256 i = 0; i < totalCount; i++) {
-            // check if NFT seller is the same with your wallet address
-            if (idToMarketItem[i + 1].seller == msg.sender) {
-                // id of a contract
-                uint256 currentId = i + 1;
-
-                // Gets the reference to the market item by mapping ID to market item obj
-                MarketItem storage currentItem = idToMarketItem[currentId];
-
-                // update array
-                listedCocktails[currIndex] = currentItem;
-
-                currIndex = currIndex + 1;
-            }
-        }
-
-        return listedCocktails;
+        _nftContract.transferFrom(nftOwner, msg.sender, tokenId);
+        _listedTokens[tokenId] = false;
     }
 }

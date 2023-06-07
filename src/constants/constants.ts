@@ -1,10 +1,10 @@
-import market from "./NFTMarketplace.json";
+import collections from "./ERC721Collections.json";
+import marketplace from "./NFTMarketplace.json";
 
 // id of a contract after its been deployed
-// export const MarketAddress = '0x7D09abaA7998818e28389ccd51E2Ea2e8cB386d0';
+export const collectionsAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 
-export const MarketAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+export const marketplaceAddress = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
 
-export const ShimerMarketAddress = "0x7a2088a1bFc9d81c55368AE168C2C02570cB814F";
-
-export const MarketAddressABI = market.abi;
+export const CollectionsABI = collections.abi;
+export const MarketplaceABI = marketplace.abi;
