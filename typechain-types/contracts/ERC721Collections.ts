@@ -49,7 +49,7 @@ export interface ERC721CollectionsInterface extends utils.Interface {
     "getNFTsInCollection(uint256)": FunctionFragment;
     "getPrice(uint256)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
-    "mint(address,uint256,string,uint256)": FunctionFragment;
+    "mint(uint256,string,uint256)": FunctionFragment;
     "name()": FunctionFragment;
     "owner()": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
@@ -126,7 +126,6 @@ export interface ERC721CollectionsInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "mint",
     values: [
-      PromiseOrValue<string>,
       PromiseOrValue<BigNumberish>,
       PromiseOrValue<string>,
       PromiseOrValue<BigNumberish>
@@ -405,7 +404,6 @@ export interface ERC721Collections extends BaseContract {
     ): Promise<[boolean]>;
 
     mint(
-      to: PromiseOrValue<string>,
       collectionId: PromiseOrValue<BigNumberish>,
       tokenURI: PromiseOrValue<string>,
       price: PromiseOrValue<BigNumberish>,
@@ -520,7 +518,6 @@ export interface ERC721Collections extends BaseContract {
   ): Promise<boolean>;
 
   mint(
-    to: PromiseOrValue<string>,
     collectionId: PromiseOrValue<BigNumberish>,
     tokenURI: PromiseOrValue<string>,
     price: PromiseOrValue<BigNumberish>,
@@ -635,7 +632,6 @@ export interface ERC721Collections extends BaseContract {
     ): Promise<boolean>;
 
     mint(
-      to: PromiseOrValue<string>,
       collectionId: PromiseOrValue<BigNumberish>,
       tokenURI: PromiseOrValue<string>,
       price: PromiseOrValue<BigNumberish>,
@@ -805,7 +801,6 @@ export interface ERC721Collections extends BaseContract {
     ): Promise<BigNumber>;
 
     mint(
-      to: PromiseOrValue<string>,
       collectionId: PromiseOrValue<BigNumberish>,
       tokenURI: PromiseOrValue<string>,
       price: PromiseOrValue<BigNumberish>,
@@ -921,7 +916,6 @@ export interface ERC721Collections extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     mint(
-      to: PromiseOrValue<string>,
       collectionId: PromiseOrValue<BigNumberish>,
       tokenURI: PromiseOrValue<string>,
       price: PromiseOrValue<BigNumberish>,

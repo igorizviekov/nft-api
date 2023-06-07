@@ -84,11 +84,38 @@ export interface NFTMarketplaceInterface extends utils.Interface {
   ): Result;
 
   events: {
+    "NFTBought(uint256)": EventFragment;
+    "NFTDelisted(uint256)": EventFragment;
+    "NFTListed(uint256)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "NFTBought"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "NFTDelisted"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "NFTListed"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
 }
+
+export interface NFTBoughtEventObject {
+  tokenId: BigNumber;
+}
+export type NFTBoughtEvent = TypedEvent<[BigNumber], NFTBoughtEventObject>;
+
+export type NFTBoughtEventFilter = TypedEventFilter<NFTBoughtEvent>;
+
+export interface NFTDelistedEventObject {
+  tokenId: BigNumber;
+}
+export type NFTDelistedEvent = TypedEvent<[BigNumber], NFTDelistedEventObject>;
+
+export type NFTDelistedEventFilter = TypedEventFilter<NFTDelistedEvent>;
+
+export interface NFTListedEventObject {
+  tokenId: BigNumber;
+}
+export type NFTListedEvent = TypedEvent<[BigNumber], NFTListedEventObject>;
+
+export type NFTListedEventFilter = TypedEventFilter<NFTListedEvent>;
 
 export interface OwnershipTransferredEventObject {
   previousOwner: string;
@@ -209,6 +236,27 @@ export interface NFTMarketplace extends BaseContract {
   };
 
   filters: {
+    "NFTBought(uint256)"(
+      tokenId?: PromiseOrValue<BigNumberish> | null
+    ): NFTBoughtEventFilter;
+    NFTBought(
+      tokenId?: PromiseOrValue<BigNumberish> | null
+    ): NFTBoughtEventFilter;
+
+    "NFTDelisted(uint256)"(
+      tokenId?: PromiseOrValue<BigNumberish> | null
+    ): NFTDelistedEventFilter;
+    NFTDelisted(
+      tokenId?: PromiseOrValue<BigNumberish> | null
+    ): NFTDelistedEventFilter;
+
+    "NFTListed(uint256)"(
+      tokenId?: PromiseOrValue<BigNumberish> | null
+    ): NFTListedEventFilter;
+    NFTListed(
+      tokenId?: PromiseOrValue<BigNumberish> | null
+    ): NFTListedEventFilter;
+
     "OwnershipTransferred(address,address)"(
       previousOwner?: PromiseOrValue<string> | null,
       newOwner?: PromiseOrValue<string> | null

@@ -15,6 +15,10 @@ contract NFTMarketplace is Ownable {
 
     mapping(uint256 => bool) private _listedTokens;
 
+    event NFTListed(uint256 indexed tokenId);
+    event NFTDelisted(uint256 indexed tokenId);
+    event NFTBought(uint256 indexed tokenId);
+
     constructor(address nftContractAddress) {
         _nftContract = IERC721Collections(nftContractAddress);
     }
@@ -28,6 +32,8 @@ contract NFTMarketplace is Ownable {
 
         _listedTokens[tokenId] = true;
         _nftContract.approve(address(this), tokenId);
+
+        emit NFTListed(tokenId);
     }
 
     function delistNFT(uint256 tokenId) public {
@@ -39,6 +45,8 @@ contract NFTMarketplace is Ownable {
 
         _listedTokens[tokenId] = false;
         _nftContract.approve(address(0), tokenId);
+
+        emit NFTDelisted(tokenId);
     }
 
     function buyNFT(uint256 tokenId) public payable {
@@ -53,5 +61,7 @@ contract NFTMarketplace is Ownable {
 
         _nftContract.transferFrom(nftOwner, msg.sender, tokenId);
         _listedTokens[tokenId] = false;
+
+        emit NFTBought(tokenId);
     }
 }

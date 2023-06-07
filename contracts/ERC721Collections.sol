@@ -24,9 +24,7 @@ contract ERC721Collections is ERC721URIStorage, Ownable {
 
     constructor() ERC721("ERC721Collections", "STR") {}
 
-    function createCollection(
-        string memory name
-    ) public onlyOwner returns (uint256) {
+    function createCollection(string memory name) public returns (uint256) {
         _collectionIdTracker.increment();
 
         _collections[_collectionIdTracker.current()] = Collection({
@@ -48,11 +46,10 @@ contract ERC721Collections is ERC721URIStorage, Ownable {
     }
 
     function mint(
-        address to,
         uint256 collectionId,
         string memory tokenURI,
         uint256 price
-    ) public onlyOwner returns (uint256) {
+    ) public returns (uint256) {
         require(
             _collections[collectionId].id != 0,
             "Collection does not exist"
@@ -61,7 +58,7 @@ contract ERC721Collections is ERC721URIStorage, Ownable {
         uint256 newTokenId = _tokenIdTracker.current();
         _tokenIdTracker.increment();
 
-        _mint(to, newTokenId);
+        _mint(msg.sender, newTokenId);
         _setTokenURI(newTokenId, tokenURI);
         _nftToCollection[newTokenId] = collectionId;
         _nftCollections[collectionId].push(newTokenId);
@@ -78,7 +75,7 @@ contract ERC721Collections is ERC721URIStorage, Ownable {
             _isApprovedOrOwner(_msgSender(), tokenId),
             "ERC721: transfer caller is not owner nor approved"
         );
-        require(_exists(tokenId), "Token does not exist");
+        require(ownerOf(tokenId) == msg.sender, "Only owner can set the price");
         require(_tokenPrices[tokenId] != 0, "Price not set");
         _tokenPrices[tokenId] = price;
         return _tokenPrices[tokenId];
