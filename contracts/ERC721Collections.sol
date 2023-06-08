@@ -22,9 +22,28 @@ contract ERC721Collections is ERC721URIStorage, Ownable {
     mapping(uint256 => uint256) private _nftToCollection; // Mapping from token ID to collection ID
     mapping(uint256 => uint256) private _tokenPrices; // Mapping from token ID to its price
 
+    mapping(address => uint256) public collectionsCreated;
+    mapping(address => uint256) public lastCollectionTimestamp;
+
+    uint256 constant MAX_COLLECTIONS_PER_ADDRESS = 999;
+    uint256 constant TIME_BETWEEN_COLLECTIONS = 1 minutes;
+
     constructor() ERC721("ERC721Collections", "STR") {}
 
     function createCollection(string memory name) public returns (uint256) {
+        require(
+            collectionsCreated[msg.sender] < MAX_COLLECTIONS_PER_ADDRESS,
+            "Max collections reached"
+        );
+        require(
+            lastCollectionTimestamp[msg.sender] + TIME_BETWEEN_COLLECTIONS <=
+                block.timestamp,
+            "Must wait before creating another collection"
+        );
+
+        collectionsCreated[msg.sender]++;
+        lastCollectionTimestamp[msg.sender] = block.timestamp;
+
         _collectionIdTracker.increment();
 
         _collections[_collectionIdTracker.current()] = Collection({
@@ -75,8 +94,7 @@ contract ERC721Collections is ERC721URIStorage, Ownable {
             _isApprovedOrOwner(_msgSender(), tokenId),
             "ERC721: transfer caller is not owner nor approved"
         );
-        require(ownerOf(tokenId) == msg.sender, "Only owner can set the price");
-        require(_tokenPrices[tokenId] != 0, "Price not set");
+
         _tokenPrices[tokenId] = price;
         return _tokenPrices[tokenId];
     }
