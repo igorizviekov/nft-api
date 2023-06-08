@@ -26,15 +26,16 @@ contract NFTMarketplace is Ownable, ReentrancyGuard {
         owner = payable(msg.sender);
     }
 
-    function listNFT(uint256 tokenId) public {
+    function listNFT(uint256 tokenId, uint256 newPrice) public {
         require(
             msg.sender == _nftContract.ownerOf(tokenId),
             "Caller is not owner of NFT"
         );
         require(!_listedTokens[tokenId], "NFT already listed");
-
+        require(newPrice > 0, "Price must be greater than 0");
         // check NFTCollection contract if the sender address is the owner of the token ID, or an approved operator of the owner
         _nftContract.approve(address(this), tokenId);
+        _nftContract.setPrice(tokenId, newPrice);
         _listedTokens[tokenId] = true;
 
         emit NFTListed(tokenId);
