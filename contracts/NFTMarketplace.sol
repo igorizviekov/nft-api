@@ -33,7 +33,7 @@ contract NFTMarketplace is Ownable, ReentrancyGuard {
         );
         require(!_listedTokens[tokenId], "NFT already listed");
 
-        // check NFTCollection contract if the current message sender is the owner of the token ID, or an approved operator of the owner
+        // check NFTCollection contract if the sender address is the owner of the token ID, or an approved operator of the owner
         _nftContract.approve(address(this), tokenId);
         _listedTokens[tokenId] = true;
 
