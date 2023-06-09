@@ -13,7 +13,10 @@ interface IERC721Collections is IERC721 {
 
 contract NFTMarketplace is Ownable, ReentrancyGuard {
     IERC721Collections private _nftContract;
-    address payable owner;
+
+    address payable[] private royaltyRecipients;
+    uint256 private royalties;
+    uint256 totalRoyalty = royalties * royaltyRecipients.length;
 
     mapping(uint256 => bool) private _listedTokens;
 
@@ -21,19 +24,32 @@ contract NFTMarketplace is Ownable, ReentrancyGuard {
     event NFTDelisted(uint256 indexed tokenId);
     event NFTBought(uint256 indexed tokenId);
 
-    constructor(address nftContractAddress) {
+    constructor(
+        address nftContractAddress,
+        address payable[] memory _royaltyRecipients,
+        uint256 _royalties
+    ) {
+        require(
+            _royaltyRecipients.length > 0,
+            "At least one royalty recipient is required"
+        );
         _nftContract = IERC721Collections(nftContractAddress);
-        owner = payable(msg.sender);
+        royaltyRecipients = _royaltyRecipients;
+        royalties = _royalties;
     }
 
     function listNFT(uint256 tokenId, uint256 newPrice) public {
+        require(newPrice > 0, "Price must be greater than 0");
+        require(!_listedTokens[tokenId], "NFT already listed");
         require(
             msg.sender == _nftContract.ownerOf(tokenId),
             "Caller is not owner of NFT"
         );
-        require(!_listedTokens[tokenId], "NFT already listed");
-        require(newPrice > 0, "Price must be greater than 0");
-        // check NFTCollection contract if the sender address is the owner of the token ID, or an approved operator of the owner
+        require(
+            newPrice > totalRoyalty,
+            "Price must be greater than total royalties"
+        );
+
         _nftContract.approve(address(this), tokenId);
         _nftContract.setPrice(tokenId, newPrice);
         _listedTokens[tokenId] = true;
@@ -41,34 +57,27 @@ contract NFTMarketplace is Ownable, ReentrancyGuard {
         emit NFTListed(tokenId);
     }
 
-    function delistNFT(uint256 tokenId) public {
-        require(
-            msg.sender == _nftContract.ownerOf(tokenId) || msg.sender == owner,
-            "Caller is not owner of NFT, nor the Marketplace"
-        );
-        require(_listedTokens[tokenId], "NFT not listed");
-
-        _listedTokens[tokenId] = false;
-
-        // revoke access to the NFT from the Marketplace
-        _nftContract.approve(address(0), tokenId);
-
-        emit NFTDelisted(tokenId);
-    }
-
     function buyNFT(uint256 tokenId) public payable nonReentrant {
         require(_listedTokens[tokenId], "NFT not listed for sale");
-        require(
-            msg.value == _nftContract.getPrice(tokenId),
-            "Sent value does not match the NFT price"
-        );
+        uint256 price = _nftContract.getPrice(tokenId);
+        require(msg.value == price, "Sent value does not match the NFT price");
         _listedTokens[tokenId] = false;
 
+        require(
+            price > totalRoyalty,
+            "Price should be higher than total royalties"
+        );
+
+        uint256 sellerAmount = price - totalRoyalty;
+
         address nftOwner = _nftContract.ownerOf(tokenId);
-        payable(nftOwner).transfer(msg.value);
+
+        payable(nftOwner).transfer(sellerAmount);
+        for (uint i = 0; i < royaltyRecipients.length; i++) {
+            royaltyRecipients[i].transfer(royalties);
+        }
 
         _nftContract.transferFrom(nftOwner, msg.sender, tokenId);
-
         emit NFTBought(tokenId);
     }
 }
