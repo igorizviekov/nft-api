@@ -30,24 +30,54 @@ import type {
 
 export interface NFTMarketplaceInterface extends utils.Interface {
   functions: {
+    "MAX_PRICE()": FunctionFragment;
+    "MIN_PRICE()": FunctionFragment;
     "buyNFT(uint256)": FunctionFragment;
     "delistNFT(uint256)": FunctionFragment;
-    "listNFT(uint256)": FunctionFragment;
+    "isTokenListed(uint256)": FunctionFragment;
+    "listNFT(uint256,uint256)": FunctionFragment;
     "owner()": FunctionFragment;
+    "payee(uint256)": FunctionFragment;
+    "releasable(address)": FunctionFragment;
+    "releasable(address,address)": FunctionFragment;
+    "release(address)": FunctionFragment;
+    "release(address,address)": FunctionFragment;
+    "released(address,address)": FunctionFragment;
+    "released(address)": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
+    "shares(address)": FunctionFragment;
+    "totalReleased(address)": FunctionFragment;
+    "totalReleased()": FunctionFragment;
+    "totalShares()": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
   };
 
   getFunction(
     nameOrSignatureOrTopic:
+      | "MAX_PRICE"
+      | "MIN_PRICE"
       | "buyNFT"
       | "delistNFT"
+      | "isTokenListed"
       | "listNFT"
       | "owner"
+      | "payee"
+      | "releasable(address)"
+      | "releasable(address,address)"
+      | "release(address)"
+      | "release(address,address)"
+      | "released(address,address)"
+      | "released(address)"
       | "renounceOwnership"
+      | "shares"
+      | "totalReleased(address)"
+      | "totalReleased()"
+      | "totalShares"
       | "transferOwnership"
   ): FunctionFragment;
 
+  encodeFunctionData(functionFragment: "MAX_PRICE", values?: undefined): string;
+  encodeFunctionData(functionFragment: "MIN_PRICE", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "buyNFT",
     values: [PromiseOrValue<BigNumberish>]
@@ -57,12 +87,60 @@ export interface NFTMarketplaceInterface extends utils.Interface {
     values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
-    functionFragment: "listNFT",
+    functionFragment: "isTokenListed",
     values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "listNFT",
+    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
+    functionFragment: "payee",
+    values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "releasable(address)",
+    values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "releasable(address,address)",
+    values: [PromiseOrValue<string>, PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "release(address)",
+    values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "release(address,address)",
+    values: [PromiseOrValue<string>, PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "released(address,address)",
+    values: [PromiseOrValue<string>, PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "released(address)",
+    values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
     functionFragment: "renounceOwnership",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "shares",
+    values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "totalReleased(address)",
+    values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "totalReleased()",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "totalShares",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -70,12 +148,56 @@ export interface NFTMarketplaceInterface extends utils.Interface {
     values: [PromiseOrValue<string>]
   ): string;
 
+  decodeFunctionResult(functionFragment: "MAX_PRICE", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "MIN_PRICE", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "buyNFT", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "delistNFT", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "isTokenListed",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "listNFT", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "payee", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "releasable(address)",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "releasable(address,address)",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "release(address)",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "release(address,address)",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "released(address,address)",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "released(address)",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "shares", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "totalReleased(address)",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "totalReleased()",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "totalShares",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -84,17 +206,38 @@ export interface NFTMarketplaceInterface extends utils.Interface {
   ): Result;
 
   events: {
+    "ERC20PaymentReleased(address,address,uint256)": EventFragment;
     "NFTBought(uint256)": EventFragment;
     "NFTDelisted(uint256)": EventFragment;
     "NFTListed(uint256)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
+    "PayeeAdded(address,uint256)": EventFragment;
+    "PaymentReceived(address,uint256)": EventFragment;
+    "PaymentReleased(address,uint256)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "ERC20PaymentReleased"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "NFTBought"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "NFTDelisted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "NFTListed"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "PayeeAdded"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "PaymentReceived"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "PaymentReleased"): EventFragment;
 }
+
+export interface ERC20PaymentReleasedEventObject {
+  token: string;
+  to: string;
+  amount: BigNumber;
+}
+export type ERC20PaymentReleasedEvent = TypedEvent<
+  [string, string, BigNumber],
+  ERC20PaymentReleasedEventObject
+>;
+
+export type ERC20PaymentReleasedEventFilter =
+  TypedEventFilter<ERC20PaymentReleasedEvent>;
 
 export interface NFTBoughtEventObject {
   tokenId: BigNumber;
@@ -129,6 +272,39 @@ export type OwnershipTransferredEvent = TypedEvent<
 export type OwnershipTransferredEventFilter =
   TypedEventFilter<OwnershipTransferredEvent>;
 
+export interface PayeeAddedEventObject {
+  account: string;
+  shares: BigNumber;
+}
+export type PayeeAddedEvent = TypedEvent<
+  [string, BigNumber],
+  PayeeAddedEventObject
+>;
+
+export type PayeeAddedEventFilter = TypedEventFilter<PayeeAddedEvent>;
+
+export interface PaymentReceivedEventObject {
+  from: string;
+  amount: BigNumber;
+}
+export type PaymentReceivedEvent = TypedEvent<
+  [string, BigNumber],
+  PaymentReceivedEventObject
+>;
+
+export type PaymentReceivedEventFilter = TypedEventFilter<PaymentReceivedEvent>;
+
+export interface PaymentReleasedEventObject {
+  to: string;
+  amount: BigNumber;
+}
+export type PaymentReleasedEvent = TypedEvent<
+  [string, BigNumber],
+  PaymentReleasedEventObject
+>;
+
+export type PaymentReleasedEventFilter = TypedEventFilter<PaymentReleasedEvent>;
+
 export interface NFTMarketplace extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
@@ -156,6 +332,10 @@ export interface NFTMarketplace extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
+    MAX_PRICE(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    MIN_PRICE(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     buyNFT(
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
@@ -166,22 +346,84 @@ export interface NFTMarketplace extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
+    isTokenListed(
+      tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
     listNFT(
       tokenId: PromiseOrValue<BigNumberish>,
+      newPrice: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
     owner(overrides?: CallOverrides): Promise<[string]>;
 
+    payee(
+      index: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    "releasable(address)"(
+      account: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    "releasable(address,address)"(
+      token: PromiseOrValue<string>,
+      account: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    "release(address)"(
+      account: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    "release(address,address)"(
+      token: PromiseOrValue<string>,
+      account: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    "released(address,address)"(
+      token: PromiseOrValue<string>,
+      account: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    "released(address)"(
+      account: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
     renounceOwnership(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
+
+    shares(
+      account: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    "totalReleased(address)"(
+      token: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    "totalReleased()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    totalShares(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     transferOwnership(
       newOwner: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
   };
+
+  MAX_PRICE(overrides?: CallOverrides): Promise<BigNumber>;
+
+  MIN_PRICE(overrides?: CallOverrides): Promise<BigNumber>;
 
   buyNFT(
     tokenId: PromiseOrValue<BigNumberish>,
@@ -193,16 +435,74 @@ export interface NFTMarketplace extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
+  isTokenListed(
+    tokenId: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
+
   listNFT(
     tokenId: PromiseOrValue<BigNumberish>,
+    newPrice: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
   owner(overrides?: CallOverrides): Promise<string>;
 
+  payee(
+    index: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
+  "releasable(address)"(
+    account: PromiseOrValue<string>,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  "releasable(address,address)"(
+    token: PromiseOrValue<string>,
+    account: PromiseOrValue<string>,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  "release(address)"(
+    account: PromiseOrValue<string>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  "release(address,address)"(
+    token: PromiseOrValue<string>,
+    account: PromiseOrValue<string>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  "released(address,address)"(
+    token: PromiseOrValue<string>,
+    account: PromiseOrValue<string>,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  "released(address)"(
+    account: PromiseOrValue<string>,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
   renounceOwnership(
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
+
+  shares(
+    account: PromiseOrValue<string>,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  "totalReleased(address)"(
+    token: PromiseOrValue<string>,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  "totalReleased()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+  totalShares(overrides?: CallOverrides): Promise<BigNumber>;
 
   transferOwnership(
     newOwner: PromiseOrValue<string>,
@@ -210,6 +510,10 @@ export interface NFTMarketplace extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    MAX_PRICE(overrides?: CallOverrides): Promise<BigNumber>;
+
+    MIN_PRICE(overrides?: CallOverrides): Promise<BigNumber>;
+
     buyNFT(
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -220,14 +524,72 @@ export interface NFTMarketplace extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    isTokenListed(
+      tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
     listNFT(
       tokenId: PromiseOrValue<BigNumberish>,
+      newPrice: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
 
     owner(overrides?: CallOverrides): Promise<string>;
 
+    payee(
+      index: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    "releasable(address)"(
+      account: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "releasable(address,address)"(
+      token: PromiseOrValue<string>,
+      account: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "release(address)"(
+      account: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "release(address,address)"(
+      token: PromiseOrValue<string>,
+      account: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "released(address,address)"(
+      token: PromiseOrValue<string>,
+      account: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "released(address)"(
+      account: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
+
+    shares(
+      account: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "totalReleased(address)"(
+      token: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "totalReleased()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    totalShares(overrides?: CallOverrides): Promise<BigNumber>;
 
     transferOwnership(
       newOwner: PromiseOrValue<string>,
@@ -236,6 +598,17 @@ export interface NFTMarketplace extends BaseContract {
   };
 
   filters: {
+    "ERC20PaymentReleased(address,address,uint256)"(
+      token?: PromiseOrValue<string> | null,
+      to?: null,
+      amount?: null
+    ): ERC20PaymentReleasedEventFilter;
+    ERC20PaymentReleased(
+      token?: PromiseOrValue<string> | null,
+      to?: null,
+      amount?: null
+    ): ERC20PaymentReleasedEventFilter;
+
     "NFTBought(uint256)"(
       tokenId?: PromiseOrValue<BigNumberish> | null
     ): NFTBoughtEventFilter;
@@ -265,9 +638,31 @@ export interface NFTMarketplace extends BaseContract {
       previousOwner?: PromiseOrValue<string> | null,
       newOwner?: PromiseOrValue<string> | null
     ): OwnershipTransferredEventFilter;
+
+    "PayeeAdded(address,uint256)"(
+      account?: null,
+      shares?: null
+    ): PayeeAddedEventFilter;
+    PayeeAdded(account?: null, shares?: null): PayeeAddedEventFilter;
+
+    "PaymentReceived(address,uint256)"(
+      from?: null,
+      amount?: null
+    ): PaymentReceivedEventFilter;
+    PaymentReceived(from?: null, amount?: null): PaymentReceivedEventFilter;
+
+    "PaymentReleased(address,uint256)"(
+      to?: null,
+      amount?: null
+    ): PaymentReleasedEventFilter;
+    PaymentReleased(to?: null, amount?: null): PaymentReleasedEventFilter;
   };
 
   estimateGas: {
+    MAX_PRICE(overrides?: CallOverrides): Promise<BigNumber>;
+
+    MIN_PRICE(overrides?: CallOverrides): Promise<BigNumber>;
+
     buyNFT(
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
@@ -278,16 +673,74 @@ export interface NFTMarketplace extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
+    isTokenListed(
+      tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     listNFT(
       tokenId: PromiseOrValue<BigNumberish>,
+      newPrice: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
+    payee(
+      index: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "releasable(address)"(
+      account: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "releasable(address,address)"(
+      token: PromiseOrValue<string>,
+      account: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "release(address)"(
+      account: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    "release(address,address)"(
+      token: PromiseOrValue<string>,
+      account: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    "released(address,address)"(
+      token: PromiseOrValue<string>,
+      account: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "released(address)"(
+      account: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     renounceOwnership(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
+
+    shares(
+      account: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "totalReleased(address)"(
+      token: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "totalReleased()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    totalShares(overrides?: CallOverrides): Promise<BigNumber>;
 
     transferOwnership(
       newOwner: PromiseOrValue<string>,
@@ -296,6 +749,10 @@ export interface NFTMarketplace extends BaseContract {
   };
 
   populateTransaction: {
+    MAX_PRICE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    MIN_PRICE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     buyNFT(
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
@@ -306,16 +763,74 @@ export interface NFTMarketplace extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
+    isTokenListed(
+      tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     listNFT(
       tokenId: PromiseOrValue<BigNumberish>,
+      newPrice: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    payee(
+      index: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "releasable(address)"(
+      account: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "releasable(address,address)"(
+      token: PromiseOrValue<string>,
+      account: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "release(address)"(
+      account: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "release(address,address)"(
+      token: PromiseOrValue<string>,
+      account: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "released(address,address)"(
+      token: PromiseOrValue<string>,
+      account: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "released(address)"(
+      account: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     renounceOwnership(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
+
+    shares(
+      account: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "totalReleased(address)"(
+      token: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "totalReleased()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    totalShares(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     transferOwnership(
       newOwner: PromiseOrValue<string>,

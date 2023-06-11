@@ -19,8 +19,48 @@ async function main() {
   const NFTMarketplace = await ethers.getContractFactory(
     marketplaceContractName
   );
-  const marketplace = await NFTMarketplace.deploy(nftCollection.address as any);
+
+  /**
+   * Deploys the NFTMarketplace contract.
+   *
+   * @param {string} collectionsContractAddress - The address of the NFT collections contract.
+   * @param {Array.<string>} royaltyRecipients - Array of recipient addresses to receive royalty payments.
+   * @param {Array.<number>} shares - Array of share percentages corresponding to each recipient.
+   * @param {number} royalties - The total royalties percentage (0-100).
+   *
+   * @returns {Promise<Contract>} Returns a promise that resolves to a Contract. This represents the deployed NFTMarketplace contract.
+   *
+   * @throws Will throw an error if deployment fails.
+   *
+   * @example
+   * const marketplace = await NFTMarketplace.deploy(
+   *   nftMarketplaceOptions.collectionsContractAddress,
+   *   nftMarketplaceOptions.royaltyRecipients,
+   *   nftMarketplaceOptions.shares,
+   *   nftMarketplaceOptions.royalties
+   * );
+   */
+
+  const nftMarketplaceOptions = {
+    collectionsContractAddress: nftCollection.address as any,
+    royalties: 5,
+    royaltyRecipients: [
+      "0xPayee1Address",
+      "0xPayee2Address",
+      "0xPayee3Address",
+    ],
+    shares: [1, 1, 1], // equal amount
+  };
+
+  const marketplace = await NFTMarketplace.deploy(
+    nftMarketplaceOptions.collectionsContractAddress, // nftContractAddress
+    nftMarketplaceOptions.royaltyRecipients, // payees
+    nftMarketplaceOptions.shares,
+    nftMarketplaceOptions.royalties
+  );
+
   await marketplace.deployed();
+  await nftCollection.setMarketplace(marketplace.address);
   console.log(`${marketplaceContractName} deployed to ${marketplace.address}`);
 }
 

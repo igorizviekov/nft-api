@@ -1,21 +1,34 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.1;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "./NFTMarketplace.sol";
 
+/**
+ * @title ERC721Collections
+ * @dev A contract for creating and managing NFT collections. Inherits from OpenZeppelin's ERC721URIStorage and Ownable contracts.
+ */
 contract ERC721Collections is ERC721URIStorage, Ownable {
     using Counters for Counters.Counter;
 
     Counters.Counter private _tokenIdTracker;
     Counters.Counter private _collectionIdTracker;
 
+    uint256 constant MAX_COLLECTIONS_PER_ADDRESS = 999;
+    uint256 constant TIME_BETWEEN_COLLECTIONS = 1 minutes;
+    uint256 public constant MIN_PRICE = 0.01 ether;
+    uint256 public constant MAX_PRICE = 10000 ether;
+
     struct Collection {
         string name;
         uint256 id;
+        address owner;
     }
+
+    NFTMarketplace private _marketplace;
 
     mapping(uint256 => Collection) private _collections;
     mapping(uint256 => uint256[]) private _nftCollections; // Mapping from collection ID to list of token IDs
@@ -25,10 +38,59 @@ contract ERC721Collections is ERC721URIStorage, Ownable {
     mapping(address => uint256) public collectionsCreated;
     mapping(address => uint256) public lastCollectionTimestamp;
 
-    uint256 constant MAX_COLLECTIONS_PER_ADDRESS = 999;
-    uint256 constant TIME_BETWEEN_COLLECTIONS = 1 minutes;
+    event CollectionCreated(uint256 id, string name);
+    event TokenMinted(uint256 tokenId, uint256 collectionId);
+    event PriceSet(uint256 tokenId, uint256 price);
 
     constructor() ERC721("ERC721Collections", "STR") {}
+
+    function setMarketplace(
+        address payable marketplaceAddress
+    ) public onlyOwner {
+        require(
+            address(_marketplace) == address(0),
+            "Marketplace address has already been set"
+        );
+        _marketplace = NFTMarketplace(marketplaceAddress);
+    }
+
+    function getCollection(uint256 id) public view returns (Collection memory) {
+        return _collections[id];
+    }
+
+    function getCollectionOfToken(
+        uint256 tokenId
+    ) public view returns (uint256) {
+        return _nftToCollection[tokenId];
+    }
+
+    function getNFTsInCollection(
+        uint256 collectionId
+    ) public view returns (uint256[] memory) {
+        return _nftCollections[collectionId];
+    }
+
+    function getPrice(uint256 tokenId) public view returns (uint256) {
+        return _tokenPrices[tokenId];
+    }
+
+    function setPrice(uint256 tokenId, uint256 price) public returns (uint256) {
+        require(price >= MIN_PRICE, "Price must be at least MIN_PRICE");
+        require(price <= MAX_PRICE, "Price must not exceed MAX_PRICE");
+        require(
+            _isApprovedOrOwner(_msgSender(), tokenId),
+            "ERC721: transfer caller is not owner nor approved"
+        );
+        require(
+            !_marketplace.isTokenListed(tokenId),
+            "Token is currently listed for sale"
+        );
+        _tokenPrices[tokenId] = price;
+
+        emit PriceSet(tokenId, price);
+
+        return _tokenPrices[tokenId];
+    }
 
     function createCollection(string memory name) public returns (uint256) {
         require(
@@ -48,27 +110,22 @@ contract ERC721Collections is ERC721URIStorage, Ownable {
 
         _collections[_collectionIdTracker.current()] = Collection({
             name: name,
-            id: _collectionIdTracker.current()
+            id: _collectionIdTracker.current(),
+            owner: msg.sender
         });
 
+        emit CollectionCreated(_collectionIdTracker.current(), name);
+
         return _collectionIdTracker.current();
-    }
-
-    function getCollection(uint256 id) public view returns (Collection memory) {
-        return _collections[id];
-    }
-
-    function getNFTsInCollection(
-        uint256 collectionId
-    ) public view returns (uint256[] memory) {
-        return _nftCollections[collectionId];
     }
 
     function mint(
         uint256 collectionId,
         string memory tokenURI,
         uint256 price
-    ) public returns (uint256) {
+    ) public onlyOwner returns (uint256) {
+        require(price >= MIN_PRICE, "Price must be at least MIN_PRICE");
+        require(price <= MAX_PRICE, "Price must not exceed MAX_PRICE");
         require(
             _collections[collectionId].id != 0,
             "Collection does not exist"
@@ -76,26 +133,18 @@ contract ERC721Collections is ERC721URIStorage, Ownable {
         require(price > 0, "Price must be greater than 0");
         uint256 newTokenId = _tokenIdTracker.current();
         _tokenIdTracker.increment();
-
+        require(
+            _collections[collectionId].owner == msg.sender,
+            "Not the owner of the collection"
+        );
         _mint(msg.sender, newTokenId);
         _setTokenURI(newTokenId, tokenURI);
         _nftToCollection[newTokenId] = collectionId;
         _nftCollections[collectionId].push(newTokenId);
         _tokenPrices[newTokenId] = price;
+
+        emit TokenMinted(newTokenId, collectionId);
+
         return newTokenId;
-    }
-
-    function getPrice(uint256 tokenId) public view returns (uint256) {
-        return _tokenPrices[tokenId];
-    }
-
-    function setPrice(uint256 tokenId, uint256 price) public returns (uint256) {
-        require(
-            _isApprovedOrOwner(_msgSender(), tokenId),
-            "ERC721: transfer caller is not owner nor approved"
-        );
-
-        _tokenPrices[tokenId] = price;
-        return _tokenPrices[tokenId];
     }
 }

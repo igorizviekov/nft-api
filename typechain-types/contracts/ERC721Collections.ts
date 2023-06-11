@@ -31,24 +31,31 @@ export declare namespace ERC721Collections {
   export type CollectionStruct = {
     name: PromiseOrValue<string>;
     id: PromiseOrValue<BigNumberish>;
+    owner: PromiseOrValue<string>;
   };
 
-  export type CollectionStructOutput = [string, BigNumber] & {
+  export type CollectionStructOutput = [string, BigNumber, string] & {
     name: string;
     id: BigNumber;
+    owner: string;
   };
 }
 
 export interface ERC721CollectionsInterface extends utils.Interface {
   functions: {
+    "MAX_PRICE()": FunctionFragment;
+    "MIN_PRICE()": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
+    "collectionsCreated(address)": FunctionFragment;
     "createCollection(string)": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "getCollection(uint256)": FunctionFragment;
+    "getCollectionOfToken(uint256)": FunctionFragment;
     "getNFTsInCollection(uint256)": FunctionFragment;
     "getPrice(uint256)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
+    "lastCollectionTimestamp(address)": FunctionFragment;
     "mint(uint256,string,uint256)": FunctionFragment;
     "name()": FunctionFragment;
     "owner()": FunctionFragment;
@@ -57,6 +64,7 @@ export interface ERC721CollectionsInterface extends utils.Interface {
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256,bytes)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
+    "setMarketplace(address)": FunctionFragment;
     "setPrice(uint256,uint256)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "symbol()": FunctionFragment;
@@ -67,14 +75,19 @@ export interface ERC721CollectionsInterface extends utils.Interface {
 
   getFunction(
     nameOrSignatureOrTopic:
+      | "MAX_PRICE"
+      | "MIN_PRICE"
       | "approve"
       | "balanceOf"
+      | "collectionsCreated"
       | "createCollection"
       | "getApproved"
       | "getCollection"
+      | "getCollectionOfToken"
       | "getNFTsInCollection"
       | "getPrice"
       | "isApprovedForAll"
+      | "lastCollectionTimestamp"
       | "mint"
       | "name"
       | "owner"
@@ -83,6 +96,7 @@ export interface ERC721CollectionsInterface extends utils.Interface {
       | "safeTransferFrom(address,address,uint256)"
       | "safeTransferFrom(address,address,uint256,bytes)"
       | "setApprovalForAll"
+      | "setMarketplace"
       | "setPrice"
       | "supportsInterface"
       | "symbol"
@@ -91,12 +105,18 @@ export interface ERC721CollectionsInterface extends utils.Interface {
       | "transferOwnership"
   ): FunctionFragment;
 
+  encodeFunctionData(functionFragment: "MAX_PRICE", values?: undefined): string;
+  encodeFunctionData(functionFragment: "MIN_PRICE", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "approve",
     values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
     functionFragment: "balanceOf",
+    values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "collectionsCreated",
     values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
@@ -112,6 +132,10 @@ export interface ERC721CollectionsInterface extends utils.Interface {
     values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
+    functionFragment: "getCollectionOfToken",
+    values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
     functionFragment: "getNFTsInCollection",
     values: [PromiseOrValue<BigNumberish>]
   ): string;
@@ -122,6 +146,10 @@ export interface ERC721CollectionsInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "isApprovedForAll",
     values: [PromiseOrValue<string>, PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "lastCollectionTimestamp",
+    values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
     functionFragment: "mint",
@@ -163,6 +191,10 @@ export interface ERC721CollectionsInterface extends utils.Interface {
     values: [PromiseOrValue<string>, PromiseOrValue<boolean>]
   ): string;
   encodeFunctionData(
+    functionFragment: "setMarketplace",
+    values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
     functionFragment: "setPrice",
     values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
   ): string;
@@ -188,8 +220,14 @@ export interface ERC721CollectionsInterface extends utils.Interface {
     values: [PromiseOrValue<string>]
   ): string;
 
+  decodeFunctionResult(functionFragment: "MAX_PRICE", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "MIN_PRICE", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "collectionsCreated",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "createCollection",
     data: BytesLike
@@ -203,12 +241,20 @@ export interface ERC721CollectionsInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "getCollectionOfToken",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "getNFTsInCollection",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "getPrice", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "isApprovedForAll",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "lastCollectionTimestamp",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
@@ -231,6 +277,10 @@ export interface ERC721CollectionsInterface extends utils.Interface {
     functionFragment: "setApprovalForAll",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "setMarketplace",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "setPrice", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "supportsInterface",
@@ -251,16 +301,22 @@ export interface ERC721CollectionsInterface extends utils.Interface {
     "Approval(address,address,uint256)": EventFragment;
     "ApprovalForAll(address,address,bool)": EventFragment;
     "BatchMetadataUpdate(uint256,uint256)": EventFragment;
+    "CollectionCreated(uint256,string)": EventFragment;
     "MetadataUpdate(uint256)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
+    "PriceSet(uint256,uint256)": EventFragment;
+    "TokenMinted(uint256,uint256)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ApprovalForAll"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "BatchMetadataUpdate"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "CollectionCreated"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "MetadataUpdate"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "PriceSet"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "TokenMinted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
 }
 
@@ -300,6 +356,18 @@ export type BatchMetadataUpdateEvent = TypedEvent<
 export type BatchMetadataUpdateEventFilter =
   TypedEventFilter<BatchMetadataUpdateEvent>;
 
+export interface CollectionCreatedEventObject {
+  id: BigNumber;
+  name: string;
+}
+export type CollectionCreatedEvent = TypedEvent<
+  [BigNumber, string],
+  CollectionCreatedEventObject
+>;
+
+export type CollectionCreatedEventFilter =
+  TypedEventFilter<CollectionCreatedEvent>;
+
 export interface MetadataUpdateEventObject {
   _tokenId: BigNumber;
 }
@@ -321,6 +389,28 @@ export type OwnershipTransferredEvent = TypedEvent<
 
 export type OwnershipTransferredEventFilter =
   TypedEventFilter<OwnershipTransferredEvent>;
+
+export interface PriceSetEventObject {
+  tokenId: BigNumber;
+  price: BigNumber;
+}
+export type PriceSetEvent = TypedEvent<
+  [BigNumber, BigNumber],
+  PriceSetEventObject
+>;
+
+export type PriceSetEventFilter = TypedEventFilter<PriceSetEvent>;
+
+export interface TokenMintedEventObject {
+  tokenId: BigNumber;
+  collectionId: BigNumber;
+}
+export type TokenMintedEvent = TypedEvent<
+  [BigNumber, BigNumber],
+  TokenMintedEventObject
+>;
+
+export type TokenMintedEventFilter = TypedEventFilter<TokenMintedEvent>;
 
 export interface TransferEventObject {
   from: string;
@@ -361,6 +451,10 @@ export interface ERC721Collections extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
+    MAX_PRICE(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    MIN_PRICE(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     approve(
       to: PromiseOrValue<string>,
       tokenId: PromiseOrValue<BigNumberish>,
@@ -369,6 +463,11 @@ export interface ERC721Collections extends BaseContract {
 
     balanceOf(
       owner: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    collectionsCreated(
+      arg0: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
@@ -387,6 +486,11 @@ export interface ERC721Collections extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[ERC721Collections.CollectionStructOutput]>;
 
+    getCollectionOfToken(
+      tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
     getNFTsInCollection(
       collectionId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -402,6 +506,11 @@ export interface ERC721Collections extends BaseContract {
       operator: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
+
+    lastCollectionTimestamp(
+      arg0: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
 
     mint(
       collectionId: PromiseOrValue<BigNumberish>,
@@ -444,6 +553,11 @@ export interface ERC721Collections extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
+    setMarketplace(
+      marketplaceAddress: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     setPrice(
       tokenId: PromiseOrValue<BigNumberish>,
       price: PromiseOrValue<BigNumberish>,
@@ -475,6 +589,10 @@ export interface ERC721Collections extends BaseContract {
     ): Promise<ContractTransaction>;
   };
 
+  MAX_PRICE(overrides?: CallOverrides): Promise<BigNumber>;
+
+  MIN_PRICE(overrides?: CallOverrides): Promise<BigNumber>;
+
   approve(
     to: PromiseOrValue<string>,
     tokenId: PromiseOrValue<BigNumberish>,
@@ -483,6 +601,11 @@ export interface ERC721Collections extends BaseContract {
 
   balanceOf(
     owner: PromiseOrValue<string>,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  collectionsCreated(
+    arg0: PromiseOrValue<string>,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
@@ -501,6 +624,11 @@ export interface ERC721Collections extends BaseContract {
     overrides?: CallOverrides
   ): Promise<ERC721Collections.CollectionStructOutput>;
 
+  getCollectionOfToken(
+    tokenId: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
   getNFTsInCollection(
     collectionId: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
@@ -516,6 +644,11 @@ export interface ERC721Collections extends BaseContract {
     operator: PromiseOrValue<string>,
     overrides?: CallOverrides
   ): Promise<boolean>;
+
+  lastCollectionTimestamp(
+    arg0: PromiseOrValue<string>,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
   mint(
     collectionId: PromiseOrValue<BigNumberish>,
@@ -558,6 +691,11 @@ export interface ERC721Collections extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
+  setMarketplace(
+    marketplaceAddress: PromiseOrValue<string>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   setPrice(
     tokenId: PromiseOrValue<BigNumberish>,
     price: PromiseOrValue<BigNumberish>,
@@ -589,6 +727,10 @@ export interface ERC721Collections extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    MAX_PRICE(overrides?: CallOverrides): Promise<BigNumber>;
+
+    MIN_PRICE(overrides?: CallOverrides): Promise<BigNumber>;
+
     approve(
       to: PromiseOrValue<string>,
       tokenId: PromiseOrValue<BigNumberish>,
@@ -597,6 +739,11 @@ export interface ERC721Collections extends BaseContract {
 
     balanceOf(
       owner: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    collectionsCreated(
+      arg0: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -615,6 +762,11 @@ export interface ERC721Collections extends BaseContract {
       overrides?: CallOverrides
     ): Promise<ERC721Collections.CollectionStructOutput>;
 
+    getCollectionOfToken(
+      tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     getNFTsInCollection(
       collectionId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -630,6 +782,11 @@ export interface ERC721Collections extends BaseContract {
       operator: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<boolean>;
+
+    lastCollectionTimestamp(
+      arg0: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     mint(
       collectionId: PromiseOrValue<BigNumberish>,
@@ -667,6 +824,11 @@ export interface ERC721Collections extends BaseContract {
     setApprovalForAll(
       operator: PromiseOrValue<string>,
       approved: PromiseOrValue<boolean>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    setMarketplace(
+      marketplaceAddress: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -733,6 +895,12 @@ export interface ERC721Collections extends BaseContract {
       _toTokenId?: null
     ): BatchMetadataUpdateEventFilter;
 
+    "CollectionCreated(uint256,string)"(
+      id?: null,
+      name?: null
+    ): CollectionCreatedEventFilter;
+    CollectionCreated(id?: null, name?: null): CollectionCreatedEventFilter;
+
     "MetadataUpdate(uint256)"(_tokenId?: null): MetadataUpdateEventFilter;
     MetadataUpdate(_tokenId?: null): MetadataUpdateEventFilter;
 
@@ -744,6 +912,18 @@ export interface ERC721Collections extends BaseContract {
       previousOwner?: PromiseOrValue<string> | null,
       newOwner?: PromiseOrValue<string> | null
     ): OwnershipTransferredEventFilter;
+
+    "PriceSet(uint256,uint256)"(
+      tokenId?: null,
+      price?: null
+    ): PriceSetEventFilter;
+    PriceSet(tokenId?: null, price?: null): PriceSetEventFilter;
+
+    "TokenMinted(uint256,uint256)"(
+      tokenId?: null,
+      collectionId?: null
+    ): TokenMintedEventFilter;
+    TokenMinted(tokenId?: null, collectionId?: null): TokenMintedEventFilter;
 
     "Transfer(address,address,uint256)"(
       from?: PromiseOrValue<string> | null,
@@ -758,6 +938,10 @@ export interface ERC721Collections extends BaseContract {
   };
 
   estimateGas: {
+    MAX_PRICE(overrides?: CallOverrides): Promise<BigNumber>;
+
+    MIN_PRICE(overrides?: CallOverrides): Promise<BigNumber>;
+
     approve(
       to: PromiseOrValue<string>,
       tokenId: PromiseOrValue<BigNumberish>,
@@ -766,6 +950,11 @@ export interface ERC721Collections extends BaseContract {
 
     balanceOf(
       owner: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    collectionsCreated(
+      arg0: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -784,6 +973,11 @@ export interface ERC721Collections extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getCollectionOfToken(
+      tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     getNFTsInCollection(
       collectionId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -797,6 +991,11 @@ export interface ERC721Collections extends BaseContract {
     isApprovedForAll(
       owner: PromiseOrValue<string>,
       operator: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    lastCollectionTimestamp(
+      arg0: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -841,6 +1040,11 @@ export interface ERC721Collections extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
+    setMarketplace(
+      marketplaceAddress: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     setPrice(
       tokenId: PromiseOrValue<BigNumberish>,
       price: PromiseOrValue<BigNumberish>,
@@ -873,6 +1077,10 @@ export interface ERC721Collections extends BaseContract {
   };
 
   populateTransaction: {
+    MAX_PRICE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    MIN_PRICE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     approve(
       to: PromiseOrValue<string>,
       tokenId: PromiseOrValue<BigNumberish>,
@@ -881,6 +1089,11 @@ export interface ERC721Collections extends BaseContract {
 
     balanceOf(
       owner: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    collectionsCreated(
+      arg0: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -899,6 +1112,11 @@ export interface ERC721Collections extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    getCollectionOfToken(
+      tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     getNFTsInCollection(
       collectionId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -912,6 +1130,11 @@ export interface ERC721Collections extends BaseContract {
     isApprovedForAll(
       owner: PromiseOrValue<string>,
       operator: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    lastCollectionTimestamp(
+      arg0: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -953,6 +1176,11 @@ export interface ERC721Collections extends BaseContract {
     setApprovalForAll(
       operator: PromiseOrValue<string>,
       approved: PromiseOrValue<boolean>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setMarketplace(
+      marketplaceAddress: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
