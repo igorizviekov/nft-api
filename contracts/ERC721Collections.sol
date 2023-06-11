@@ -4,7 +4,6 @@ pragma solidity ^0.8.1;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "./NFTMarketplace.sol";
 
 /**
@@ -51,6 +50,7 @@ contract ERC721Collections is ERC721URIStorage, Ownable {
             address(_marketplace) == address(0),
             "Marketplace address has already been set"
         );
+        require(marketplaceAddress != address(0), "Invalid address");
         _marketplace = NFTMarketplace(marketplaceAddress);
     }
 
@@ -103,9 +103,6 @@ contract ERC721Collections is ERC721URIStorage, Ownable {
             "Must wait before creating another collection"
         );
 
-        collectionsCreated[msg.sender]++;
-        lastCollectionTimestamp[msg.sender] = block.timestamp;
-
         _collectionIdTracker.increment();
 
         _collections[_collectionIdTracker.current()] = Collection({
@@ -113,6 +110,9 @@ contract ERC721Collections is ERC721URIStorage, Ownable {
             id: _collectionIdTracker.current(),
             owner: msg.sender
         });
+
+        collectionsCreated[msg.sender]++;
+        lastCollectionTimestamp[msg.sender] = block.timestamp;
 
         emit CollectionCreated(_collectionIdTracker.current(), name);
 
@@ -123,7 +123,7 @@ contract ERC721Collections is ERC721URIStorage, Ownable {
         uint256 collectionId,
         string memory tokenURI,
         uint256 price
-    ) public onlyOwner returns (uint256) {
+    ) public returns (uint256) {
         require(price >= MIN_PRICE, "Price must be at least MIN_PRICE");
         require(price <= MAX_PRICE, "Price must not exceed MAX_PRICE");
         require(

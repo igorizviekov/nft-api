@@ -48,6 +48,10 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
         uint256 royalties
     ) PaymentSplitter(payees, shares) {
         require(payees.length > 0, "At least one payee is required");
+        require(
+            payees.length == shares.length,
+            "Payees and shares length must match"
+        );
         _nftContract = IERC721Collections(nftContractAddress);
         _royalties = royalties;
     }
@@ -67,7 +71,6 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
     function listNFT(uint256 tokenId, uint256 newPrice) public nonReentrant {
         require(newPrice >= MIN_PRICE, "Price must be at least MIN_PRICE");
         require(newPrice <= MAX_PRICE, "Price must not exceed MAX_PRICE");
-        require(newPrice > 0, "Price must be greater than 0");
         require(!_listedTokens[tokenId], "NFT already listed");
         require(
             _nftContract.ownerOf(tokenId) == msg.sender,
@@ -120,11 +123,12 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
 
         address nftOwner = _nftContract.ownerOf(tokenId);
 
+        _listedTokens[tokenId] = false;
+
         payable(nftOwner).transfer(sellerAmount);
         payable(address(this)).transfer(royaltiesAmount);
 
         _nftContract.transferFrom(nftOwner, msg.sender, tokenId);
-        _listedTokens[tokenId] = false;
 
         emit NFTBought(tokenId);
     }
