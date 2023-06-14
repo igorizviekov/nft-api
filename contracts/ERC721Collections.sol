@@ -20,9 +20,11 @@ contract ERC721Collections is ERC721URIStorage, Ownable {
     uint256 constant TIME_BETWEEN_COLLECTIONS = 1 minutes;
     uint256 public constant MIN_PRICE = 0.01 ether;
     uint256 public constant MAX_PRICE = 10000 ether;
+    string public constant PUBLIC_METADATA_URI =
+        "https://ipfs.io/ipfs/QmaNfrXqMu8j2UdNDj881r3VnaXoAGrpDbJoDRJRXwfdaU";
 
     struct Collection {
-        string name;
+        string uri;
         uint256 id;
         address owner;
     }
@@ -37,12 +39,12 @@ contract ERC721Collections is ERC721URIStorage, Ownable {
     mapping(address => uint256) public collectionsCreated;
     mapping(address => uint256) public lastCollectionTimestamp;
 
-    event CollectionCreated(uint256 id, string name);
+    event CollectionCreated(uint256 id, string uri);
     event TokenMinted(uint256 tokenId, uint256 collectionId);
     event PriceSet(uint256 tokenId, uint256 price);
 
     constructor() ERC721("ERC721Collections", "STR") {
-        createCollection("Public");
+        createCollection(PUBLIC_METADATA_URI);
     }
 
     function setMarketplace(
@@ -94,7 +96,7 @@ contract ERC721Collections is ERC721URIStorage, Ownable {
         return _tokenPrices[tokenId];
     }
 
-    function createCollection(string memory name) public returns (uint256) {
+    function createCollection(string memory uri) public returns (uint256) {
         require(
             collectionsCreated[msg.sender] < MAX_COLLECTIONS_PER_ADDRESS,
             "Max collections reached"
@@ -108,7 +110,7 @@ contract ERC721Collections is ERC721URIStorage, Ownable {
         _collectionIdTracker.increment();
 
         _collections[_collectionIdTracker.current()] = Collection({
-            name: name,
+            uri: uri,
             id: _collectionIdTracker.current(),
             owner: msg.sender
         });
@@ -116,7 +118,7 @@ contract ERC721Collections is ERC721URIStorage, Ownable {
         collectionsCreated[msg.sender]++;
         lastCollectionTimestamp[msg.sender] = block.timestamp;
 
-        emit CollectionCreated(_collectionIdTracker.current(), name);
+        emit CollectionCreated(_collectionIdTracker.current(), uri);
 
         return _collectionIdTracker.current();
     }
