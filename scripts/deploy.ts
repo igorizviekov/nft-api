@@ -50,7 +50,6 @@ async function main() {
     ],
     shares: [1, 1, 1], // equal amount
   };
-  console.log("qq");
 
   const marketplace = await NFTMarketplace.deploy(
     nftMarketplaceOptions.collectionsContractAddress, // nftContractAddress
@@ -58,10 +57,8 @@ async function main() {
     nftMarketplaceOptions.shares,
     nftMarketplaceOptions.royalties
   );
-  console.log("qqq");
 
   await marketplace.deployed();
-  console.log("qq1");
 
   await nftCollection.setMarketplace(marketplace.address);
   console.log(`${marketplaceContractName} deployed to ${marketplace.address}`);

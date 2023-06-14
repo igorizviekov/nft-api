@@ -41,7 +41,9 @@ contract ERC721Collections is ERC721URIStorage, Ownable {
     event TokenMinted(uint256 tokenId, uint256 collectionId);
     event PriceSet(uint256 tokenId, uint256 price);
 
-    constructor() ERC721("ERC721Collections", "STR") {}
+    constructor() ERC721("ERC721Collections", "STR") {
+        createCollection("Public");
+    }
 
     function setMarketplace(
         address payable marketplaceAddress
@@ -131,7 +133,7 @@ contract ERC721Collections is ERC721URIStorage, Ownable {
             "Collection does not exist"
         );
         require(
-            _collections[collectionId].owner == msg.sender,
+            collectionId == 1 || _collections[collectionId].owner == msg.sender,
             "Not the owner of the collection"
         );
         uint256 newTokenId = _tokenIdTracker.current();
