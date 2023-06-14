@@ -64,8 +64,13 @@ contract ERC721Collections is ERC721URIStorage, Ownable {
 
     function getCollectionOfToken(
         uint256 tokenId
-    ) public view returns (uint256) {
-        return _nftToCollection[tokenId];
+    ) public view returns (Collection memory) {
+        require(
+            _nftToCollection[tokenId] != 0,
+            "Token does not belong to any collection"
+        );
+        uint256 collectionId = _nftToCollection[tokenId];
+        return _collections[collectionId];
     }
 
     function getNFTsInCollection(
