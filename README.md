@@ -1,73 +1,47 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# NFT Marketplace
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+NFT Marketplace is a decentralized platform for trading Non-Fungible Tokens (NFTs) built on Ethereum blockchain.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Technologies Used
 
-## Description
+The NFT Marketplace app uses various technologies including:
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- Solidity for smart contracts.
+- OpenZeppelin libraries for reusable smart contract components.
+- NestJS, a progressive Node.js framework for building efficient, reliable and scalable server-side applications.
+- Hardhat, a development environment to compile, deploy, test, and debug your Ethereum software.
+- TypeChain, a development tool for generating TypeScript typings for Ethereum smart contracts.
+- IPFS for decentralized storage.
+- Jest for running tests.
+- Prettier for code formatting.
 
-## Installation
+## Running Scripts
 
-```bash
-$ yarn install
-```
+The following scripts are provided for building and testing the app:
 
-## Running the app
+- `npm run build`: Compiles the application.
+- `npm start`: Starts the application.
+- `npm run start:dev`: Starts the application in development mode.
+- `npm run start:debug`: Starts the application in debug mode.
+- `npm run start:prod`: Starts the application in production mode.
+- `npm run test`: Runs the application tests.
+- `npm run test:watch`: Runs the application tests in watch mode.
+- `npm run test:cov`: Runs the application tests and generates a coverage report.
+- `npm run test:debug`: Runs the application tests in debug mode.
+- `npm run test:e2e`: Runs end-to-end tests.
+- `npm run lint`: Runs the ESLint to find and fix problems in your JavaScript code.
+- `npm run format`: Formats the code using Prettier.
 
-```bash
-# development
-$ yarn run start
+You can run these scripts using npm. For example, you can build the application by running `npm run build` from the command line.
 
-# watch mode
-$ yarn run start:dev
+## Setup
 
-# production mode
-$ yarn run start:prod
-```
-
-## Test
-
-```bash
-# unit tests
-$ yarn run test
-
-# e2e tests
-$ yarn run test:e2e
-
-# test coverage
-$ yarn run test:cov
-```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+1. Install Node.js and npm.
+2. Clone the repository.
+3. Install the dependencies using `npm install`.
+4. Create a .env file based on the example.env file provided and fill in the necessary environment variables.
+5. Start the application using one of the npm scripts mentioned above.
 
 ## License
 
-Nest is [MIT licensed](LICENSE).
+This project is licensed under the Attribution Assurance License. This means you are free to use, share, and modify this software, provided that you give appropriate credit to the original author(s), and obtain the approval from the owner before you use this code.
