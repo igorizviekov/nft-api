@@ -10,7 +10,9 @@ async function main() {
   const NFTCollection = await ethers.getContractFactory(
     collectionsContractName
   );
-  const nftCollection = await NFTCollection.deploy();
+  const nftCollection = await NFTCollection.deploy(
+    "https://ipfs.io/ipfs/QmaNfrXqMu8j2UdNDj881r3VnaXoAGrpDbJoDRJRXwfdaU"
+  );
   await nftCollection.deployed();
   console.log(
     `${collectionsContractName} deployed to ${nftCollection.address}`

@@ -45,7 +45,6 @@ export interface ERC721CollectionsInterface extends utils.Interface {
   functions: {
     "MAX_PRICE()": FunctionFragment;
     "MIN_PRICE()": FunctionFragment;
-    "PUBLIC_METADATA_URI()": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "collectionsCreated(address)": FunctionFragment;
@@ -78,7 +77,6 @@ export interface ERC721CollectionsInterface extends utils.Interface {
     nameOrSignatureOrTopic:
       | "MAX_PRICE"
       | "MIN_PRICE"
-      | "PUBLIC_METADATA_URI"
       | "approve"
       | "balanceOf"
       | "collectionsCreated"
@@ -109,10 +107,6 @@ export interface ERC721CollectionsInterface extends utils.Interface {
 
   encodeFunctionData(functionFragment: "MAX_PRICE", values?: undefined): string;
   encodeFunctionData(functionFragment: "MIN_PRICE", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "PUBLIC_METADATA_URI",
-    values?: undefined
-  ): string;
   encodeFunctionData(
     functionFragment: "approve",
     values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]
@@ -228,10 +222,6 @@ export interface ERC721CollectionsInterface extends utils.Interface {
 
   decodeFunctionResult(functionFragment: "MAX_PRICE", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "MIN_PRICE", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "PUBLIC_METADATA_URI",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(
@@ -465,8 +455,6 @@ export interface ERC721Collections extends BaseContract {
 
     MIN_PRICE(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    PUBLIC_METADATA_URI(overrides?: CallOverrides): Promise<[string]>;
-
     approve(
       to: PromiseOrValue<string>,
       tokenId: PromiseOrValue<BigNumberish>,
@@ -605,8 +593,6 @@ export interface ERC721Collections extends BaseContract {
 
   MIN_PRICE(overrides?: CallOverrides): Promise<BigNumber>;
 
-  PUBLIC_METADATA_URI(overrides?: CallOverrides): Promise<string>;
-
   approve(
     to: PromiseOrValue<string>,
     tokenId: PromiseOrValue<BigNumberish>,
@@ -744,8 +730,6 @@ export interface ERC721Collections extends BaseContract {
     MAX_PRICE(overrides?: CallOverrides): Promise<BigNumber>;
 
     MIN_PRICE(overrides?: CallOverrides): Promise<BigNumber>;
-
-    PUBLIC_METADATA_URI(overrides?: CallOverrides): Promise<string>;
 
     approve(
       to: PromiseOrValue<string>,
@@ -958,8 +942,6 @@ export interface ERC721Collections extends BaseContract {
 
     MIN_PRICE(overrides?: CallOverrides): Promise<BigNumber>;
 
-    PUBLIC_METADATA_URI(overrides?: CallOverrides): Promise<BigNumber>;
-
     approve(
       to: PromiseOrValue<string>,
       tokenId: PromiseOrValue<BigNumberish>,
@@ -1098,10 +1080,6 @@ export interface ERC721Collections extends BaseContract {
     MAX_PRICE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     MIN_PRICE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    PUBLIC_METADATA_URI(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
 
     approve(
       to: PromiseOrValue<string>,

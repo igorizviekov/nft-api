@@ -20,8 +20,6 @@ contract ERC721Collections is ERC721URIStorage, Ownable {
     uint256 constant TIME_BETWEEN_COLLECTIONS = 1 minutes;
     uint256 public constant MIN_PRICE = 0.01 ether;
     uint256 public constant MAX_PRICE = 10000 ether;
-    string public constant PUBLIC_METADATA_URI =
-        "https://ipfs.io/ipfs/QmaNfrXqMu8j2UdNDj881r3VnaXoAGrpDbJoDRJRXwfdaU";
 
     struct Collection {
         string uri;
@@ -43,8 +41,10 @@ contract ERC721Collections is ERC721URIStorage, Ownable {
     event TokenMinted(uint256 tokenId, uint256 collectionId);
     event PriceSet(uint256 tokenId, uint256 price);
 
-    constructor() ERC721("ERC721Collections", "STR") {
-        createCollection(PUBLIC_METADATA_URI);
+    constructor(
+        string memory publicCollectionURI
+    ) ERC721("ERC721Collections", "STR") {
+        createCollection(publicCollectionURI);
     }
 
     function setMarketplace(
