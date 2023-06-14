@@ -130,13 +130,12 @@ contract ERC721Collections is ERC721URIStorage, Ownable {
             _collections[collectionId].id != 0,
             "Collection does not exist"
         );
-        require(price > 0, "Price must be greater than 0");
-        uint256 newTokenId = _tokenIdTracker.current();
-        _tokenIdTracker.increment();
         require(
             _collections[collectionId].owner == msg.sender,
             "Not the owner of the collection"
         );
+        uint256 newTokenId = _tokenIdTracker.current();
+        _tokenIdTracker.increment();
         _mint(msg.sender, newTokenId);
         _setTokenURI(newTokenId, tokenURI);
         _nftToCollection[newTokenId] = collectionId;
