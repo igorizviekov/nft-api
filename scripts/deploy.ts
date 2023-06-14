@@ -19,7 +19,6 @@ async function main() {
   const NFTMarketplace = await ethers.getContractFactory(
     marketplaceContractName
   );
-
   /**
    * Deploys the NFTMarketplace contract.
    *
@@ -45,12 +44,13 @@ async function main() {
     collectionsContractAddress: nftCollection.address as any,
     royalties: 5,
     royaltyRecipients: [
-      "0xPayee1Address",
-      "0xPayee2Address",
-      "0xPayee3Address",
+      "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+      "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "0xFABB0ac9d68B0B445fB7357272Ff202C5651694a",
     ],
     shares: [1, 1, 1], // equal amount
   };
+  console.log("qq");
 
   const marketplace = await NFTMarketplace.deploy(
     nftMarketplaceOptions.collectionsContractAddress, // nftContractAddress
@@ -58,8 +58,11 @@ async function main() {
     nftMarketplaceOptions.shares,
     nftMarketplaceOptions.royalties
   );
+  console.log("qqq");
 
   await marketplace.deployed();
+  console.log("qq1");
+
   await nftCollection.setMarketplace(marketplace.address);
   console.log(`${marketplaceContractName} deployed to ${marketplace.address}`);
 }
