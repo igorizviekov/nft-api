@@ -39,9 +39,7 @@ export class UsersService {
 
   async getById(id: string): Promise<IResponse> {
     try {
-      const match = await this.usersRepo.findOne(id, {
-        select: ["id", "discord", "email", "location", "website", "name"],
-      });
+      const match = await this.usersRepo.findOne(id);
       if (!match) {
         throw new NotFoundException(`User with id ${id} not found.`);
       }
