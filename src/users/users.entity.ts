@@ -34,4 +34,28 @@ export class User {
     unique: false,
   })
   website: string;
+
+  @Column({
+    nullable: true,
+    unique: false,
+  })
+  image: string;
+
+  @Column({
+    nullable: true,
+    unique: false,
+  })
+  twitter: string;
+
+  @Column({
+    nullable: true,
+    unique: false,
+  })
+  instagram: string;
+
+  @Column({
+    nullable: true,
+    unique: false,
+  })
+  description: string;
 }

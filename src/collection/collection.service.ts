@@ -89,6 +89,19 @@ export class CollectionService {
     }
   }
 
+  async getByNetwork(network: string): Promise<IResponse> {
+    try {
+      const match = await this.collectionRepo.find({ blockchain_id: network });
+      if (!match) {
+        throw new NotFoundException(`No collection was found on ${network}`);
+      }
+      return { status: "success", data: match };
+    } catch (e) {
+      console.log(e);
+      throw new NotFoundException(`Collection on ${network} not found.`);
+    }
+  }
+
   async getABI(collectionId: string, res: Response) {
     try {
       const match = await this.collectionRepo.findOne(collectionId);

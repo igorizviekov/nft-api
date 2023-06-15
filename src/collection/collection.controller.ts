@@ -86,6 +86,18 @@ export class CollectionController {
     return this.collectionService.getById(id);
   }
 
+  @Get("/:chainID")
+  @ApiOkResponse({
+    description: "Collection details",
+    type: Collection,
+  })
+  @ApiNotFoundResponse({
+    description: "Collection does not exist",
+  })
+  async getByNetwork(@Param("id") id: string): Promise<IResponse> {
+    return this.collectionService.getByNetwork(id);
+  }
+
   @Get("/abi/:id")
   @ApiOkResponse({
     description: "Collection ABI",
