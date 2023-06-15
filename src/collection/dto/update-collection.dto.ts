@@ -54,7 +54,7 @@ export class UpdateCollectionDto {
   @ApiProperty({ description: "Royalties percentage", required: false })
   @IsOptional()
   @IsNumber()
-  royalties?: CollectionRoyalties;
+  royalties?: CollectionRoyalties[];
 
   @ApiProperty({ description: "Collection image", required: false })
   @IsUrl()

@@ -60,5 +60,5 @@ export class CollectionDto {
   @ApiProperty({ description: "Royalties percentage", required: false })
   @IsOptional()
   @IsNumber()
-  royalties?: CollectionRoyalties;
+  royalties?: CollectionRoyalties[];
 }
