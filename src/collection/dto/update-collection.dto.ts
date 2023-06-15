@@ -7,7 +7,7 @@ import {
   IsUUID,
   IsUrl,
 } from "class-validator";
-import { CollectionCategory } from "../collection.enum";
+import { CollectionCategory, CollectionRoyalties } from "../collection.enum";
 
 export class UpdateCollectionDto {
   @ApiProperty({ description: "Collection title" })
@@ -54,7 +54,7 @@ export class UpdateCollectionDto {
   @ApiProperty({ description: "Royalties percentage", required: false })
   @IsOptional()
   @IsNumber()
-  royalties?: number;
+  royalties?: CollectionRoyalties;
 
   @ApiProperty({ description: "Collection image", required: false })
   @IsUrl()

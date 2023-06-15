@@ -64,4 +64,40 @@ export class RegisterUserDto {
     required: false,
   })
   website: string;
+
+  @IsOptional()
+  @IsUrl()
+  @ApiProperty({
+    type: String,
+    description: "User image",
+    required: false,
+  })
+  image: string;
+
+  @IsOptional()
+  @IsUrl()
+  @ApiProperty({
+    type: String,
+    description: "User twitter",
+    required: false,
+  })
+  twitter: string;
+
+  @IsOptional()
+  @IsUrl()
+  @ApiProperty({
+    type: String,
+    description: "User instagram",
+    required: false,
+  })
+  instagram: string;
+
+  @IsOptional()
+  @IsUrl()
+  @ApiProperty({
+    type: String,
+    description: "User description",
+    required: false,
+  })
+  description: string;
 }

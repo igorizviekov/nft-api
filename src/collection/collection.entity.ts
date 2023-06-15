@@ -1,5 +1,5 @@
 import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
-import { CollectionCategory } from "./collection.enum";
+import { CollectionCategory, CollectionRoyalties } from "./collection.enum";
 
 @Entity()
 export class Collection extends BaseEntity {
@@ -11,6 +11,9 @@ export class Collection extends BaseEntity {
 
   @Column()
   symbol: string;
+
+  @Column()
+  networkSymbol: string;
 
   @Column()
   creator_id: string;
@@ -37,5 +40,5 @@ export class Collection extends BaseEntity {
   website?: string;
 
   @Column({ nullable: true })
-  royalties?: number;
+  royalties?: CollectionRoyalties;
 }

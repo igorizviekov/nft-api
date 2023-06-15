@@ -1,9 +1,14 @@
 export enum CollectionCategory {
-  ART = "art",
-  GAMES = "games",
-  COLLECTIBLES = "collectibles",
-  VIRTUAL_WORLDS = "virtual_worlds",
-  MUSIC = "music",
-  SPORTS = "sports",
-  PFPS = "pfps",
+  ART = "Art",
+  GAMES = "Games",
+  COLLECTIBLES = "Collectibles",
+  VIRTUAL_WORLDS = "Virtual Worlds",
+  MUSIC = "Music",
+  SPORTS = "Sports",
+  PFPS = "PFPS",
+}
+
+export interface CollectionRoyalties {
+  address: string;
+  percentage: number;
 }
