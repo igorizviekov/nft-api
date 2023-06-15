@@ -13,9 +13,6 @@ export class Collection extends BaseEntity {
   symbol: string;
 
   @Column()
-  networkSymbol: string;
-
-  @Column()
   creator_id: string;
 
   @Column({ type: "enum", enum: CollectionCategory })
