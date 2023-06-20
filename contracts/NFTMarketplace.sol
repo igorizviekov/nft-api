@@ -5,11 +5,23 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/finance/PaymentSplitter.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 interface IERC721Collections is IERC721 {
     function getPrice(uint256 tokenId) external view returns (uint256 price);
 
+    function getCollectionOwner(
+        uint256 collectionId
+    ) external view returns (address);
+
     function setPrice(uint256 tokenId, uint256 price) external;
+
+    function lazyMint(
+        uint256 collectionId,
+        string memory tokenURI,
+        uint256 price,
+        address to
+    ) external returns (uint256);
 }
 
 /**
@@ -18,6 +30,7 @@ interface IERC721Collections is IERC721 {
  * Inherits from OpenZeppelin's Ownable, ReentrancyGuard, and PaymentSplitter contracts.
  */
 contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
+    using SafeMath for uint256;
     /**
      * @dev IERC721Collections - an interface to interact with the NFT Collections contract.
      */
@@ -32,15 +45,28 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
 
     mapping(uint256 => bool) private _listedTokens;
 
+    struct MintRequest {
+        uint256 collectionId;
+        string tokenURI;
+        uint256 price;
+        address buyer;
+        bool approved;
+    }
+
+    mapping(uint256 => MintRequest) public mintRequests;
+    uint256 public mintRequestIdTracker = 0;
+
     event NFTListed(uint256 indexed tokenId);
     event NFTDelisted(uint256 indexed tokenId);
     event NFTBought(uint256 indexed tokenId);
+    event MintRequestApproved(uint256 requestId, uint256 tokenId);
+    event TokenMintRequest(
+        uint256 indexed requestId,
+        address buyer,
+        string tokenURI,
+        uint256 price
+    );
 
-    /**
-     * @dev Sets the values for {nftContractAddress}, {payees}, {shares}, and {royalties}.
-     * Initializes the contract by setting the deployed NFT contract's address, the payees' addresses,
-     * their corresponding shares, and the royalties rate.
-     */
     constructor(
         address nftContractAddress,
         address[] memory payees,
@@ -101,35 +127,111 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
         emit NFTDelisted(tokenId);
     }
 
-    /**
-     * @dev Buys an NFT.
-     * Requirements:
-     * - The NFT must be listed for sale.
-     * - The value sent must match the NFT's price.
-     * - The price should be higher than total royalties.
-     */
-    function buyNFT(uint256 tokenId) public payable nonReentrant {
-        require(_listedTokens[tokenId], "NFT not listed for sale");
-        uint256 price = _nftContract.getPrice(tokenId);
-        require(msg.value == price, "Sent value does not match the NFT price");
+    function buyNFT(
+        uint256 tokenId,
+        uint256 collectionId,
+        string memory tokenURI
+    ) public payable nonReentrant {
+        uint256 price;
+        address nftOwner;
 
-        uint256 royaltiesAmount = (price * _royalties) / 100;
+        if (tokenId != 0) {
+            require(_listedTokens[tokenId], "NFT not listed for sale");
+            price = _nftContract.getPrice(tokenId);
+            nftOwner = _nftContract.ownerOf(tokenId);
+
+            require(
+                msg.value == price,
+                "Sent value does not match the NFT price"
+            );
+
+            uint256 royaltiesAmount = price.mul(_royalties).div(100);
+
+            require(
+                price > royaltiesAmount,
+                "Price should be higher than total royalties"
+            );
+            uint256 sellerAmount = price.sub(royaltiesAmount);
+
+            _listedTokens[tokenId] = false;
+
+            (bool success, ) = payable(nftOwner).call{value: sellerAmount}("");
+            require(success, "Transfer to NFT owner failed.");
+
+            (bool successRoyalties, ) = payable(address(this)).call{
+                value: royaltiesAmount
+            }("");
+            require(successRoyalties, "Transfer of royalties failed.");
+
+            _nftContract.transferFrom(nftOwner, msg.sender, tokenId);
+
+            emit NFTBought(tokenId);
+        } else {
+            require(msg.value >= MIN_PRICE, "Price must be at least MIN_PRICE");
+            require(msg.value <= MAX_PRICE, "Price must not exceed MAX_PRICE");
+            require(
+                bytes(tokenURI).length > 0,
+                "Token URI is required for minting"
+            );
+            require(collectionId != 1, "");
+            require(collectionId != 0, "Collection ID is required for minting");
+
+            mintRequests[mintRequestIdTracker] = MintRequest({
+                collectionId: collectionId,
+                tokenURI: tokenURI,
+                price: msg.value,
+                buyer: msg.sender,
+                approved: false
+            });
+
+            emit TokenMintRequest(
+                mintRequestIdTracker,
+                msg.sender,
+                tokenURI,
+                msg.value
+            );
+
+            mintRequestIdTracker++;
+        }
+    }
+
+    function approveMintRequest(uint256 requestId) public nonReentrant {
+        MintRequest storage request = mintRequests[requestId];
+        require(request.buyer != address(0), "Mint request does not exist");
+        require(!request.approved, "Mint request already approved");
+        address collectionOwner = _nftContract.getCollectionOwner(
+            request.collectionId
+        );
         require(
-            price > royaltiesAmount,
+            collectionOwner == msg.sender,
+            "Only the collection owner can approve the mint request"
+        );
+        uint256 royaltiesAmount = request.price.mul(_royalties).div(100);
+        require(
+            request.price > royaltiesAmount,
             "Price should be higher than total royalties"
         );
 
-        uint256 sellerAmount = price - royaltiesAmount;
+        uint256 collectionOwnerAmount = request.price.sub(royaltiesAmount);
 
-        address nftOwner = _nftContract.ownerOf(tokenId);
+        (bool success, ) = payable(collectionOwner).call{
+            value: collectionOwnerAmount
+        }("");
+        require(success, "Transfer to Collection owner failed.");
 
-        _listedTokens[tokenId] = false;
+        (bool successRoyalties, ) = payable(address(this)).call{
+            value: royaltiesAmount
+        }("");
+        require(successRoyalties, "Transfer of royalties failed.");
 
-        payable(nftOwner).transfer(sellerAmount);
-        payable(address(this)).transfer(royaltiesAmount);
-
-        _nftContract.transferFrom(nftOwner, msg.sender, tokenId);
-
+        uint256 tokenId = _nftContract.lazyMint(
+            request.collectionId,
+            request.tokenURI,
+            request.price,
+            request.buyer
+        );
+        request.approved = true;
+        emit MintRequestApproved(requestId, tokenId);
         emit NFTBought(tokenId);
     }
 }

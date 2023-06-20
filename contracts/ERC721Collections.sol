@@ -29,6 +29,14 @@ contract ERC721Collections is ERC721URIStorage, Ownable {
 
     NFTMarketplace private _marketplace;
 
+    modifier onlyMarketplace() {
+        require(
+            msg.sender == address(_marketplace),
+            "Caller is not the marketplace"
+        );
+        _;
+    }
+
     mapping(uint256 => Collection) private _collections;
     mapping(uint256 => uint256[]) private _nftCollections; // Mapping from collection ID to list of token IDs
     mapping(uint256 => uint256) private _nftToCollection; // Mapping from token ID to collection ID
@@ -74,13 +82,37 @@ contract ERC721Collections is ERC721URIStorage, Ownable {
     }
 
     function getNFTsInCollection(
-        uint256 collectionId
+        uint256 collectionId,
+        uint256 startIndex,
+        uint256 pageSize
     ) public view returns (uint256[] memory) {
-        return _nftCollections[collectionId];
+        uint256[] storage allTokens = _nftCollections[collectionId];
+        require(allTokens.length > 0, "Array is empty");
+        require(startIndex < allTokens.length, "Invalid start index");
+        if (pageSize > 100) {
+            pageSize = 100;
+        }
+        uint256 endIndex = startIndex + pageSize;
+        if (endIndex > allTokens.length) {
+            endIndex = allTokens.length;
+        }
+
+        uint256[] memory tokens = new uint256[](endIndex - startIndex);
+        for (uint256 i = startIndex; i < endIndex; i++) {
+            tokens[i - startIndex] = allTokens[i];
+        }
+
+        return tokens;
     }
 
     function getPrice(uint256 tokenId) public view returns (uint256) {
         return _tokenPrices[tokenId];
+    }
+
+    function getCollectionOwner(
+        uint256 collectionId
+    ) external view returns (address) {
+        return _collections[collectionId].owner;
     }
 
     function setPrice(uint256 tokenId, uint256 price) public returns (uint256) {
@@ -153,6 +185,35 @@ contract ERC721Collections is ERC721URIStorage, Ownable {
 
         emit TokenMinted(newTokenId, collectionId);
 
+        return newTokenId;
+    }
+
+    function lazyMint(
+        uint256 collectionId,
+        string memory tokenURI,
+        uint256 price,
+        address to
+    ) public onlyMarketplace returns (uint256) {
+        require(price >= MIN_PRICE, "Price must be at least MIN_PRICE");
+        require(price <= MAX_PRICE, "Price must not exceed MAX_PRICE");
+        require(
+            _collections[collectionId].id != 0,
+            "Collection does not exist"
+        );
+        require(
+            _collections[collectionId].owner == msg.sender,
+            "Not the owner of the collection"
+        );
+
+        uint256 newTokenId = _tokenIdTracker.current();
+        _tokenIdTracker.increment();
+        _mint(to, newTokenId);
+        _setTokenURI(newTokenId, tokenURI);
+        _nftToCollection[newTokenId] = collectionId;
+        _nftCollections[collectionId].push(newTokenId);
+        _tokenPrices[newTokenId] = price;
+
+        emit TokenMinted(newTokenId, collectionId);
         return newTokenId;
     }
 }

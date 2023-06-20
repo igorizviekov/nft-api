@@ -32,10 +32,13 @@ export interface NFTMarketplaceInterface extends utils.Interface {
   functions: {
     "MAX_PRICE()": FunctionFragment;
     "MIN_PRICE()": FunctionFragment;
-    "buyNFT(uint256)": FunctionFragment;
+    "approveMintRequest(uint256)": FunctionFragment;
+    "buyNFT(uint256,uint256,string)": FunctionFragment;
     "delistNFT(uint256)": FunctionFragment;
     "isTokenListed(uint256)": FunctionFragment;
     "listNFT(uint256,uint256)": FunctionFragment;
+    "mintRequestIdTracker()": FunctionFragment;
+    "mintRequests(uint256)": FunctionFragment;
     "owner()": FunctionFragment;
     "payee(uint256)": FunctionFragment;
     "releasable(address)": FunctionFragment;
@@ -56,10 +59,13 @@ export interface NFTMarketplaceInterface extends utils.Interface {
     nameOrSignatureOrTopic:
       | "MAX_PRICE"
       | "MIN_PRICE"
+      | "approveMintRequest"
       | "buyNFT"
       | "delistNFT"
       | "isTokenListed"
       | "listNFT"
+      | "mintRequestIdTracker"
+      | "mintRequests"
       | "owner"
       | "payee"
       | "releasable(address)"
@@ -79,8 +85,16 @@ export interface NFTMarketplaceInterface extends utils.Interface {
   encodeFunctionData(functionFragment: "MAX_PRICE", values?: undefined): string;
   encodeFunctionData(functionFragment: "MIN_PRICE", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "buyNFT",
+    functionFragment: "approveMintRequest",
     values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "buyNFT",
+    values: [
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<string>
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "delistNFT",
@@ -93,6 +107,14 @@ export interface NFTMarketplaceInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "listNFT",
     values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "mintRequestIdTracker",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "mintRequests",
+    values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
@@ -150,6 +172,10 @@ export interface NFTMarketplaceInterface extends utils.Interface {
 
   decodeFunctionResult(functionFragment: "MAX_PRICE", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "MIN_PRICE", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "approveMintRequest",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "buyNFT", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "delistNFT", data: BytesLike): Result;
   decodeFunctionResult(
@@ -157,6 +183,14 @@ export interface NFTMarketplaceInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "listNFT", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "mintRequestIdTracker",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "mintRequests",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "payee", data: BytesLike): Result;
   decodeFunctionResult(
@@ -207,6 +241,7 @@ export interface NFTMarketplaceInterface extends utils.Interface {
 
   events: {
     "ERC20PaymentReleased(address,address,uint256)": EventFragment;
+    "MintRequestApproved(uint256,uint256)": EventFragment;
     "NFTBought(uint256)": EventFragment;
     "NFTDelisted(uint256)": EventFragment;
     "NFTListed(uint256)": EventFragment;
@@ -214,9 +249,11 @@ export interface NFTMarketplaceInterface extends utils.Interface {
     "PayeeAdded(address,uint256)": EventFragment;
     "PaymentReceived(address,uint256)": EventFragment;
     "PaymentReleased(address,uint256)": EventFragment;
+    "TokenMintRequest(uint256,address,string,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "ERC20PaymentReleased"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "MintRequestApproved"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "NFTBought"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "NFTDelisted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "NFTListed"): EventFragment;
@@ -224,6 +261,7 @@ export interface NFTMarketplaceInterface extends utils.Interface {
   getEvent(nameOrSignatureOrTopic: "PayeeAdded"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "PaymentReceived"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "PaymentReleased"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "TokenMintRequest"): EventFragment;
 }
 
 export interface ERC20PaymentReleasedEventObject {
@@ -238,6 +276,18 @@ export type ERC20PaymentReleasedEvent = TypedEvent<
 
 export type ERC20PaymentReleasedEventFilter =
   TypedEventFilter<ERC20PaymentReleasedEvent>;
+
+export interface MintRequestApprovedEventObject {
+  requestId: BigNumber;
+  tokenId: BigNumber;
+}
+export type MintRequestApprovedEvent = TypedEvent<
+  [BigNumber, BigNumber],
+  MintRequestApprovedEventObject
+>;
+
+export type MintRequestApprovedEventFilter =
+  TypedEventFilter<MintRequestApprovedEvent>;
 
 export interface NFTBoughtEventObject {
   tokenId: BigNumber;
@@ -305,6 +355,20 @@ export type PaymentReleasedEvent = TypedEvent<
 
 export type PaymentReleasedEventFilter = TypedEventFilter<PaymentReleasedEvent>;
 
+export interface TokenMintRequestEventObject {
+  requestId: BigNumber;
+  buyer: string;
+  tokenURI: string;
+  price: BigNumber;
+}
+export type TokenMintRequestEvent = TypedEvent<
+  [BigNumber, string, string, BigNumber],
+  TokenMintRequestEventObject
+>;
+
+export type TokenMintRequestEventFilter =
+  TypedEventFilter<TokenMintRequestEvent>;
+
 export interface NFTMarketplace extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
@@ -336,8 +400,15 @@ export interface NFTMarketplace extends BaseContract {
 
     MIN_PRICE(overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    approveMintRequest(
+      requestId: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     buyNFT(
       tokenId: PromiseOrValue<BigNumberish>,
+      collectionId: PromiseOrValue<BigNumberish>,
+      tokenURI: PromiseOrValue<string>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -356,6 +427,21 @@ export interface NFTMarketplace extends BaseContract {
       newPrice: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
+
+    mintRequestIdTracker(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    mintRequests(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, string, BigNumber, string, boolean] & {
+        collectionId: BigNumber;
+        tokenURI: string;
+        price: BigNumber;
+        buyer: string;
+        approved: boolean;
+      }
+    >;
 
     owner(overrides?: CallOverrides): Promise<[string]>;
 
@@ -425,8 +511,15 @@ export interface NFTMarketplace extends BaseContract {
 
   MIN_PRICE(overrides?: CallOverrides): Promise<BigNumber>;
 
+  approveMintRequest(
+    requestId: PromiseOrValue<BigNumberish>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   buyNFT(
     tokenId: PromiseOrValue<BigNumberish>,
+    collectionId: PromiseOrValue<BigNumberish>,
+    tokenURI: PromiseOrValue<string>,
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -445,6 +538,21 @@ export interface NFTMarketplace extends BaseContract {
     newPrice: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
+
+  mintRequestIdTracker(overrides?: CallOverrides): Promise<BigNumber>;
+
+  mintRequests(
+    arg0: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides
+  ): Promise<
+    [BigNumber, string, BigNumber, string, boolean] & {
+      collectionId: BigNumber;
+      tokenURI: string;
+      price: BigNumber;
+      buyer: string;
+      approved: boolean;
+    }
+  >;
 
   owner(overrides?: CallOverrides): Promise<string>;
 
@@ -514,8 +622,15 @@ export interface NFTMarketplace extends BaseContract {
 
     MIN_PRICE(overrides?: CallOverrides): Promise<BigNumber>;
 
+    approveMintRequest(
+      requestId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     buyNFT(
       tokenId: PromiseOrValue<BigNumberish>,
+      collectionId: PromiseOrValue<BigNumberish>,
+      tokenURI: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -534,6 +649,21 @@ export interface NFTMarketplace extends BaseContract {
       newPrice: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    mintRequestIdTracker(overrides?: CallOverrides): Promise<BigNumber>;
+
+    mintRequests(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, string, BigNumber, string, boolean] & {
+        collectionId: BigNumber;
+        tokenURI: string;
+        price: BigNumber;
+        buyer: string;
+        approved: boolean;
+      }
+    >;
 
     owner(overrides?: CallOverrides): Promise<string>;
 
@@ -609,6 +739,15 @@ export interface NFTMarketplace extends BaseContract {
       amount?: null
     ): ERC20PaymentReleasedEventFilter;
 
+    "MintRequestApproved(uint256,uint256)"(
+      requestId?: null,
+      tokenId?: null
+    ): MintRequestApprovedEventFilter;
+    MintRequestApproved(
+      requestId?: null,
+      tokenId?: null
+    ): MintRequestApprovedEventFilter;
+
     "NFTBought(uint256)"(
       tokenId?: PromiseOrValue<BigNumberish> | null
     ): NFTBoughtEventFilter;
@@ -656,6 +795,19 @@ export interface NFTMarketplace extends BaseContract {
       amount?: null
     ): PaymentReleasedEventFilter;
     PaymentReleased(to?: null, amount?: null): PaymentReleasedEventFilter;
+
+    "TokenMintRequest(uint256,address,string,uint256)"(
+      requestId?: PromiseOrValue<BigNumberish> | null,
+      buyer?: null,
+      tokenURI?: null,
+      price?: null
+    ): TokenMintRequestEventFilter;
+    TokenMintRequest(
+      requestId?: PromiseOrValue<BigNumberish> | null,
+      buyer?: null,
+      tokenURI?: null,
+      price?: null
+    ): TokenMintRequestEventFilter;
   };
 
   estimateGas: {
@@ -663,8 +815,15 @@ export interface NFTMarketplace extends BaseContract {
 
     MIN_PRICE(overrides?: CallOverrides): Promise<BigNumber>;
 
+    approveMintRequest(
+      requestId: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     buyNFT(
       tokenId: PromiseOrValue<BigNumberish>,
+      collectionId: PromiseOrValue<BigNumberish>,
+      tokenURI: PromiseOrValue<string>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -682,6 +841,13 @@ export interface NFTMarketplace extends BaseContract {
       tokenId: PromiseOrValue<BigNumberish>,
       newPrice: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    mintRequestIdTracker(overrides?: CallOverrides): Promise<BigNumber>;
+
+    mintRequests(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     owner(overrides?: CallOverrides): Promise<BigNumber>;
@@ -753,8 +919,15 @@ export interface NFTMarketplace extends BaseContract {
 
     MIN_PRICE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    approveMintRequest(
+      requestId: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
     buyNFT(
       tokenId: PromiseOrValue<BigNumberish>,
+      collectionId: PromiseOrValue<BigNumberish>,
+      tokenURI: PromiseOrValue<string>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -772,6 +945,15 @@ export interface NFTMarketplace extends BaseContract {
       tokenId: PromiseOrValue<BigNumberish>,
       newPrice: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    mintRequestIdTracker(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    mintRequests(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;

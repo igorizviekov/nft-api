@@ -32,8 +32,10 @@ export interface IERC721CollectionsInterface extends utils.Interface {
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
+    "getCollectionOwner(uint256)": FunctionFragment;
     "getPrice(uint256)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
+    "lazyMint(uint256,string,uint256,address)": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256,bytes)": FunctionFragment;
@@ -48,8 +50,10 @@ export interface IERC721CollectionsInterface extends utils.Interface {
       | "approve"
       | "balanceOf"
       | "getApproved"
+      | "getCollectionOwner"
       | "getPrice"
       | "isApprovedForAll"
+      | "lazyMint"
       | "ownerOf"
       | "safeTransferFrom(address,address,uint256)"
       | "safeTransferFrom(address,address,uint256,bytes)"
@@ -72,12 +76,25 @@ export interface IERC721CollectionsInterface extends utils.Interface {
     values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
+    functionFragment: "getCollectionOwner",
+    values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
     functionFragment: "getPrice",
     values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
     functionFragment: "isApprovedForAll",
     values: [PromiseOrValue<string>, PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "lazyMint",
+    values: [
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<string>,
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<string>
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "ownerOf",
@@ -127,11 +144,16 @@ export interface IERC721CollectionsInterface extends utils.Interface {
     functionFragment: "getApproved",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "getCollectionOwner",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "getPrice", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "isApprovedForAll",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "lazyMint", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "safeTransferFrom(address,address,uint256)",
@@ -245,6 +267,11 @@ export interface IERC721Collections extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string] & { operator: string }>;
 
+    getCollectionOwner(
+      collectionId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
     getPrice(
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -255,6 +282,14 @@ export interface IERC721Collections extends BaseContract {
       operator: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
+
+    lazyMint(
+      collectionId: PromiseOrValue<BigNumberish>,
+      tokenURI: PromiseOrValue<string>,
+      price: PromiseOrValue<BigNumberish>,
+      to: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
 
     ownerOf(
       tokenId: PromiseOrValue<BigNumberish>,
@@ -317,6 +352,11 @@ export interface IERC721Collections extends BaseContract {
     overrides?: CallOverrides
   ): Promise<string>;
 
+  getCollectionOwner(
+    collectionId: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
   getPrice(
     tokenId: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
@@ -327,6 +367,14 @@ export interface IERC721Collections extends BaseContract {
     operator: PromiseOrValue<string>,
     overrides?: CallOverrides
   ): Promise<boolean>;
+
+  lazyMint(
+    collectionId: PromiseOrValue<BigNumberish>,
+    tokenURI: PromiseOrValue<string>,
+    price: PromiseOrValue<BigNumberish>,
+    to: PromiseOrValue<string>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
   ownerOf(
     tokenId: PromiseOrValue<BigNumberish>,
@@ -389,6 +437,11 @@ export interface IERC721Collections extends BaseContract {
       overrides?: CallOverrides
     ): Promise<string>;
 
+    getCollectionOwner(
+      collectionId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
     getPrice(
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -399,6 +452,14 @@ export interface IERC721Collections extends BaseContract {
       operator: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<boolean>;
+
+    lazyMint(
+      collectionId: PromiseOrValue<BigNumberish>,
+      tokenURI: PromiseOrValue<string>,
+      price: PromiseOrValue<BigNumberish>,
+      to: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     ownerOf(
       tokenId: PromiseOrValue<BigNumberish>,
@@ -497,6 +558,11 @@ export interface IERC721Collections extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getCollectionOwner(
+      collectionId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     getPrice(
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -506,6 +572,14 @@ export interface IERC721Collections extends BaseContract {
       owner: PromiseOrValue<string>,
       operator: PromiseOrValue<string>,
       overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    lazyMint(
+      collectionId: PromiseOrValue<BigNumberish>,
+      tokenURI: PromiseOrValue<string>,
+      price: PromiseOrValue<BigNumberish>,
+      to: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
     ownerOf(
@@ -570,6 +644,11 @@ export interface IERC721Collections extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    getCollectionOwner(
+      collectionId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     getPrice(
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -579,6 +658,14 @@ export interface IERC721Collections extends BaseContract {
       owner: PromiseOrValue<string>,
       operator: PromiseOrValue<string>,
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    lazyMint(
+      collectionId: PromiseOrValue<BigNumberish>,
+      tokenURI: PromiseOrValue<string>,
+      price: PromiseOrValue<BigNumberish>,
+      to: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     ownerOf(

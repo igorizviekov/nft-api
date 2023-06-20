@@ -52,10 +52,12 @@ export interface ERC721CollectionsInterface extends utils.Interface {
     "getApproved(uint256)": FunctionFragment;
     "getCollection(uint256)": FunctionFragment;
     "getCollectionOfToken(uint256)": FunctionFragment;
-    "getNFTsInCollection(uint256)": FunctionFragment;
+    "getCollectionOwner(uint256)": FunctionFragment;
+    "getNFTsInCollection(uint256,uint256,uint256)": FunctionFragment;
     "getPrice(uint256)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
     "lastCollectionTimestamp(address)": FunctionFragment;
+    "lazyMint(uint256,string,uint256,address)": FunctionFragment;
     "mint(uint256,string,uint256)": FunctionFragment;
     "name()": FunctionFragment;
     "owner()": FunctionFragment;
@@ -84,10 +86,12 @@ export interface ERC721CollectionsInterface extends utils.Interface {
       | "getApproved"
       | "getCollection"
       | "getCollectionOfToken"
+      | "getCollectionOwner"
       | "getNFTsInCollection"
       | "getPrice"
       | "isApprovedForAll"
       | "lastCollectionTimestamp"
+      | "lazyMint"
       | "mint"
       | "name"
       | "owner"
@@ -136,8 +140,16 @@ export interface ERC721CollectionsInterface extends utils.Interface {
     values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
-    functionFragment: "getNFTsInCollection",
+    functionFragment: "getCollectionOwner",
     values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getNFTsInCollection",
+    values: [
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<BigNumberish>
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "getPrice",
@@ -150,6 +162,15 @@ export interface ERC721CollectionsInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "lastCollectionTimestamp",
     values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "lazyMint",
+    values: [
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<string>,
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<string>
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "mint",
@@ -245,6 +266,10 @@ export interface ERC721CollectionsInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "getCollectionOwner",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "getNFTsInCollection",
     data: BytesLike
   ): Result;
@@ -257,6 +282,7 @@ export interface ERC721CollectionsInterface extends utils.Interface {
     functionFragment: "lastCollectionTimestamp",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "lazyMint", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
@@ -491,8 +517,15 @@ export interface ERC721Collections extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[ERC721Collections.CollectionStructOutput]>;
 
+    getCollectionOwner(
+      collectionId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
     getNFTsInCollection(
       collectionId: PromiseOrValue<BigNumberish>,
+      startIndex: PromiseOrValue<BigNumberish>,
+      pageSize: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[BigNumber[]]>;
 
@@ -511,6 +544,14 @@ export interface ERC721Collections extends BaseContract {
       arg0: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
+
+    lazyMint(
+      collectionId: PromiseOrValue<BigNumberish>,
+      tokenURI: PromiseOrValue<string>,
+      price: PromiseOrValue<BigNumberish>,
+      to: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
 
     mint(
       collectionId: PromiseOrValue<BigNumberish>,
@@ -629,8 +670,15 @@ export interface ERC721Collections extends BaseContract {
     overrides?: CallOverrides
   ): Promise<ERC721Collections.CollectionStructOutput>;
 
+  getCollectionOwner(
+    collectionId: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
   getNFTsInCollection(
     collectionId: PromiseOrValue<BigNumberish>,
+    startIndex: PromiseOrValue<BigNumberish>,
+    pageSize: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<BigNumber[]>;
 
@@ -649,6 +697,14 @@ export interface ERC721Collections extends BaseContract {
     arg0: PromiseOrValue<string>,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
+
+  lazyMint(
+    collectionId: PromiseOrValue<BigNumberish>,
+    tokenURI: PromiseOrValue<string>,
+    price: PromiseOrValue<BigNumberish>,
+    to: PromiseOrValue<string>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
   mint(
     collectionId: PromiseOrValue<BigNumberish>,
@@ -767,8 +823,15 @@ export interface ERC721Collections extends BaseContract {
       overrides?: CallOverrides
     ): Promise<ERC721Collections.CollectionStructOutput>;
 
+    getCollectionOwner(
+      collectionId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
     getNFTsInCollection(
       collectionId: PromiseOrValue<BigNumberish>,
+      startIndex: PromiseOrValue<BigNumberish>,
+      pageSize: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber[]>;
 
@@ -785,6 +848,14 @@ export interface ERC721Collections extends BaseContract {
 
     lastCollectionTimestamp(
       arg0: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    lazyMint(
+      collectionId: PromiseOrValue<BigNumberish>,
+      tokenURI: PromiseOrValue<string>,
+      price: PromiseOrValue<BigNumberish>,
+      to: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -978,8 +1049,15 @@ export interface ERC721Collections extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getCollectionOwner(
+      collectionId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     getNFTsInCollection(
       collectionId: PromiseOrValue<BigNumberish>,
+      startIndex: PromiseOrValue<BigNumberish>,
+      pageSize: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -997,6 +1075,14 @@ export interface ERC721Collections extends BaseContract {
     lastCollectionTimestamp(
       arg0: PromiseOrValue<string>,
       overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    lazyMint(
+      collectionId: PromiseOrValue<BigNumberish>,
+      tokenURI: PromiseOrValue<string>,
+      price: PromiseOrValue<BigNumberish>,
+      to: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
     mint(
@@ -1117,8 +1203,15 @@ export interface ERC721Collections extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    getCollectionOwner(
+      collectionId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     getNFTsInCollection(
       collectionId: PromiseOrValue<BigNumberish>,
+      startIndex: PromiseOrValue<BigNumberish>,
+      pageSize: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1136,6 +1229,14 @@ export interface ERC721Collections extends BaseContract {
     lastCollectionTimestamp(
       arg0: PromiseOrValue<string>,
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    lazyMint(
+      collectionId: PromiseOrValue<BigNumberish>,
+      tokenURI: PromiseOrValue<string>,
+      price: PromiseOrValue<BigNumberish>,
+      to: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     mint(
