@@ -54,7 +54,7 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
     }
 
     mapping(uint256 => MintRequest) public mintRequests;
-    uint256 public mintRequestIdTracker = 0;
+    uint256 public mintRequestIdTracker = 1;
 
     event NFTListed(uint256 indexed tokenId);
     event NFTDelisted(uint256 indexed tokenId);
@@ -139,7 +139,7 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
             require(_listedTokens[tokenId], "NFT not listed for sale");
             price = _nftContract.getPrice(tokenId);
             nftOwner = _nftContract.ownerOf(tokenId);
-
+            require(nftOwner != msg.sender, "Owner cannot buy their own NFT");
             require(
                 msg.value == price,
                 "Sent value does not match the NFT price"
@@ -158,11 +158,6 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
             (bool success, ) = payable(nftOwner).call{value: sellerAmount}("");
             require(success, "Transfer to NFT owner failed.");
 
-            (bool successRoyalties, ) = payable(address(this)).call{
-                value: royaltiesAmount
-            }("");
-            require(successRoyalties, "Transfer of royalties failed.");
-
             _nftContract.transferFrom(nftOwner, msg.sender, tokenId);
 
             emit NFTBought(tokenId);
@@ -175,7 +170,14 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
             );
             require(collectionId != 1, "");
             require(collectionId != 0, "Collection ID is required for minting");
-
+            address collectionOwner = _nftContract.getCollectionOwner(
+                collectionId
+            );
+            (collectionId);
+            require(
+                collectionOwner != msg.sender,
+                "Collection owner should not request NFTs in their own collection"
+            );
             mintRequests[mintRequestIdTracker] = MintRequest({
                 collectionId: collectionId,
                 tokenURI: tokenURI,
@@ -218,11 +220,6 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
             value: collectionOwnerAmount
         }("");
         require(success, "Transfer to Collection owner failed.");
-
-        (bool successRoyalties, ) = payable(address(this)).call{
-            value: royaltiesAmount
-        }("");
-        require(successRoyalties, "Transfer of royalties failed.");
 
         uint256 tokenId = _nftContract.lazyMint(
             request.collectionId,

@@ -53,6 +53,7 @@ contract ERC721Collections is ERC721URIStorage, Ownable {
         string memory publicCollectionURI
     ) ERC721("ERC721Collections", "STR") {
         createCollection(publicCollectionURI);
+        _tokenIdTracker.increment();
     }
 
     function setMarketplace(
@@ -199,10 +200,6 @@ contract ERC721Collections is ERC721URIStorage, Ownable {
         require(
             _collections[collectionId].id != 0,
             "Collection does not exist"
-        );
-        require(
-            _collections[collectionId].owner == msg.sender,
-            "Not the owner of the collection"
         );
 
         uint256 newTokenId = _tokenIdTracker.current();
