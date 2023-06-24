@@ -57,8 +57,7 @@ export class CollectionDto {
   @IsNotEmpty()
   image: string;
 
-  @ApiProperty({ description: "Royalties percentage", required: false })
+  @ApiProperty({ description: "Uploaded NFTs to IPFS", required: false })
   @IsOptional()
-  @IsNumber()
-  royalties?: number;
+  nfts?: string[];
 }

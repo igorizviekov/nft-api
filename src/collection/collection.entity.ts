@@ -36,6 +36,6 @@ export class Collection extends BaseEntity {
   @Column({ nullable: true })
   website?: string;
 
-  @Column({ nullable: true })
-  royalties?: number;
+  @Column("text", { array: true, nullable: true })
+  nfts?: string[];
 }

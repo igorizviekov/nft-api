@@ -13,12 +13,65 @@ import { CollectionRepository } from "./collection.repository";
 import { CollectionCategory } from "./collection.enum";
 import * as path from "path";
 import * as fs from "fs";
+import * as unzipper from "unzipper";
+import * as util from "util";
+import { create as ipfsClient } from "ipfs-http-client";
+import { ConfigService } from "@nestjs/config";
+import rimraf from "rimraf";
+import yauzl from "yauzl";
+import mkdirp from "mkdirp";
+import { pipeline } from "stream";
+import { promisify } from "util";
+import { promises as fsPromises } from "fs";
+
+const readFile = util.promisify(fs.readFile);
+const streamPipeline = promisify(pipeline);
+async function unzip(
+  file: Express.Multer.File,
+  extractionPath: string
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    yauzl.open(file.path, { lazyEntries: true }, (err, zipfile) => {
+      if (err) throw err;
+
+      zipfile.readEntry();
+
+      zipfile.on("entry", async function (entry) {
+        if (
+          /__MACOSX/.test(entry.fileName) ||
+          entry.fileName.indexOf(".DS_Store") !== -1
+        ) {
+          zipfile.readEntry();
+          return;
+        }
+        if (/\/$/.test(entry.fileName)) {
+          await mkdirp(`${extractionPath}/${entry.fileName}`);
+          zipfile.readEntry();
+        } else {
+          zipfile.openReadStream(entry, async (err, readStream) => {
+            if (err) throw err;
+            await mkdirp(`${extractionPath}/${path.dirname(entry.fileName)}`);
+            await streamPipeline(
+              readStream,
+              fs.createWriteStream(`${extractionPath}/${entry.fileName}`)
+            );
+            zipfile.readEntry();
+          });
+        }
+      });
+
+      zipfile.on("end", resolve);
+      zipfile.on("error", reject);
+    });
+  });
+}
 
 @Injectable()
 export class CollectionService {
   constructor(
     @InjectRepository(CollectionRepository)
-    private collectionRepo: CollectionRepository
+    private collectionRepo: CollectionRepository,
+    private configService: ConfigService
   ) {}
 
   async add(collection: CollectionDto, userId: string): Promise<IResponse> {
@@ -46,36 +99,90 @@ export class CollectionService {
       );
     }
     try {
-      await this.getById(collectionId);
-      const collectionFolderPath = path.join(
-        "tmp",
-        "collections",
-        collectionId
+      console.log(1);
+      const collection = await this.collectionRepo.findOne(collectionId);
+      if (!collection) {
+        throw new NotFoundException(
+          `Collection with id ${collectionId} not found.`
+        );
+      }
+      const auth =
+        "Basic " +
+        Buffer.from(
+          `${this.configService.get<string>(
+            "INFURA_PROJECT_ID"
+          )}:${this.configService.get<string>("INFURA_SECRET")}`
+        ).toString("base64");
+
+      const client = ipfsClient({
+        url: "https://ipfs.infura.io:5001/api/v0",
+        headers: {
+          authorization: auth,
+        },
+      });
+      // Extract zip contents to a directory
+      const extractionPath = `./collections/${collectionId}`;
+      console.log(3);
+      await unzip(file, extractionPath);
+      const fileName = path.parse(file.originalname).name;
+
+      // Get list of files in art and metadata directories
+      const artFiles = await fsPromises.readdir(
+        path.join(extractionPath, fileName, "art")
+      );
+      const metadataFiles = await fsPromises.readdir(
+        path.join(extractionPath, fileName, "metadata")
       );
 
-      if (!fs.existsSync(collectionFolderPath)) {
-        fs.mkdirSync(collectionFolderPath, { recursive: true });
-      }
-      // Save the zip file to the server
-      const zipFilePath = path.join(collectionFolderPath, file.originalname);
-
-      // Copy the file to the desired location
-      await fs.promises.copyFile(file.path, zipFilePath);
-
-      // Delete the temporary file in the 'uploads' folder after saving it to the new location
-      fs.unlink(file.path, (err) => {
-        if (err) {
-          console.error(`Error deleting temporary file ${file.path}:`, err);
-        } else {
-          console.log(`Temporary file ${file.path} deleted successfully`);
-        }
+      // Group images and their json files together
+      const groupedFiles = artFiles.map((artFile) => {
+        const metadataFile = metadataFiles.find(
+          (file) => file.replace(".json", "") === artFile.replace(".png", "")
+        );
+        return { artFile, metadataFile };
       });
-      return { status: "success" };
+      console.log(6);
+
+      // Upload images to IPFS and update json files with the URI
+      const uploadedFiles = []; // This will store the information about the uploaded files.
+      for (const { artFile, metadataFile } of groupedFiles) {
+        const imageContent = await readFile(
+          path.join(extractionPath, fileName, "art", artFile)
+        );
+        const addedImage = await client.add(imageContent);
+        const imageUri = `https://${this.configService.get<string>(
+          "INFURA_PROJECT_NAME"
+        )}.infura-ipfs.io/ipfs/${addedImage.path}`;
+
+        // Update the json file with the URI
+        const metadataContent = JSON.parse(
+          (
+            await readFile(
+              path.join(extractionPath, fileName, "metadata", metadataFile)
+            )
+          ).toString()
+        );
+        metadataContent.image = imageUri;
+        // Upload updated JSON file to IPFS
+        const updatedJsonBuffer = Buffer.from(JSON.stringify(metadataContent));
+        const addedNFT = await client.add(updatedJsonBuffer);
+        const nftUri = `https://${this.configService.get<string>(
+          "INFURA_PROJECT_NAME"
+        )}.infura-ipfs.io/ipfs/${addedNFT.path}`;
+
+        uploadedFiles.push(nftUri);
+      }
+      // Remove the temporary extraction directory
+      rimraf.sync(extractionPath);
+      fs.unlinkSync(file.path);
+
+      collection.nfts = uploadedFiles;
+      await this.collectionRepo.update(collectionId, collection);
+
+      return { status: "success", data: uploadedFiles };
     } catch (e) {
       console.log({ e });
-      throw new NotFoundException(
-        `Collection with id ${collectionId} not found.`
-      );
+      throw new NotFoundException(`Error with uploading a file to IPFS`);
     }
   }
 

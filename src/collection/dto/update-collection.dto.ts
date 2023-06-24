@@ -51,10 +51,9 @@ export class UpdateCollectionDto {
   @IsUrl()
   website?: string;
 
-  @ApiProperty({ description: "Royalties percentage", required: false })
+  @ApiProperty({ description: "Uploaded NFTs to IPFS", required: false })
   @IsOptional()
-  @IsNumber()
-  royalties?: number;
+  nfts?: string[];
 
   @ApiProperty({ description: "Collection image", required: false })
   @IsUrl()
