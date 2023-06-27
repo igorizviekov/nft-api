@@ -34,6 +34,7 @@ import { NotAuthorizedDto } from "../users/dto/unauthorized-error.dto";
 import { UpdateCollectionDto } from "./dto/update-collection.dto";
 import { Collection } from "./collection.entity";
 import { AddMintRequestDto } from "./dto/mint-request.dto";
+import { GetUser } from "../users/get-user.decorator";
 @ApiTags("Collections")
 @Controller("collection")
 export class CollectionController {
