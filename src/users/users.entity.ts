@@ -34,4 +34,10 @@ export class User {
     unique: false,
   })
   website: string;
+
+  @Column({
+    nullable: true,
+    unique: false,
+  })
+  isApprovedMarketplace?: boolean;
 }

@@ -7,6 +7,9 @@ export class Collection extends BaseEntity {
   id: string;
 
   @Column()
+  tokenId: number;
+
+  @Column()
   name: string;
 
   @Column()
@@ -38,4 +41,7 @@ export class Collection extends BaseEntity {
 
   @Column("text", { array: true, nullable: true })
   nfts?: string[];
+
+  @Column("integer", { array: true, nullable: true })
+  mintRequests?: number[];
 }

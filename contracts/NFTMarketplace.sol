@@ -197,6 +197,37 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
         }
     }
 
+    /**
+     * @dev Returns the details of a mint request by ID.
+     */
+    function getMintRequestDetails(
+        uint256 requestId
+    )
+        public
+        view
+        returns (
+            uint256 collectionId,
+            string memory tokenURI,
+            uint256 price,
+            address buyer,
+            bool approved
+        )
+    {
+        require(
+            requestId < mintRequestIdTracker && requestId >= 1,
+            "Invalid request ID"
+        );
+
+        MintRequest storage request = mintRequests[requestId];
+        return (
+            request.collectionId,
+            request.tokenURI,
+            request.price,
+            request.buyer,
+            request.approved
+        );
+    }
+
     function approveMintRequest(uint256 requestId) public nonReentrant {
         MintRequest storage request = mintRequests[requestId];
         require(request.buyer != address(0), "Mint request does not exist");

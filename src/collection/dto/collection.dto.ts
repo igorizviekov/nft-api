@@ -57,7 +57,15 @@ export class CollectionDto {
   @IsNotEmpty()
   image: string;
 
+  @ApiProperty({ description: "Blockchain id", required: true })
+  @IsNumber()
+  tokenId: number;
+
   @ApiProperty({ description: "Uploaded NFTs to IPFS", required: false })
   @IsOptional()
   nfts?: string[];
+
+  @ApiProperty({ description: "Mint requests IDs", required: false })
+  @IsOptional()
+  mintRequests?: number[];
 }

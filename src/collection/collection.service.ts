@@ -6,14 +6,12 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Response } from "express";
 import { CollectionDto } from "./dto/collection.dto";
 import { IResponse } from "src/app.types";
 import { CollectionRepository } from "./collection.repository";
 import { CollectionCategory } from "./collection.enum";
 import * as path from "path";
 import * as fs from "fs";
-import * as unzipper from "unzipper";
 import * as util from "util";
 import { create as ipfsClient } from "ipfs-http-client";
 import { ConfigService } from "@nestjs/config";
@@ -76,11 +74,9 @@ export class CollectionService {
 
   async add(collection: CollectionDto, userId: string): Promise<IResponse> {
     try {
-      // TODO: upload to blockchain
       const newCollection = await this.collectionRepo.createCollection(
         collection,
-        userId,
-        "placeholder_contract_address"
+        userId
       );
       return { status: "success", data: newCollection };
     } catch (e) {
@@ -99,7 +95,6 @@ export class CollectionService {
       );
     }
     try {
-      console.log(1);
       const collection = await this.collectionRepo.findOne(collectionId);
       if (!collection) {
         throw new NotFoundException(
@@ -122,7 +117,6 @@ export class CollectionService {
       });
       // Extract zip contents to a directory
       const extractionPath = `./collections/${collectionId}`;
-      console.log(3);
       await unzip(file, extractionPath);
       const fileName = path.parse(file.originalname).name;
 
@@ -141,7 +135,6 @@ export class CollectionService {
         );
         return { artFile, metadataFile };
       });
-      console.log(6);
 
       // Upload images to IPFS and update json files with the URI
       const uploadedFiles = []; // This will store the information about the uploaded files.
@@ -199,46 +192,15 @@ export class CollectionService {
     }
   }
 
-  async getABI(collectionId: string, res: Response) {
-    try {
-      const match = await this.collectionRepo.findOne(collectionId);
-      if (!match) {
-        throw new NotFoundException(
-          `Collection with id ${collectionId} not found.`
-        );
-      }
-      // TODO: attach collection contract ABI instead of a file
-      const collectionFolderPath = path.join(
-        "tmp",
-        "collections",
-        collectionId
-      );
-      if (!fs.existsSync(collectionFolderPath)) {
-        throw new NotFoundException(
-          `A not found for collection with id ${collectionId}.`
-        );
-      }
-      const files = fs
-        .readdirSync(collectionFolderPath)
-        .filter((file) => file !== ".DS_Store");
-      const filePath = path.join(collectionFolderPath, files[0]);
-      res.setHeader("Content-Disposition", `attachment; filename=${files[0]}`);
-      res.setHeader("Content-Type", "application/zip");
-      fs.createReadStream(filePath).pipe(res);
-    } catch (e) {
-      console.log(e);
-      throw new NotFoundException(
-        `ABI for collection  ${collectionId} not found.`
-      );
-    }
-  }
-
   async update(id: string, collectionData: CollectionDto): Promise<IResponse> {
     const collection = await this.collectionRepo.findOne(id);
     if (!collection) {
       throw new NotFoundException(`Collection with id ${id} not found.`);
     }
     Object.keys(collectionData).forEach((key) => {
+      if (key === "tokenId") {
+        return;
+      }
       collection[key] = collectionData[key];
     });
     await this.collectionRepo.update(id, collection);
@@ -265,5 +227,33 @@ export class CollectionService {
       category
     );
     return { status: "success", data: collections };
+  }
+
+  async addMintRequest(id: string, requestId: number): Promise<IResponse> {
+    const collection = await this.collectionRepo.findOne(id);
+    if (!collection) {
+      throw new Error(`Collection with id ${id} not found.`);
+    }
+    if (collection.mintRequests) {
+      collection.mintRequests.push(requestId);
+    } else {
+      collection.mintRequests = [requestId];
+    }
+    await this.collectionRepo.save(collection);
+    return { status: "success", data: collection };
+  }
+
+  async closeMintRequest(id: string, requestId: number): Promise<IResponse> {
+    const collection = await this.collectionRepo.findOne(id);
+    if (!collection) {
+      throw new Error(`Collection with id ${id} not found.`);
+    }
+    if (collection.mintRequests) {
+      collection.mintRequests = collection.mintRequests.filter(
+        (req) => req !== requestId
+      );
+    }
+    await this.collectionRepo.save(collection);
+    return { status: "success", data: collection };
   }
 }

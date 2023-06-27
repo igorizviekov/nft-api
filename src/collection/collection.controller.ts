@@ -10,7 +10,6 @@ import {
   UseInterceptors,
   UploadedFile,
   HttpStatus,
-  Res,
 } from "@nestjs/common";
 import {
   ApiTags,
@@ -24,7 +23,6 @@ import {
   ApiResponse,
   ApiConsumes,
 } from "@nestjs/swagger";
-import { Response } from "express";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { CollectionDto } from "./dto/collection.dto";
 import { IResponse } from "src/app.types";
@@ -36,6 +34,7 @@ import { User } from "src/users/users.entity";
 import { NotAuthorizedDto } from "src/users/dto/unauthorized-error.dto";
 import { UpdateCollectionDto } from "./dto/update-collection.dto";
 import { Collection } from "./collection.entity";
+import { AddMintRequestDto } from "./dto/mint-request.dto";
 @ApiTags("Collections")
 @Controller("collection")
 export class CollectionController {
@@ -84,21 +83,6 @@ export class CollectionController {
   })
   async getById(@Param("id") id: string): Promise<IResponse> {
     return this.collectionService.getById(id);
-  }
-
-  @Get("/abi/:id")
-  @ApiOkResponse({
-    description: "Collection ABI",
-    type: Collection,
-  })
-  @ApiNotFoundResponse({
-    description: "Collection does not exist",
-  })
-  @ApiOperation({
-    summary: "Get collection ABI file",
-  })
-  async getABI(@Param("id") id: string, @Res() res: Response): Promise<void> {
-    return this.collectionService.getABI(id, res);
   }
 
   @UseGuards(AuthGuard())
@@ -196,5 +180,49 @@ export class CollectionController {
     @Param("id") id: string
   ): Promise<IResponse> {
     return this.collectionService.update(id, collection);
+  }
+
+  @UseGuards(AuthGuard())
+  @ApiBearerAuth("access-token")
+  @ApiOkResponse({
+    description: "Open Mint Request",
+    type: Collection,
+  })
+  @ApiUnauthorizedResponse({
+    description: "Invalid credentials",
+    type: NotAuthorizedDto,
+  })
+  @ApiNotFoundResponse({
+    description: "Collection does not exist",
+  })
+  @ApiBody({ type: AddMintRequestDto })
+  @Post("/mint-request/:id")
+  async addMintRequest(
+    @Param("id") id: string,
+    @Body("requestId") requestId: number
+  ): Promise<IResponse> {
+    return this.collectionService.addMintRequest(id, requestId);
+  }
+
+  @UseGuards(AuthGuard())
+  @ApiBearerAuth("access-token")
+  @ApiOkResponse({
+    description: "Mint Request",
+    type: Collection,
+  })
+  @ApiUnauthorizedResponse({
+    description: "Invalid credentials",
+    type: NotAuthorizedDto,
+  })
+  @ApiNotFoundResponse({
+    description: "Collection does not exist",
+  })
+  @ApiBody({ type: AddMintRequestDto })
+  @Post("/mint-request/close/:id")
+  async closeMintRequest(
+    @Param("id") id: string,
+    @Body("requestId") requestId: number
+  ): Promise<IResponse> {
+    return this.collectionService.closeMintRequest(id, requestId);
   }
 }

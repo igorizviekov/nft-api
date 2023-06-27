@@ -9,13 +9,11 @@ import { CollectionCategory } from "./collection.enum";
 export class CollectionRepository extends Repository<Collection> {
   async createCollection(
     collectionData: CollectionDto,
-    userId: string,
-    contractAddress: string
+    userId: string
   ): Promise<Collection> {
     const collection = this.create({
       ...collectionData,
       creator_id: userId,
-      contract_address: contractAddress,
     });
 
     try {

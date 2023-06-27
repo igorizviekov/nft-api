@@ -55,6 +55,14 @@ export class UpdateCollectionDto {
   @IsOptional()
   nfts?: string[];
 
+  @ApiProperty({ description: "Mint requests IDs", required: false })
+  @IsOptional()
+  mintRequests?: number[];
+
+  @ApiProperty({ description: "Blockchain id", required: true })
+  @IsNumber()
+  tokenId: number;
+
   @ApiProperty({ description: "Collection image", required: false })
   @IsUrl()
   @IsOptional()

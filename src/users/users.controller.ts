@@ -127,4 +127,24 @@ export class UsersController {
   remove(@Param("id") id: string): Promise<IResponse> {
     return this.usersService.remove(id);
   }
+
+  @UseGuards(AuthGuard())
+  @Post("/approve/:id")
+  @ApiOkResponse({
+    description: "User approved successfully",
+    isArray: false,
+    type: UserDto,
+  })
+  @ApiBearerAuth("access-token")
+  @ApiNotFoundResponse({
+    description: "User does not exist",
+    type: NotFoundDto,
+  })
+  @ApiUnauthorizedResponse({
+    description: "Invalid credentials",
+    type: NotAuthorizedDto,
+  })
+  approve(@Param("id") id: string): Promise<IResponse> {
+    return this.usersService.approve(id);
+  }
 }
