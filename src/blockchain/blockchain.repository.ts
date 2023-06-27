@@ -4,7 +4,7 @@ import { Blockchain } from "./blockchain.entity";
 import { BlockchainDto } from "./dto/blockchain.dto";
 
 @EntityRepository(Blockchain)
-export class BlockchainRepository extends Repository<BlockchainDto> {
+export class BlockchainRepository extends Repository<Blockchain> {
   async getAll(): Promise<BlockchainDto[]> {
     const query = this.createQueryBuilder("blockchain");
     const blockchains = await query.getMany();
