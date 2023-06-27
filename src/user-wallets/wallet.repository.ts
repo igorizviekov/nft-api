@@ -4,7 +4,7 @@ import { WalletDto } from "./dto/wallet.dto";
 import { Wallet } from "./wallet.entity";
 
 @EntityRepository(Wallet)
-export class WalletRepository extends Repository<WalletDto> {
+export class WalletRepository extends Repository<Wallet> {
   async getAll(): Promise<WalletDto[]> {
     const query = this.createQueryBuilder("user_wallet");
 
