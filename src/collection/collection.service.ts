@@ -24,10 +24,7 @@ import { promises as fsPromises } from "fs";
 
 const readFile = util.promisify(fs.readFile);
 const streamPipeline = promisify(pipeline);
-async function unzip(
-  file: Express.Multer.File,
-  extractionPath: string
-): Promise<void> {
+async function unzip(file: any, extractionPath: string): Promise<void> {
   return new Promise((resolve, reject) => {
     yauzl.open(file.path, { lazyEntries: true }, (err, zipfile) => {
       if (err) throw err;
