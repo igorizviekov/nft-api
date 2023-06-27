@@ -3,12 +3,12 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { JwtStrategy } from "src/auth/jwt.strategy";
+import { JwtStrategy } from "../auth/jwt.strategy";
 import { UsersController } from "./users.controller";
 import { UsersRepository } from "./users.repository";
 import { UsersService } from "./users.service";
-import { WalletRepository } from "src/user-wallets/wallet.repository";
-import { BlockchainRepository } from "src/blockchain/blockchain.repository";
+import { WalletRepository } from "../user-wallets/wallet.repository";
+import { BlockchainRepository } from "../blockchain/blockchain.repository";
 
 @Module({
   imports: [

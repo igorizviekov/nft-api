@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { NftLogsRepository } from "./nft-logs.repository";
 import { TransactionType } from "./nft-logs.enum";
 import { InjectRepository } from "@nestjs/typeorm";
-import { IResponse } from "src/app.types";
+import { IResponse } from "../app.types";
 import { NftLogsDto } from "./dto/nft-logs.dto";
 
 @Injectable()

@@ -17,8 +17,8 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from "@nestjs/swagger";
-import { IResponse } from "src/app.types";
-import { NotAuthorizedDto } from "src/users/dto/unauthorized-error.dto";
+import { IResponse } from "../app.types";
+import { NotAuthorizedDto } from "../users/dto/unauthorized-error.dto";
 import { WalletNotFoundDto } from "./dto/wallet-notFound.dto";
 import { WalletService } from "./wallet.service";
 import { WalletDto } from "./dto/wallet.dto";

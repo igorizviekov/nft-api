@@ -3,11 +3,11 @@ import { ConfigModule } from "@nestjs/config";
 import { PassportModule } from "@nestjs/passport";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { WalletRepository } from "./wallet.repository";
-import { UsersRepository } from "src/users/users.repository";
+import { UsersRepository } from "../users/users.repository";
 import { WalletsController } from "./wallet.controller";
 import { WalletService } from "./wallet.service";
-import { JwtStrategy } from "src/auth/jwt.strategy";
-import { BlockchainRepository } from "src/blockchain/blockchain.repository";
+import { JwtStrategy } from "../auth/jwt.strategy";
+import { BlockchainRepository } from "../blockchain/blockchain.repository";
 
 @Module({
   imports: [

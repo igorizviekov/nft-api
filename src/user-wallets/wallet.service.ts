@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { IResponse } from "src/app.types";
+import { IResponse } from "../app.types";
 import { WalletRepository } from "./wallet.repository";
 import { WalletDto } from "./dto/wallet.dto";
-import { UsersRepository } from "src/users/users.repository";
-import { BlockchainRepository } from "src/blockchain/blockchain.repository";
+import { UsersRepository } from "../users/users.repository";
+import { BlockchainRepository } from "../blockchain/blockchain.repository";
 
 @Injectable()
 export class WalletService {

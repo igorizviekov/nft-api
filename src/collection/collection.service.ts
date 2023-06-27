@@ -7,7 +7,7 @@ import {
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { CollectionDto } from "./dto/collection.dto";
-import { IResponse } from "src/app.types";
+import { IResponse } from "../app.types";
 import { CollectionRepository } from "./collection.repository";
 import { CollectionCategory } from "./collection.enum";
 import * as path from "path";

@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 
-import { IResponse } from "src/app.types";
+import { IResponse } from "../app.types";
 import { BlockchainRepository } from "./blockchain.repository";
 import { BlockchainDto } from "./dto/blockchain.dto";
 import { Blockchain } from "./blockchain.entity";

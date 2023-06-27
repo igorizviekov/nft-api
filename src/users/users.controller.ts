@@ -27,7 +27,7 @@ import { DeletedUserDto } from "./dto/user-deleted.dto";
 import { NotFoundDto } from "./dto/user-notFoundError.dto";
 import { NotAuthorizedDto } from "./dto/unauthorized-error.dto";
 import { SignInDto } from "./dto/signin.dto";
-import { IResponse } from "src/app.types";
+import { IResponse } from "../app.types";
 import { RegisterUserDto } from "./dto/register-user.dto";
 
 @Controller("users")

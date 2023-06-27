@@ -8,7 +8,7 @@ import {
   ApiQuery,
   ApiTags,
 } from "@nestjs/swagger";
-import { IResponse } from "src/app.types";
+import { IResponse } from "../app.types";
 import { NftLogsDto } from "./dto/nft-logs.dto";
 
 @Controller("nft-logs")

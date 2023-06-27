@@ -18,8 +18,8 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from "@nestjs/swagger";
-import { IResponse } from "src/app.types";
-import { NotAuthorizedDto } from "src/users/dto/unauthorized-error.dto";
+import { IResponse } from "../app.types";
+import { NotAuthorizedDto } from "../users/dto/unauthorized-error.dto";
 import { BlockchainDto } from "./dto/blockchain.dto";
 import { ChainNotFoundDto } from "./dto/blockchain-notFound.dto";
 import { DeletedChainDto } from "./dto/chain-deleted.dto";

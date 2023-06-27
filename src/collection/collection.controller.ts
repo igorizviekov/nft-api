@@ -25,13 +25,12 @@ import {
 } from "@nestjs/swagger";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { CollectionDto } from "./dto/collection.dto";
-import { IResponse } from "src/app.types";
+import { IResponse } from "../app.types";
 import { CollectionCategory } from "./collection.enum";
 import { AuthGuard } from "@nestjs/passport";
-import { GetUser } from "src/users/get-user.decorator";
 import { CollectionService } from "./collection.service";
-import { User } from "src/users/users.entity";
-import { NotAuthorizedDto } from "src/users/dto/unauthorized-error.dto";
+import { User } from "../users/users.entity";
+import { NotAuthorizedDto } from "../users/dto/unauthorized-error.dto";
 import { UpdateCollectionDto } from "./dto/update-collection.dto";
 import { Collection } from "./collection.entity";
 import { AddMintRequestDto } from "./dto/mint-request.dto";
