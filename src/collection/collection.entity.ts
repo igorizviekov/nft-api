@@ -27,9 +27,6 @@ export class Collection extends BaseEntity {
   @Column()
   blockchain_id: string;
 
-  @Column()
-  contract_address: string;
-
   @Column({ nullable: true })
   description?: string;
 

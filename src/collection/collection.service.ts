@@ -198,7 +198,7 @@ export class CollectionService {
       throw new NotFoundException(`Collection with id ${id} not found.`);
     }
     Object.keys(collectionData).forEach((key) => {
-      if (key === "tokenId") {
+      if (key === "tokenId" || key === "nfts" || key === "mintRequests") {
         return;
       }
       collection[key] = collectionData[key];
