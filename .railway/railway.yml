@@ -1,0 +1,16 @@
+services:
+  main:
+    image: node:14
+    buildCommand: npm ci && npm run build
+    runCommand: npm run start:prod
+    port: 3000
+    environment:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      JWT_EXPIRES: ${{ secrets.JWT_EXPIRES }}
+      CORS_ALLOW_ORIGIN: ${{ secrets.CORS_ALLOW_ORIGIN }}
+      SHIMMER_RPC_URL: ${{ secrets.SHIMMER_RPC_URL }}
+      SHIMMER_TEST_ACCOUNT_KEY: ${{ secrets.SHIMMER_TEST_ACCOUNT_KEY }}
+    resources:
+      cpu: 250m
+      memory: 512Mi

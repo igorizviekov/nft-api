@@ -84,10 +84,7 @@ export class CollectionService {
     }
   }
 
-  async ipfs(
-    file: Express.Multer.File,
-    collectionId: string
-  ): Promise<IResponse> {
+  async ipfs(file: any, collectionId: string): Promise<IResponse> {
     if (!file || file.mimetype !== "application/zip") {
       throw new HttpException(
         "Invalid file format. Please upload a zip file.",
@@ -116,7 +113,7 @@ export class CollectionService {
         },
       });
       // Extract zip contents to a directory
-      const extractionPath = `./collections/${collectionId}`;
+      const extractionPath = path.join("tmp", "collections", collectionId);
       await unzip(file, extractionPath);
       const fileName = path.parse(file.originalname).name;
 
@@ -189,6 +186,19 @@ export class CollectionService {
     } catch (e) {
       console.log(e);
       throw new NotFoundException(`Collection with id ${id} not found.`);
+    }
+  }
+
+  async getByNetwork(network: string): Promise<IResponse> {
+    try {
+      const match = await this.collectionRepo.find({ blockchain_id: network });
+      if (!match) {
+        throw new NotFoundException(`No collection was found on ${network}`);
+      }
+      return { status: "success", data: match };
+    } catch (e) {
+      console.log(e);
+      throw new NotFoundException(`Collection on ${network} not found.`);
     }
   }
 

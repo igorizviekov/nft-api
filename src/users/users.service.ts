@@ -90,7 +90,10 @@ export class UsersService {
     }
     const payload: JwtPayload = { wallet };
     const accessToken: string = this.jwtService.sign(payload);
-    return { status: "success", data: { accessToken } };
+    return {
+      status: "success",
+      data: { accessToken: accessToken, usersUID: userWallet.user_id },
+    };
   }
 
   async update(id: string, UserToUpdate: UserDto): Promise<IResponse> {

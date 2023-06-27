@@ -85,6 +85,18 @@ export class CollectionController {
     return this.collectionService.getById(id);
   }
 
+  @Get("/:chainID")
+  @ApiOkResponse({
+    description: "Collection details",
+    type: Collection,
+  })
+  @ApiNotFoundResponse({
+    description: "Collection does not exist",
+  })
+  async getByNetwork(@Param("id") id: string): Promise<IResponse> {
+    return this.collectionService.getByNetwork(id);
+  }
+
   @UseGuards(AuthGuard())
   @ApiBearerAuth("access-token")
   @Get("user/:userId")
@@ -155,7 +167,7 @@ export class CollectionController {
     description: "Collection does not exist",
   })
   async ipfs(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() file: any,
     @Param("id") id: string
   ): Promise<IResponse> {
     return this.collectionService.ipfs(file, id);
