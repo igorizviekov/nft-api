@@ -10,7 +10,7 @@ import { User } from "./users.entity";
 import { JwtService } from "@nestjs/jwt";
 import { JwtPayload } from "src/auth/jwt-payload.interface";
 import { IResponse } from "src/app.types";
-import { WalletRepository } from "src/user-wallets/wallet.repository";
+import { WalletRepository } from "../user-wallets/wallet.repository";
 import { AuthUserDto } from "./dto/auth-user.dto";
 import { WalletDto } from "src/user-wallets/dto/wallet.dto";
 import { BlockchainRepository } from "src/blockchain/blockchain.repository";
