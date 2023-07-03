@@ -215,7 +215,7 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
     {
         require(
             requestId < mintRequestIdTracker && requestId >= 1,
-            "Invalid request ID"
+            "The provided request ID is invalid"
         );
 
         MintRequest storage request = mintRequests[requestId];

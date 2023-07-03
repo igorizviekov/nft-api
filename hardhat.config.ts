@@ -12,7 +12,7 @@ const config: HardhatUserConfig = {
     },
     "shimmerevm-testnet": {
       url: process.env.SHIMMER_RPC_URL,
-      chainId: 1071,
+      chainId: 1072,
       accounts: [process.env.SHIMMER_TEST_ACCOUNT_KEY],
     },
   },

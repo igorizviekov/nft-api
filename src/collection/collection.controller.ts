@@ -85,7 +85,7 @@ export class CollectionController {
     return this.collectionService.getById(id);
   }
 
-  @Get("/:chainID")
+  @Get("/blockchain/:id")
   @ApiOkResponse({
     description: "Collection details",
     type: Collection,
