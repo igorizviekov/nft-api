@@ -35,6 +35,8 @@ export interface NFTMarketplaceInterface extends utils.Interface {
     "approveMintRequest(uint256)": FunctionFragment;
     "buyNFT(uint256,uint256,string)": FunctionFragment;
     "delistNFT(uint256)": FunctionFragment;
+    "getListedTokensInCollection(uint256,uint256,uint256)": FunctionFragment;
+    "getMintRequestDetails(uint256)": FunctionFragment;
     "isTokenListed(uint256)": FunctionFragment;
     "listNFT(uint256,uint256)": FunctionFragment;
     "mintRequestIdTracker()": FunctionFragment;
@@ -62,6 +64,8 @@ export interface NFTMarketplaceInterface extends utils.Interface {
       | "approveMintRequest"
       | "buyNFT"
       | "delistNFT"
+      | "getListedTokensInCollection"
+      | "getMintRequestDetails"
       | "isTokenListed"
       | "listNFT"
       | "mintRequestIdTracker"
@@ -98,6 +102,18 @@ export interface NFTMarketplaceInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "delistNFT",
+    values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getListedTokensInCollection",
+    values: [
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<BigNumberish>
+    ]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getMintRequestDetails",
     values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
@@ -178,6 +194,14 @@ export interface NFTMarketplaceInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "buyNFT", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "delistNFT", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getListedTokensInCollection",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getMintRequestDetails",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "isTokenListed",
     data: BytesLike
@@ -417,6 +441,26 @@ export interface NFTMarketplace extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
+    getListedTokensInCollection(
+      collectionId: PromiseOrValue<BigNumberish>,
+      startIndex: PromiseOrValue<BigNumberish>,
+      pageSize: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber[]]>;
+
+    getMintRequestDetails(
+      requestId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, string, BigNumber, string, boolean] & {
+        collectionId: BigNumber;
+        tokenURI: string;
+        price: BigNumber;
+        buyer: string;
+        approved: boolean;
+      }
+    >;
+
     isTokenListed(
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -528,6 +572,26 @@ export interface NFTMarketplace extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
+  getListedTokensInCollection(
+    collectionId: PromiseOrValue<BigNumberish>,
+    startIndex: PromiseOrValue<BigNumberish>,
+    pageSize: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides
+  ): Promise<BigNumber[]>;
+
+  getMintRequestDetails(
+    requestId: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides
+  ): Promise<
+    [BigNumber, string, BigNumber, string, boolean] & {
+      collectionId: BigNumber;
+      tokenURI: string;
+      price: BigNumber;
+      buyer: string;
+      approved: boolean;
+    }
+  >;
+
   isTokenListed(
     tokenId: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
@@ -638,6 +702,26 @@ export interface NFTMarketplace extends BaseContract {
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    getListedTokensInCollection(
+      collectionId: PromiseOrValue<BigNumberish>,
+      startIndex: PromiseOrValue<BigNumberish>,
+      pageSize: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber[]>;
+
+    getMintRequestDetails(
+      requestId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, string, BigNumber, string, boolean] & {
+        collectionId: BigNumber;
+        tokenURI: string;
+        price: BigNumber;
+        buyer: string;
+        approved: boolean;
+      }
+    >;
 
     isTokenListed(
       tokenId: PromiseOrValue<BigNumberish>,
@@ -832,6 +916,18 @@ export interface NFTMarketplace extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
+    getListedTokensInCollection(
+      collectionId: PromiseOrValue<BigNumberish>,
+      startIndex: PromiseOrValue<BigNumberish>,
+      pageSize: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getMintRequestDetails(
+      requestId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     isTokenListed(
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -934,6 +1030,18 @@ export interface NFTMarketplace extends BaseContract {
     delistNFT(
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    getListedTokensInCollection(
+      collectionId: PromiseOrValue<BigNumberish>,
+      startIndex: PromiseOrValue<BigNumberish>,
+      pageSize: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getMintRequestDetails(
+      requestId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     isTokenListed(

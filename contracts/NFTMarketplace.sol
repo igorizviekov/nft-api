@@ -22,6 +22,12 @@ interface IERC721Collections is IERC721 {
         uint256 price,
         address to
     ) external returns (uint256);
+
+    function getNFTsInCollection(
+        uint256 collectionId,
+        uint256 startIndex,
+        uint256 pageSize
+    ) external view returns (uint256[] memory);
 }
 
 /**
@@ -84,6 +90,43 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
 
     function isTokenListed(uint256 tokenId) public view returns (bool) {
         return _listedTokens[tokenId];
+    }
+
+    /**
+     * @dev get all NFT listed for sale
+     */
+    function getListedTokensInCollection(
+        uint256 collectionId,
+        uint256 startIndex,
+        uint256 pageSize
+    ) public view returns (uint256[] memory) {
+        uint256[] memory listedNFTs = new uint256[](pageSize);
+        uint256 count = 0;
+        uint256[] memory collectionTokens = _nftContract.getNFTsInCollection(
+            collectionId,
+            startIndex,
+            pageSize
+        );
+
+        if (collectionTokens.length == 0) {
+            return listedNFTs;
+        }
+
+        for (uint256 i = 0; i < collectionTokens.length; i++) {
+            uint256 tokenId = collectionTokens[i];
+            if (_listedTokens[tokenId]) {
+                listedNFTs[count] = tokenId;
+                count++;
+            }
+        }
+
+        uint256[] memory result = new uint256[](count);
+
+        for (uint256 i = 0; i < count; i++) {
+            result[i] = listedNFTs[i];
+        }
+
+        return result;
     }
 
     /**
@@ -215,7 +258,7 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
     {
         require(
             requestId < mintRequestIdTracker && requestId >= 1,
-            "Invalid request ID"
+            "The provided request ID is invalid"
         );
 
         MintRequest storage request = mintRequests[requestId];

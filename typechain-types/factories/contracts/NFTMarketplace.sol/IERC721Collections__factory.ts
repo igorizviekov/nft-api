@@ -164,6 +164,35 @@ const _abi = [
     inputs: [
       {
         internalType: "uint256",
+        name: "collectionId",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "startIndex",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "pageSize",
+        type: "uint256",
+      },
+    ],
+    name: "getNFTsInCollection",
+    outputs: [
+      {
+        internalType: "uint256[]",
+        name: "",
+        type: "uint256[]",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
         name: "tokenId",
         type: "uint256",
       },

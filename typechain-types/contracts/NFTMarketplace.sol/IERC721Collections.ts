@@ -33,6 +33,7 @@ export interface IERC721CollectionsInterface extends utils.Interface {
     "balanceOf(address)": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "getCollectionOwner(uint256)": FunctionFragment;
+    "getNFTsInCollection(uint256,uint256,uint256)": FunctionFragment;
     "getPrice(uint256)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
     "lazyMint(uint256,string,uint256,address)": FunctionFragment;
@@ -51,6 +52,7 @@ export interface IERC721CollectionsInterface extends utils.Interface {
       | "balanceOf"
       | "getApproved"
       | "getCollectionOwner"
+      | "getNFTsInCollection"
       | "getPrice"
       | "isApprovedForAll"
       | "lazyMint"
@@ -78,6 +80,14 @@ export interface IERC721CollectionsInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "getCollectionOwner",
     values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getNFTsInCollection",
+    values: [
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<BigNumberish>
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "getPrice",
@@ -146,6 +156,10 @@ export interface IERC721CollectionsInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "getCollectionOwner",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getNFTsInCollection",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "getPrice", data: BytesLike): Result;
@@ -272,6 +286,13 @@ export interface IERC721Collections extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
+    getNFTsInCollection(
+      collectionId: PromiseOrValue<BigNumberish>,
+      startIndex: PromiseOrValue<BigNumberish>,
+      pageSize: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber[]]>;
+
     getPrice(
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -357,6 +378,13 @@ export interface IERC721Collections extends BaseContract {
     overrides?: CallOverrides
   ): Promise<string>;
 
+  getNFTsInCollection(
+    collectionId: PromiseOrValue<BigNumberish>,
+    startIndex: PromiseOrValue<BigNumberish>,
+    pageSize: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides
+  ): Promise<BigNumber[]>;
+
   getPrice(
     tokenId: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
@@ -441,6 +469,13 @@ export interface IERC721Collections extends BaseContract {
       collectionId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<string>;
+
+    getNFTsInCollection(
+      collectionId: PromiseOrValue<BigNumberish>,
+      startIndex: PromiseOrValue<BigNumberish>,
+      pageSize: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber[]>;
 
     getPrice(
       tokenId: PromiseOrValue<BigNumberish>,
@@ -563,6 +598,13 @@ export interface IERC721Collections extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getNFTsInCollection(
+      collectionId: PromiseOrValue<BigNumberish>,
+      startIndex: PromiseOrValue<BigNumberish>,
+      pageSize: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     getPrice(
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -646,6 +688,13 @@ export interface IERC721Collections extends BaseContract {
 
     getCollectionOwner(
       collectionId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getNFTsInCollection(
+      collectionId: PromiseOrValue<BigNumberish>,
+      startIndex: PromiseOrValue<BigNumberish>,
+      pageSize: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
