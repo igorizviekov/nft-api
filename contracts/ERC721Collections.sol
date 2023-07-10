@@ -87,9 +87,10 @@ contract ERC721Collections is ERC721URIStorage, Ownable {
         uint256 startIndex,
         uint256 pageSize
     ) public view returns (uint256[] memory) {
-        uint256[] storage allTokens = _nftCollections[collectionId];
-        require(allTokens.length > 0, "Array is empty");
-        require(startIndex < allTokens.length, "Invalid start index");
+        uint256[] memory allTokens = _nftCollections[collectionId];
+        if (allTokens.length == 0 || startIndex >= allTokens.length) {
+            return new uint256[](0);
+        }
         if (pageSize > 100) {
             pageSize = 100;
         }
