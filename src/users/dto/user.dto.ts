@@ -92,7 +92,7 @@ export class UserDto {
   instagram: string;
 
   @IsOptional()
-  @IsUrl()
+  @IsString()
   @ApiProperty({
     type: String,
     description: "User description",
