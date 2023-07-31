@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/Users/igorizviekov/Desktop/Projects/NFT-api/nft-api/contracts/ERC721Collections.sol": {
-      "lastModificationDate": 1689012120002,
-      "contentHash": "37bace56d45164228055d1a8faf004c4",
+      "lastModificationDate": 1690815623061,
+      "contentHash": "630f947d7e6f06c1ef7b6c16ed669ab5",
       "sourceName": "contracts/ERC721Collections.sol",
       "solcConfig": {
         "version": "0.8.1",
@@ -32,6 +32,7 @@
         "@openzeppelin/contracts/access/Ownable.sol",
         "@openzeppelin/contracts/utils/Counters.sol",
         "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol",
+        "@openzeppelin/contracts/interfaces/IERC2981.sol",
         "./NFTMarketplace.sol"
       ],
       "versionPragmas": [
@@ -42,8 +43,8 @@
       ]
     },
     "/Users/igorizviekov/Desktop/Projects/NFT-api/nft-api/contracts/NFTMarketplace.sol": {
-      "lastModificationDate": 1689006193319,
-      "contentHash": "c85426e3a84575432070f2f980b00881",
+      "lastModificationDate": 1690806935317,
+      "contentHash": "60978db269150ea1bea947ece7a60b9e",
       "sourceName": "contracts/NFTMarketplace.sol",
       "solcConfig": {
         "version": "0.8.1",
@@ -155,6 +156,43 @@
         "Counters"
       ]
     },
+    "/Users/igorizviekov/Desktop/Projects/NFT-api/nft-api/node_modules/@openzeppelin/contracts/interfaces/IERC2981.sol": {
+      "lastModificationDate": 1686429912202,
+      "contentHash": "23ed9f4f05068d7fc726138726c34bee",
+      "sourceName": "@openzeppelin/contracts/interfaces/IERC2981.sol",
+      "solcConfig": {
+        "version": "0.8.1",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../utils/introspection/IERC165.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IERC2981"
+      ]
+    },
     "/Users/igorizviekov/Desktop/Projects/NFT-api/nft-api/node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol": {
       "lastModificationDate": 1686429916128,
       "contentHash": "de368c6a87e159c86544ae5041b58cf3",
@@ -226,41 +264,6 @@
       ],
       "artifacts": [
         "ReentrancyGuard"
-      ]
-    },
-    "/Users/igorizviekov/Desktop/Projects/NFT-api/nft-api/node_modules/@openzeppelin/contracts/utils/math/SafeMath.sol": {
-      "lastModificationDate": 1686429914376,
-      "contentHash": "f6f4fda16c536e57069af40a245c985e",
-      "sourceName": "@openzeppelin/contracts/utils/math/SafeMath.sol",
-      "solcConfig": {
-        "version": "0.8.1",
-        "settings": {
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "SafeMath"
       ]
     },
     "/Users/igorizviekov/Desktop/Projects/NFT-api/nft-api/node_modules/@openzeppelin/contracts/finance/PaymentSplitter.sol": {
@@ -343,6 +346,41 @@
       ],
       "artifacts": [
         "ERC721"
+      ]
+    },
+    "/Users/igorizviekov/Desktop/Projects/NFT-api/nft-api/node_modules/@openzeppelin/contracts/utils/math/SafeMath.sol": {
+      "lastModificationDate": 1686429914376,
+      "contentHash": "f6f4fda16c536e57069af40a245c985e",
+      "sourceName": "@openzeppelin/contracts/utils/math/SafeMath.sol",
+      "solcConfig": {
+        "version": "0.8.1",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "SafeMath"
       ]
     },
     "/Users/igorizviekov/Desktop/Projects/NFT-api/nft-api/node_modules/@openzeppelin/contracts/utils/Context.sol": {
@@ -599,41 +637,6 @@
         "ERC165"
       ]
     },
-    "/Users/igorizviekov/Desktop/Projects/NFT-api/nft-api/node_modules/@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol": {
-      "lastModificationDate": 1686429914373,
-      "contentHash": "c22d4395e33763de693fd440c6fd10e1",
-      "sourceName": "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol",
-      "solcConfig": {
-        "version": "0.8.1",
-        "settings": {
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "IERC721Receiver"
-      ]
-    },
     "/Users/igorizviekov/Desktop/Projects/NFT-api/nft-api/node_modules/@openzeppelin/contracts/token/ERC721/IERC721.sol": {
       "lastModificationDate": 1686429914373,
       "contentHash": "48de4c9a3a4ae5ef66a2aa620843413f",
@@ -669,6 +672,41 @@
       ],
       "artifacts": [
         "IERC721"
+      ]
+    },
+    "/Users/igorizviekov/Desktop/Projects/NFT-api/nft-api/node_modules/@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol": {
+      "lastModificationDate": 1686429914373,
+      "contentHash": "c22d4395e33763de693fd440c6fd10e1",
+      "sourceName": "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol",
+      "solcConfig": {
+        "version": "0.8.1",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IERC721Receiver"
       ]
     },
     "/Users/igorizviekov/Desktop/Projects/NFT-api/nft-api/node_modules/@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol": {

@@ -4,13 +4,14 @@ pragma solidity ^0.8.1;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/interfaces/IERC2981.sol";
 import "./NFTMarketplace.sol";
 
 /**
  * @title ERC721Collections
  * @dev A contract for creating and managing NFT collections. Inherits from OpenZeppelin's ERC721URIStorage and Ownable contracts.
  */
-contract ERC721Collections is ERC721URIStorage, Ownable {
+contract ERC721Collections is ERC721URIStorage, IERC2981, Ownable {
     using Counters for Counters.Counter;
 
     Counters.Counter private _tokenIdTracker;
@@ -19,23 +20,18 @@ contract ERC721Collections is ERC721URIStorage, Ownable {
     uint256 constant MAX_COLLECTIONS_PER_ADDRESS = 999;
     uint256 constant TIME_BETWEEN_COLLECTIONS = 1 minutes;
     uint256 public constant MIN_PRICE = 0.01 ether;
-    uint256 public constant MAX_PRICE = 10000 ether;
+
+    mapping(uint256 => address) private _creators;
+    mapping(uint256 => uint256) private _creatorRoyalties;
 
     struct Collection {
         string uri;
         uint256 id;
         address owner;
+        uint256 mintDate;
     }
 
     NFTMarketplace private _marketplace;
-
-    modifier onlyMarketplace() {
-        require(
-            msg.sender == address(_marketplace),
-            "Caller is not the marketplace"
-        );
-        _;
-    }
 
     mapping(uint256 => Collection) private _collections;
     mapping(uint256 => uint256[]) private _nftCollections; // Mapping from collection ID to list of token IDs
@@ -52,7 +48,7 @@ contract ERC721Collections is ERC721URIStorage, Ownable {
     constructor(
         string memory publicCollectionURI
     ) ERC721("ERC721Collections", "STR") {
-        createCollection(publicCollectionURI);
+        createCollection(publicCollectionURI, block.timestamp);
         _tokenIdTracker.increment();
     }
 
@@ -119,7 +115,6 @@ contract ERC721Collections is ERC721URIStorage, Ownable {
 
     function setPrice(uint256 tokenId, uint256 price) public returns (uint256) {
         require(price >= MIN_PRICE, "Price must be at least MIN_PRICE");
-        require(price <= MAX_PRICE, "Price must not exceed MAX_PRICE");
         require(
             _isApprovedOrOwner(_msgSender(), tokenId),
             "ERC721: transfer caller is not owner nor approved"
@@ -135,7 +130,10 @@ contract ERC721Collections is ERC721URIStorage, Ownable {
         return _tokenPrices[tokenId];
     }
 
-    function createCollection(string memory uri) public returns (uint256) {
+    function createCollection(
+        string memory uri,
+        uint256 mintDate
+    ) public returns (uint256) {
         require(
             collectionsCreated[msg.sender] < MAX_COLLECTIONS_PER_ADDRESS,
             "Max collections reached"
@@ -151,7 +149,8 @@ contract ERC721Collections is ERC721URIStorage, Ownable {
         _collections[_collectionIdTracker.current()] = Collection({
             uri: uri,
             id: _collectionIdTracker.current(),
-            owner: msg.sender
+            owner: msg.sender,
+            mintDate: mintDate
         });
 
         collectionsCreated[msg.sender]++;
@@ -165,13 +164,22 @@ contract ERC721Collections is ERC721URIStorage, Ownable {
     function mint(
         uint256 collectionId,
         string memory tokenURI,
-        uint256 price
+        uint256 price,
+        uint256 royaltyPercentage,
+        bool isMintToMarketplace
     ) public returns (uint256) {
+        require(
+            block.timestamp >= _collections[collectionId].mintDate,
+            "Collection is not yet available for minting"
+        );
         require(price >= MIN_PRICE, "Price must be at least MIN_PRICE");
-        require(price <= MAX_PRICE, "Price must not exceed MAX_PRICE");
         require(
             _collections[collectionId].id != 0,
             "Collection does not exist"
+        );
+        require(
+            royaltyPercentage <= 100,
+            "Royalties percentage should be less than 100"
         );
         require(
             collectionId == 1 || _collections[collectionId].owner == msg.sender,
@@ -184,34 +192,22 @@ contract ERC721Collections is ERC721URIStorage, Ownable {
         _nftToCollection[newTokenId] = collectionId;
         _nftCollections[collectionId].push(newTokenId);
         _tokenPrices[newTokenId] = price;
-
+        _creators[newTokenId] = msg.sender;
+        _creatorRoyalties[newTokenId] = royaltyPercentage;
+        if (isMintToMarketplace) {
+            _marketplace.listNFT(newTokenId, price);
+        }
         emit TokenMinted(newTokenId, collectionId);
 
         return newTokenId;
     }
 
-    function lazyMint(
-        uint256 collectionId,
-        string memory tokenURI,
-        uint256 price,
-        address to
-    ) public onlyMarketplace returns (uint256) {
-        require(price >= MIN_PRICE, "Price must be at least MIN_PRICE");
-        require(price <= MAX_PRICE, "Price must not exceed MAX_PRICE");
-        require(
-            _collections[collectionId].id != 0,
-            "Collection does not exist"
-        );
-
-        uint256 newTokenId = _tokenIdTracker.current();
-        _tokenIdTracker.increment();
-        _mint(to, newTokenId);
-        _setTokenURI(newTokenId, tokenURI);
-        _nftToCollection[newTokenId] = collectionId;
-        _nftCollections[collectionId].push(newTokenId);
-        _tokenPrices[newTokenId] = price;
-
-        emit TokenMinted(newTokenId, collectionId);
-        return newTokenId;
+    function royaltyInfo(
+        uint256 _tokenId,
+        uint256 _salePrice
+    ) external view override returns (address receiver, uint256 royaltyAmount) {
+        uint256 royaltyPercentage = _creatorRoyalties[_tokenId];
+        uint256 royaltyAmount = (_salePrice * royaltyPercentage) / 100;
+        return (_creators[_tokenId], royaltyAmount);
     }
 }

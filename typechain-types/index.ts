@@ -10,6 +10,8 @@ export type { Ownable } from "./@openzeppelin/contracts/access/Ownable";
 export { Ownable__factory } from "./factories/@openzeppelin/contracts/access/Ownable__factory";
 export type { PaymentSplitter } from "./@openzeppelin/contracts/finance/PaymentSplitter";
 export { PaymentSplitter__factory } from "./factories/@openzeppelin/contracts/finance/PaymentSplitter__factory";
+export type { IERC2981 } from "./@openzeppelin/contracts/interfaces/IERC2981";
+export { IERC2981__factory } from "./factories/@openzeppelin/contracts/interfaces/IERC2981__factory";
 export type { IERC4906 } from "./@openzeppelin/contracts/interfaces/IERC4906";
 export { IERC4906__factory } from "./factories/@openzeppelin/contracts/interfaces/IERC4906__factory";
 export type { IERC20Permit } from "./@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit";

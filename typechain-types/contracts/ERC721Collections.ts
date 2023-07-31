@@ -32,23 +32,24 @@ export declare namespace ERC721Collections {
     uri: PromiseOrValue<string>;
     id: PromiseOrValue<BigNumberish>;
     owner: PromiseOrValue<string>;
+    mintDate: PromiseOrValue<BigNumberish>;
   };
 
-  export type CollectionStructOutput = [string, BigNumber, string] & {
-    uri: string;
-    id: BigNumber;
-    owner: string;
-  };
+  export type CollectionStructOutput = [
+    string,
+    BigNumber,
+    string,
+    BigNumber
+  ] & { uri: string; id: BigNumber; owner: string; mintDate: BigNumber };
 }
 
 export interface ERC721CollectionsInterface extends utils.Interface {
   functions: {
-    "MAX_PRICE()": FunctionFragment;
     "MIN_PRICE()": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "collectionsCreated(address)": FunctionFragment;
-    "createCollection(string)": FunctionFragment;
+    "createCollection(string,uint256)": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "getCollection(uint256)": FunctionFragment;
     "getCollectionOfToken(uint256)": FunctionFragment;
@@ -57,12 +58,12 @@ export interface ERC721CollectionsInterface extends utils.Interface {
     "getPrice(uint256)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
     "lastCollectionTimestamp(address)": FunctionFragment;
-    "lazyMint(uint256,string,uint256,address)": FunctionFragment;
-    "mint(uint256,string,uint256)": FunctionFragment;
+    "mint(uint256,string,uint256,uint256,bool)": FunctionFragment;
     "name()": FunctionFragment;
     "owner()": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
+    "royaltyInfo(uint256,uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256,bytes)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
@@ -77,7 +78,6 @@ export interface ERC721CollectionsInterface extends utils.Interface {
 
   getFunction(
     nameOrSignatureOrTopic:
-      | "MAX_PRICE"
       | "MIN_PRICE"
       | "approve"
       | "balanceOf"
@@ -91,12 +91,12 @@ export interface ERC721CollectionsInterface extends utils.Interface {
       | "getPrice"
       | "isApprovedForAll"
       | "lastCollectionTimestamp"
-      | "lazyMint"
       | "mint"
       | "name"
       | "owner"
       | "ownerOf"
       | "renounceOwnership"
+      | "royaltyInfo"
       | "safeTransferFrom(address,address,uint256)"
       | "safeTransferFrom(address,address,uint256,bytes)"
       | "setApprovalForAll"
@@ -109,7 +109,6 @@ export interface ERC721CollectionsInterface extends utils.Interface {
       | "transferOwnership"
   ): FunctionFragment;
 
-  encodeFunctionData(functionFragment: "MAX_PRICE", values?: undefined): string;
   encodeFunctionData(functionFragment: "MIN_PRICE", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "approve",
@@ -125,7 +124,7 @@ export interface ERC721CollectionsInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "createCollection",
-    values: [PromiseOrValue<string>]
+    values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
     functionFragment: "getApproved",
@@ -164,20 +163,13 @@ export interface ERC721CollectionsInterface extends utils.Interface {
     values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
-    functionFragment: "lazyMint",
-    values: [
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<string>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<string>
-    ]
-  ): string;
-  encodeFunctionData(
     functionFragment: "mint",
     values: [
       PromiseOrValue<BigNumberish>,
       PromiseOrValue<string>,
-      PromiseOrValue<BigNumberish>
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<boolean>
     ]
   ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
@@ -189,6 +181,10 @@ export interface ERC721CollectionsInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "renounceOwnership",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "royaltyInfo",
+    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
     functionFragment: "safeTransferFrom(address,address,uint256)",
@@ -241,7 +237,6 @@ export interface ERC721CollectionsInterface extends utils.Interface {
     values: [PromiseOrValue<string>]
   ): string;
 
-  decodeFunctionResult(functionFragment: "MAX_PRICE", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "MIN_PRICE", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
@@ -282,13 +277,16 @@ export interface ERC721CollectionsInterface extends utils.Interface {
     functionFragment: "lastCollectionTimestamp",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "lazyMint", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "royaltyInfo",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -477,8 +475,6 @@ export interface ERC721Collections extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
-    MAX_PRICE(overrides?: CallOverrides): Promise<[BigNumber]>;
-
     MIN_PRICE(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     approve(
@@ -499,6 +495,7 @@ export interface ERC721Collections extends BaseContract {
 
     createCollection(
       uri: PromiseOrValue<string>,
+      mintDate: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -545,18 +542,12 @@ export interface ERC721Collections extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    lazyMint(
-      collectionId: PromiseOrValue<BigNumberish>,
-      tokenURI: PromiseOrValue<string>,
-      price: PromiseOrValue<BigNumberish>,
-      to: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
     mint(
       collectionId: PromiseOrValue<BigNumberish>,
       tokenURI: PromiseOrValue<string>,
       price: PromiseOrValue<BigNumberish>,
+      royaltyPercentage: PromiseOrValue<BigNumberish>,
+      isMintToMarketplace: PromiseOrValue<boolean>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -572,6 +563,14 @@ export interface ERC721Collections extends BaseContract {
     renounceOwnership(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
+
+    royaltyInfo(
+      _tokenId: PromiseOrValue<BigNumberish>,
+      _salePrice: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<
+      [string, BigNumber] & { receiver: string; royaltyAmount: BigNumber }
+    >;
 
     "safeTransferFrom(address,address,uint256)"(
       from: PromiseOrValue<string>,
@@ -630,8 +629,6 @@ export interface ERC721Collections extends BaseContract {
     ): Promise<ContractTransaction>;
   };
 
-  MAX_PRICE(overrides?: CallOverrides): Promise<BigNumber>;
-
   MIN_PRICE(overrides?: CallOverrides): Promise<BigNumber>;
 
   approve(
@@ -652,6 +649,7 @@ export interface ERC721Collections extends BaseContract {
 
   createCollection(
     uri: PromiseOrValue<string>,
+    mintDate: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -698,18 +696,12 @@ export interface ERC721Collections extends BaseContract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  lazyMint(
-    collectionId: PromiseOrValue<BigNumberish>,
-    tokenURI: PromiseOrValue<string>,
-    price: PromiseOrValue<BigNumberish>,
-    to: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
   mint(
     collectionId: PromiseOrValue<BigNumberish>,
     tokenURI: PromiseOrValue<string>,
     price: PromiseOrValue<BigNumberish>,
+    royaltyPercentage: PromiseOrValue<BigNumberish>,
+    isMintToMarketplace: PromiseOrValue<boolean>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -725,6 +717,14 @@ export interface ERC721Collections extends BaseContract {
   renounceOwnership(
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
+
+  royaltyInfo(
+    _tokenId: PromiseOrValue<BigNumberish>,
+    _salePrice: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides
+  ): Promise<
+    [string, BigNumber] & { receiver: string; royaltyAmount: BigNumber }
+  >;
 
   "safeTransferFrom(address,address,uint256)"(
     from: PromiseOrValue<string>,
@@ -783,8 +783,6 @@ export interface ERC721Collections extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    MAX_PRICE(overrides?: CallOverrides): Promise<BigNumber>;
-
     MIN_PRICE(overrides?: CallOverrides): Promise<BigNumber>;
 
     approve(
@@ -805,6 +803,7 @@ export interface ERC721Collections extends BaseContract {
 
     createCollection(
       uri: PromiseOrValue<string>,
+      mintDate: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -851,18 +850,12 @@ export interface ERC721Collections extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    lazyMint(
-      collectionId: PromiseOrValue<BigNumberish>,
-      tokenURI: PromiseOrValue<string>,
-      price: PromiseOrValue<BigNumberish>,
-      to: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     mint(
       collectionId: PromiseOrValue<BigNumberish>,
       tokenURI: PromiseOrValue<string>,
       price: PromiseOrValue<BigNumberish>,
+      royaltyPercentage: PromiseOrValue<BigNumberish>,
+      isMintToMarketplace: PromiseOrValue<boolean>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -876,6 +869,14 @@ export interface ERC721Collections extends BaseContract {
     ): Promise<string>;
 
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
+
+    royaltyInfo(
+      _tokenId: PromiseOrValue<BigNumberish>,
+      _salePrice: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<
+      [string, BigNumber] & { receiver: string; royaltyAmount: BigNumber }
+    >;
 
     "safeTransferFrom(address,address,uint256)"(
       from: PromiseOrValue<string>,
@@ -1009,8 +1010,6 @@ export interface ERC721Collections extends BaseContract {
   };
 
   estimateGas: {
-    MAX_PRICE(overrides?: CallOverrides): Promise<BigNumber>;
-
     MIN_PRICE(overrides?: CallOverrides): Promise<BigNumber>;
 
     approve(
@@ -1031,6 +1030,7 @@ export interface ERC721Collections extends BaseContract {
 
     createCollection(
       uri: PromiseOrValue<string>,
+      mintDate: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -1077,18 +1077,12 @@ export interface ERC721Collections extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    lazyMint(
-      collectionId: PromiseOrValue<BigNumberish>,
-      tokenURI: PromiseOrValue<string>,
-      price: PromiseOrValue<BigNumberish>,
-      to: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
     mint(
       collectionId: PromiseOrValue<BigNumberish>,
       tokenURI: PromiseOrValue<string>,
       price: PromiseOrValue<BigNumberish>,
+      royaltyPercentage: PromiseOrValue<BigNumberish>,
+      isMintToMarketplace: PromiseOrValue<boolean>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -1103,6 +1097,12 @@ export interface ERC721Collections extends BaseContract {
 
     renounceOwnership(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    royaltyInfo(
+      _tokenId: PromiseOrValue<BigNumberish>,
+      _salePrice: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     "safeTransferFrom(address,address,uint256)"(
@@ -1163,8 +1163,6 @@ export interface ERC721Collections extends BaseContract {
   };
 
   populateTransaction: {
-    MAX_PRICE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     MIN_PRICE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     approve(
@@ -1185,6 +1183,7 @@ export interface ERC721Collections extends BaseContract {
 
     createCollection(
       uri: PromiseOrValue<string>,
+      mintDate: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1231,18 +1230,12 @@ export interface ERC721Collections extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    lazyMint(
-      collectionId: PromiseOrValue<BigNumberish>,
-      tokenURI: PromiseOrValue<string>,
-      price: PromiseOrValue<BigNumberish>,
-      to: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
     mint(
       collectionId: PromiseOrValue<BigNumberish>,
       tokenURI: PromiseOrValue<string>,
       price: PromiseOrValue<BigNumberish>,
+      royaltyPercentage: PromiseOrValue<BigNumberish>,
+      isMintToMarketplace: PromiseOrValue<boolean>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1257,6 +1250,12 @@ export interface ERC721Collections extends BaseContract {
 
     renounceOwnership(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    royaltyInfo(
+      _tokenId: PromiseOrValue<BigNumberish>,
+      _salePrice: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     "safeTransferFrom(address,address,uint256)"(
