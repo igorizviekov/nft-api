@@ -55,7 +55,6 @@ export interface ERC721CollectionsInterface extends utils.Interface {
     "getCollectionOfToken(uint256)": FunctionFragment;
     "getCollectionOwner(uint256)": FunctionFragment;
     "getNFTsInCollection(uint256,uint256,uint256)": FunctionFragment;
-    "getPrice(uint256)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
     "lastCollectionTimestamp(address)": FunctionFragment;
     "mint(uint256,string,uint256,uint256,bool)": FunctionFragment;
@@ -68,7 +67,6 @@ export interface ERC721CollectionsInterface extends utils.Interface {
     "safeTransferFrom(address,address,uint256,bytes)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
     "setMarketplace(address)": FunctionFragment;
-    "setPrice(uint256,uint256)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "symbol()": FunctionFragment;
     "tokenURI(uint256)": FunctionFragment;
@@ -88,7 +86,6 @@ export interface ERC721CollectionsInterface extends utils.Interface {
       | "getCollectionOfToken"
       | "getCollectionOwner"
       | "getNFTsInCollection"
-      | "getPrice"
       | "isApprovedForAll"
       | "lastCollectionTimestamp"
       | "mint"
@@ -101,7 +98,6 @@ export interface ERC721CollectionsInterface extends utils.Interface {
       | "safeTransferFrom(address,address,uint256,bytes)"
       | "setApprovalForAll"
       | "setMarketplace"
-      | "setPrice"
       | "supportsInterface"
       | "symbol"
       | "tokenURI"
@@ -149,10 +145,6 @@ export interface ERC721CollectionsInterface extends utils.Interface {
       PromiseOrValue<BigNumberish>,
       PromiseOrValue<BigNumberish>
     ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getPrice",
-    values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
     functionFragment: "isApprovedForAll",
@@ -212,10 +204,6 @@ export interface ERC721CollectionsInterface extends utils.Interface {
     values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
-    functionFragment: "setPrice",
-    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
-  ): string;
-  encodeFunctionData(
     functionFragment: "supportsInterface",
     values: [PromiseOrValue<BytesLike>]
   ): string;
@@ -268,7 +256,6 @@ export interface ERC721CollectionsInterface extends utils.Interface {
     functionFragment: "getNFTsInCollection",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "getPrice", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "isApprovedForAll",
     data: BytesLike
@@ -305,7 +292,6 @@ export interface ERC721CollectionsInterface extends utils.Interface {
     functionFragment: "setMarketplace",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "setPrice", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "supportsInterface",
     data: BytesLike
@@ -526,11 +512,6 @@ export interface ERC721Collections extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[BigNumber[]]>;
 
-    getPrice(
-      tokenId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
     isApprovedForAll(
       owner: PromiseOrValue<string>,
       operator: PromiseOrValue<string>,
@@ -595,12 +576,6 @@ export interface ERC721Collections extends BaseContract {
 
     setMarketplace(
       marketplaceAddress: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    setPrice(
-      tokenId: PromiseOrValue<BigNumberish>,
-      price: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -680,11 +655,6 @@ export interface ERC721Collections extends BaseContract {
     overrides?: CallOverrides
   ): Promise<BigNumber[]>;
 
-  getPrice(
-    tokenId: PromiseOrValue<BigNumberish>,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
   isApprovedForAll(
     owner: PromiseOrValue<string>,
     operator: PromiseOrValue<string>,
@@ -749,12 +719,6 @@ export interface ERC721Collections extends BaseContract {
 
   setMarketplace(
     marketplaceAddress: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  setPrice(
-    tokenId: PromiseOrValue<BigNumberish>,
-    price: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -834,11 +798,6 @@ export interface ERC721Collections extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber[]>;
 
-    getPrice(
-      tokenId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     isApprovedForAll(
       owner: PromiseOrValue<string>,
       operator: PromiseOrValue<string>,
@@ -903,12 +862,6 @@ export interface ERC721Collections extends BaseContract {
       marketplaceAddress: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<void>;
-
-    setPrice(
-      tokenId: PromiseOrValue<BigNumberish>,
-      price: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
 
     supportsInterface(
       interfaceId: PromiseOrValue<BytesLike>,
@@ -1061,11 +1014,6 @@ export interface ERC721Collections extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    getPrice(
-      tokenId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     isApprovedForAll(
       owner: PromiseOrValue<string>,
       operator: PromiseOrValue<string>,
@@ -1128,12 +1076,6 @@ export interface ERC721Collections extends BaseContract {
 
     setMarketplace(
       marketplaceAddress: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    setPrice(
-      tokenId: PromiseOrValue<BigNumberish>,
-      price: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -1214,11 +1156,6 @@ export interface ERC721Collections extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    getPrice(
-      tokenId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     isApprovedForAll(
       owner: PromiseOrValue<string>,
       operator: PromiseOrValue<string>,
@@ -1281,12 +1218,6 @@ export interface ERC721Collections extends BaseContract {
 
     setMarketplace(
       marketplaceAddress: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setPrice(
-      tokenId: PromiseOrValue<BigNumberish>,
-      price: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 

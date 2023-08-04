@@ -148,25 +148,6 @@ const _abi = [
         name: "collectionId",
         type: "uint256",
       },
-    ],
-    name: "getCollectionOwner",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "collectionId",
-        type: "uint256",
-      },
       {
         internalType: "uint256",
         name: "startIndex",
@@ -184,25 +165,6 @@ const _abi = [
         internalType: "uint256[]",
         name: "",
         type: "uint256[]",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "tokenId",
-        type: "uint256",
-      },
-    ],
-    name: "getPrice",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "price",
-        type: "uint256",
       },
     ],
     stateMutability: "view",
@@ -345,24 +307,6 @@ const _abi = [
       },
     ],
     name: "setApprovalForAll",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "tokenId",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "price",
-        type: "uint256",
-      },
-    ],
-    name: "setPrice",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

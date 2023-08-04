@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/Users/igorizviekov/Desktop/Projects/NFT-api/nft-api/contracts/ERC721Collections.sol": {
-      "lastModificationDate": 1690815623061,
-      "contentHash": "630f947d7e6f06c1ef7b6c16ed669ab5",
+      "lastModificationDate": 1691132339107,
+      "contentHash": "1921a8caf5343948e4b0bac5b116eb6b",
       "sourceName": "contracts/ERC721Collections.sol",
       "solcConfig": {
         "version": "0.8.1",
@@ -43,8 +43,8 @@
       ]
     },
     "/Users/igorizviekov/Desktop/Projects/NFT-api/nft-api/contracts/NFTMarketplace.sol": {
-      "lastModificationDate": 1690806935317,
-      "contentHash": "60978db269150ea1bea947ece7a60b9e",
+      "lastModificationDate": 1691132818881,
+      "contentHash": "0707fcb3971b97152d30dd261e71f8b3",
       "sourceName": "contracts/NFTMarketplace.sol",
       "solcConfig": {
         "version": "0.8.1",
@@ -74,7 +74,8 @@
         "@openzeppelin/contracts/access/Ownable.sol",
         "@openzeppelin/contracts/security/ReentrancyGuard.sol",
         "@openzeppelin/contracts/finance/PaymentSplitter.sol",
-        "@openzeppelin/contracts/utils/math/SafeMath.sol"
+        "@openzeppelin/contracts/utils/Counters.sol",
+        "@openzeppelin/contracts/interfaces/IERC2981.sol"
       ],
       "versionPragmas": [
         "^0.8.1"

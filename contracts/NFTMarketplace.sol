@@ -28,10 +28,6 @@ interface IERC721Collections is IERC721 {
  */
 contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
     using Counters for Counters.Counter;
-    /**
-     * @dev IERC721Collections - an interface to interact with the NFT Collections contract.
-     */
-    IERC721Collections private _nftContract;
 
     /**
      * @dev The percentage of the sale price that will be kept as royalties
@@ -39,18 +35,24 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
     uint256 private _royalties;
     uint256 public constant MIN_PRICE = 0.01 ether;
 
+    /**
+     * @dev IERC721Collections - an interface to interact with the NFT Collections contract.
+     */
+    IERC721Collections private _nftContract;
+
+    Counters.Counter private _totalListings;
+
+    mapping(bytes32 => Listing) public listings;
+    bytes32[] public listingsKeys;
+    // maximum number of listings per page
+    uint256 constant PAGE_SIZE = 100;
+
     struct Listing {
         uint256 tokenId;
         uint256 price;
         address seller;
         address nftAddress;
     }
-    Counters.Counter private _totalListings;
-    mapping(bytes32 => Listing) public listings;
-    bytes32[] public listingsKeys;
-
-    // xmaximum number of listings per page
-    uint256 constant PAGE_SIZE = 100;
 
     event NFTListed(
         uint256 indexed tokenId,
@@ -130,6 +132,76 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
     }
 
     /**
+     * @dev Gets all listings of a specific seller.
+     * @param seller The address of the seller.
+     * @return A dynamic array containing all listings of the seller.
+     */
+    function getListingsBySeller(
+        address seller
+    ) public view returns (Listing[] memory) {
+        uint256 count = 0;
+        for (uint256 i = 0; i < listingsKeys.length; i++) {
+            if (listings[listingsKeys[i]].seller == seller) {
+                count++;
+            }
+        }
+        Listing[] memory sellerListings = new Listing[](count);
+        uint256 index = 0;
+        for (uint256 i = 0; i < listingsKeys.length; i++) {
+            if (listings[listingsKeys[i]].seller == seller) {
+                sellerListings[index] = listings[listingsKeys[i]];
+                index++;
+            }
+        }
+        return sellerListings;
+    }
+
+    /**
+     * @dev Gets all listings of a specific NFT contract.
+     * @param nftAddress The address of the NFT contract.
+     * @return A dynamic array containing all listings of the NFT contract.
+     */
+    function getListingsByNFTContract(
+        address nftAddress
+    ) public view returns (Listing[] memory) {
+        uint256 count = 0;
+        for (uint256 i = 0; i < listingsKeys.length; i++) {
+            if (listings[listingsKeys[i]].nftAddress == nftAddress) {
+                count++;
+            }
+        }
+        Listing[] memory contractListings = new Listing[](count);
+
+        uint256 index = 0;
+        for (uint256 i = 0; i < listingsKeys.length; i++) {
+            if (listings[listingsKeys[i]].nftAddress == nftAddress) {
+                contractListings[index] = listings[listingsKeys[i]];
+                index++;
+            }
+        }
+
+        return contractListings;
+    }
+
+    /**
+     * @dev Gets the listing associated with a specific token ID and contract address.
+     * @param tokenId The token ID.
+     * @param nftAddress The address of the NFT contract.
+     * @return The listing associated with the specific token ID and contract address.
+     */
+    function getListingByTokenIdAndAddress(
+        uint256 tokenId,
+        address nftAddress
+    ) public view returns (Listing memory) {
+        bytes32 key = getKeyForToken(nftAddress, tokenId);
+        require(
+            listings[key].seller != address(0),
+            "No listing found for this tokenId and nftAddress"
+        );
+        return listings[key];
+    }
+
+    /**
      * @dev get all NFT listed for sale inside a Collection
      */
     function getListedTokensInCollection(
@@ -197,12 +269,12 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
         );
         require(price >= MIN_PRICE, "Price must be greater than MIN_PRICE");
         require(!isTokenListed(nftAddress, tokenId), "Token is already listed");
-        nftContract.transferFrom(msg.sender, address(this), tokenId);
         require(
             nftContract.isApprovedForAll(msg.sender, address(this)),
             "Marketplace not approved to transfer this NFT"
         );
         bytes32 key = getKeyForToken(nftAddress, tokenId);
+        nftContract.transferFrom(msg.sender, address(this), tokenId);
         listings[key] = Listing({
             tokenId: tokenId,
             price: price,

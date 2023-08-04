@@ -36,7 +36,6 @@ contract ERC721Collections is ERC721URIStorage, IERC2981, Ownable {
     mapping(uint256 => Collection) private _collections;
     mapping(uint256 => uint256[]) private _nftCollections; // Mapping from collection ID to list of token IDs
     mapping(uint256 => uint256) private _nftToCollection; // Mapping from token ID to collection ID
-    mapping(uint256 => uint256) private _tokenPrices; // Mapping from token ID to its price
 
     mapping(address => uint256) public collectionsCreated;
     mapping(address => uint256) public lastCollectionTimestamp;
@@ -103,31 +102,10 @@ contract ERC721Collections is ERC721URIStorage, IERC2981, Ownable {
         return tokens;
     }
 
-    function getPrice(uint256 tokenId) public view returns (uint256) {
-        return _tokenPrices[tokenId];
-    }
-
     function getCollectionOwner(
         uint256 collectionId
     ) external view returns (address) {
         return _collections[collectionId].owner;
-    }
-
-    function setPrice(uint256 tokenId, uint256 price) public returns (uint256) {
-        require(price >= MIN_PRICE, "Price must be at least MIN_PRICE");
-        require(
-            _isApprovedOrOwner(_msgSender(), tokenId),
-            "ERC721: transfer caller is not owner nor approved"
-        );
-        require(
-            !_marketplace.isTokenListed(tokenId),
-            "Token is currently listed for sale"
-        );
-        _tokenPrices[tokenId] = price;
-
-        emit PriceSet(tokenId, price);
-
-        return _tokenPrices[tokenId];
     }
 
     function createCollection(
@@ -185,17 +163,17 @@ contract ERC721Collections is ERC721URIStorage, IERC2981, Ownable {
             collectionId == 1 || _collections[collectionId].owner == msg.sender,
             "Not the owner of the collection"
         );
+        setApprovalForAll(address(_marketplace), true);
         uint256 newTokenId = _tokenIdTracker.current();
         _tokenIdTracker.increment();
         _mint(msg.sender, newTokenId);
         _setTokenURI(newTokenId, tokenURI);
         _nftToCollection[newTokenId] = collectionId;
         _nftCollections[collectionId].push(newTokenId);
-        _tokenPrices[newTokenId] = price;
         _creators[newTokenId] = msg.sender;
         _creatorRoyalties[newTokenId] = royaltyPercentage;
         if (isMintToMarketplace) {
-            _marketplace.listNFT(newTokenId, price);
+            _marketplace.listNFT(newTokenId, price, address(this));
         }
         emit TokenMinted(newTokenId, collectionId);
 
