@@ -29,10 +29,18 @@ contract ERC721Collections is ERC721URIStorage, IERC2981, Ownable {
         uint256 id;
         address owner;
         uint256 mintDate;
+        uint256 mintPrice;
+        uint256 royaltyPercentage;
     }
 
     NFTMarketplace private _marketplace;
-
+    modifier onlyMarketplace() {
+        require(
+            msg.sender == address(_marketplace),
+            "Only marketplace can call"
+        );
+        _;
+    }
     mapping(uint256 => Collection) private _collections;
     mapping(uint256 => uint256[]) private _nftCollections; // Mapping from collection ID to list of token IDs
     mapping(uint256 => uint256) private _nftToCollection; // Mapping from token ID to collection ID
@@ -47,7 +55,7 @@ contract ERC721Collections is ERC721URIStorage, IERC2981, Ownable {
     constructor(
         string memory publicCollectionURI
     ) ERC721("ERC721Collections", "STR") {
-        createCollection(publicCollectionURI, block.timestamp);
+        createCollection(publicCollectionURI, block.timestamp, 0, 0);
         _tokenIdTracker.increment();
     }
 
@@ -110,7 +118,9 @@ contract ERC721Collections is ERC721URIStorage, IERC2981, Ownable {
 
     function createCollection(
         string memory uri,
-        uint256 mintDate
+        uint256 mintDate,
+        uint256 mintPrice,
+        uint256 royaltyPercentage
     ) public returns (uint256) {
         require(
             collectionsCreated[msg.sender] < MAX_COLLECTIONS_PER_ADDRESS,
@@ -121,14 +131,19 @@ contract ERC721Collections is ERC721URIStorage, IERC2981, Ownable {
                 block.timestamp,
             "Must wait before creating another collection"
         );
-
+        require(
+            royaltyPercentage <= 100,
+            "Royalties percentage should be less than 100"
+        );
         _collectionIdTracker.increment();
 
         _collections[_collectionIdTracker.current()] = Collection({
             uri: uri,
             id: _collectionIdTracker.current(),
             owner: msg.sender,
-            mintDate: mintDate
+            mintDate: mintDate,
+            mintPrice: mintPrice,
+            royaltyPercentage: royaltyPercentage
         });
 
         collectionsCreated[msg.sender]++;
@@ -178,6 +193,42 @@ contract ERC721Collections is ERC721URIStorage, IERC2981, Ownable {
         emit TokenMinted(newTokenId, collectionId);
 
         return newTokenId;
+    }
+
+    function mintToCollection(
+        uint256 collectionId,
+        address to,
+        string memory tokenURI,
+        uint256 price
+    )
+        public
+        onlyMarketplace
+        returns (uint256 tokenId, address collectionOwner)
+    {
+        require(
+            _collections[collectionId].id != 0,
+            "Collection does not exist"
+        );
+        require(
+            block.timestamp >= _collections[collectionId].mintDate,
+            "Collection is not yet available for minting"
+        );
+        require(
+            price == _collections[collectionId].mintPrice,
+            "Price should be equal to collections mint price"
+        );
+        setApprovalForAll(address(_marketplace), true);
+        uint256 newTokenId = _tokenIdTracker.current();
+        _tokenIdTracker.increment();
+        _mint(to, newTokenId);
+        _setTokenURI(newTokenId, tokenURI);
+        _nftToCollection[newTokenId] = collectionId;
+        _nftCollections[collectionId].push(newTokenId);
+        _creators[newTokenId] = _collections[collectionId].owner;
+        _creatorRoyalties[newTokenId] = _collections[collectionId]
+            .royaltyPercentage;
+        emit TokenMinted(newTokenId, collectionId);
+        return (newTokenId, _collections[collectionId].owner);
     }
 
     function royaltyInfo(

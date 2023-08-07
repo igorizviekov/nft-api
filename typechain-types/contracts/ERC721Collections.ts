@@ -33,14 +33,25 @@ export declare namespace ERC721Collections {
     id: PromiseOrValue<BigNumberish>;
     owner: PromiseOrValue<string>;
     mintDate: PromiseOrValue<BigNumberish>;
+    mintPrice: PromiseOrValue<BigNumberish>;
+    royaltyPercentage: PromiseOrValue<BigNumberish>;
   };
 
   export type CollectionStructOutput = [
     string,
     BigNumber,
     string,
+    BigNumber,
+    BigNumber,
     BigNumber
-  ] & { uri: string; id: BigNumber; owner: string; mintDate: BigNumber };
+  ] & {
+    uri: string;
+    id: BigNumber;
+    owner: string;
+    mintDate: BigNumber;
+    mintPrice: BigNumber;
+    royaltyPercentage: BigNumber;
+  };
 }
 
 export interface ERC721CollectionsInterface extends utils.Interface {
@@ -49,7 +60,7 @@ export interface ERC721CollectionsInterface extends utils.Interface {
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "collectionsCreated(address)": FunctionFragment;
-    "createCollection(string,uint256)": FunctionFragment;
+    "createCollection(string,uint256,uint256,uint256)": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "getCollection(uint256)": FunctionFragment;
     "getCollectionOfToken(uint256)": FunctionFragment;
@@ -58,6 +69,7 @@ export interface ERC721CollectionsInterface extends utils.Interface {
     "isApprovedForAll(address,address)": FunctionFragment;
     "lastCollectionTimestamp(address)": FunctionFragment;
     "mint(uint256,string,uint256,uint256,bool)": FunctionFragment;
+    "mintToCollection(uint256,address,string,uint256)": FunctionFragment;
     "name()": FunctionFragment;
     "owner()": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
@@ -89,6 +101,7 @@ export interface ERC721CollectionsInterface extends utils.Interface {
       | "isApprovedForAll"
       | "lastCollectionTimestamp"
       | "mint"
+      | "mintToCollection"
       | "name"
       | "owner"
       | "ownerOf"
@@ -120,7 +133,12 @@ export interface ERC721CollectionsInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "createCollection",
-    values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]
+    values: [
+      PromiseOrValue<string>,
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<BigNumberish>
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "getApproved",
@@ -162,6 +180,15 @@ export interface ERC721CollectionsInterface extends utils.Interface {
       PromiseOrValue<BigNumberish>,
       PromiseOrValue<BigNumberish>,
       PromiseOrValue<boolean>
+    ]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "mintToCollection",
+    values: [
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<string>,
+      PromiseOrValue<string>,
+      PromiseOrValue<BigNumberish>
     ]
   ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
@@ -265,6 +292,10 @@ export interface ERC721CollectionsInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "mintToCollection",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
@@ -482,6 +513,8 @@ export interface ERC721Collections extends BaseContract {
     createCollection(
       uri: PromiseOrValue<string>,
       mintDate: PromiseOrValue<BigNumberish>,
+      mintPrice: PromiseOrValue<BigNumberish>,
+      royaltyPercentage: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -529,6 +562,14 @@ export interface ERC721Collections extends BaseContract {
       price: PromiseOrValue<BigNumberish>,
       royaltyPercentage: PromiseOrValue<BigNumberish>,
       isMintToMarketplace: PromiseOrValue<boolean>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    mintToCollection(
+      collectionId: PromiseOrValue<BigNumberish>,
+      to: PromiseOrValue<string>,
+      tokenURI: PromiseOrValue<string>,
+      price: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -625,6 +666,8 @@ export interface ERC721Collections extends BaseContract {
   createCollection(
     uri: PromiseOrValue<string>,
     mintDate: PromiseOrValue<BigNumberish>,
+    mintPrice: PromiseOrValue<BigNumberish>,
+    royaltyPercentage: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -672,6 +715,14 @@ export interface ERC721Collections extends BaseContract {
     price: PromiseOrValue<BigNumberish>,
     royaltyPercentage: PromiseOrValue<BigNumberish>,
     isMintToMarketplace: PromiseOrValue<boolean>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  mintToCollection(
+    collectionId: PromiseOrValue<BigNumberish>,
+    to: PromiseOrValue<string>,
+    tokenURI: PromiseOrValue<string>,
+    price: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -768,6 +819,8 @@ export interface ERC721Collections extends BaseContract {
     createCollection(
       uri: PromiseOrValue<string>,
       mintDate: PromiseOrValue<BigNumberish>,
+      mintPrice: PromiseOrValue<BigNumberish>,
+      royaltyPercentage: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -817,6 +870,16 @@ export interface ERC721Collections extends BaseContract {
       isMintToMarketplace: PromiseOrValue<boolean>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    mintToCollection(
+      collectionId: PromiseOrValue<BigNumberish>,
+      to: PromiseOrValue<string>,
+      tokenURI: PromiseOrValue<string>,
+      price: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, string] & { tokenId: BigNumber; collectionOwner: string }
+    >;
 
     name(overrides?: CallOverrides): Promise<string>;
 
@@ -984,6 +1047,8 @@ export interface ERC721Collections extends BaseContract {
     createCollection(
       uri: PromiseOrValue<string>,
       mintDate: PromiseOrValue<BigNumberish>,
+      mintPrice: PromiseOrValue<BigNumberish>,
+      royaltyPercentage: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -1031,6 +1096,14 @@ export interface ERC721Collections extends BaseContract {
       price: PromiseOrValue<BigNumberish>,
       royaltyPercentage: PromiseOrValue<BigNumberish>,
       isMintToMarketplace: PromiseOrValue<boolean>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    mintToCollection(
+      collectionId: PromiseOrValue<BigNumberish>,
+      to: PromiseOrValue<string>,
+      tokenURI: PromiseOrValue<string>,
+      price: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -1126,6 +1199,8 @@ export interface ERC721Collections extends BaseContract {
     createCollection(
       uri: PromiseOrValue<string>,
       mintDate: PromiseOrValue<BigNumberish>,
+      mintPrice: PromiseOrValue<BigNumberish>,
+      royaltyPercentage: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1173,6 +1248,14 @@ export interface ERC721Collections extends BaseContract {
       price: PromiseOrValue<BigNumberish>,
       royaltyPercentage: PromiseOrValue<BigNumberish>,
       isMintToMarketplace: PromiseOrValue<boolean>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    mintToCollection(
+      collectionId: PromiseOrValue<BigNumberish>,
+      to: PromiseOrValue<string>,
+      tokenURI: PromiseOrValue<string>,
+      price: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 

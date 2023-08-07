@@ -47,14 +47,15 @@ export declare namespace NFTMarketplace {
 export interface NFTMarketplaceInterface extends utils.Interface {
   functions: {
     "MIN_PRICE()": FunctionFragment;
+    "buyFromCollection(uint256,string)": FunctionFragment;
     "buyNFT(address,uint256)": FunctionFragment;
     "delistNFT(address,uint256)": FunctionFragment;
     "getAllListings(uint256)": FunctionFragment;
     "getKeyForToken(address,uint256)": FunctionFragment;
     "getListedTokensInCollection(uint256,uint256,uint256,address)": FunctionFragment;
     "getListingByTokenIdAndAddress(uint256,address)": FunctionFragment;
-    "getListingsByNFTContract(address)": FunctionFragment;
-    "getListingsBySeller(address)": FunctionFragment;
+    "getListingsByNFTContract(address,uint256,uint256)": FunctionFragment;
+    "getListingsBySeller(address,uint256,uint256)": FunctionFragment;
     "isTokenListed(address,uint256)": FunctionFragment;
     "listNFT(uint256,uint256,address)": FunctionFragment;
     "listings(bytes32)": FunctionFragment;
@@ -78,6 +79,7 @@ export interface NFTMarketplaceInterface extends utils.Interface {
   getFunction(
     nameOrSignatureOrTopic:
       | "MIN_PRICE"
+      | "buyFromCollection"
       | "buyNFT"
       | "delistNFT"
       | "getAllListings"
@@ -107,6 +109,10 @@ export interface NFTMarketplaceInterface extends utils.Interface {
   ): FunctionFragment;
 
   encodeFunctionData(functionFragment: "MIN_PRICE", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "buyFromCollection",
+    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<string>]
+  ): string;
   encodeFunctionData(
     functionFragment: "buyNFT",
     values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]
@@ -138,11 +144,19 @@ export interface NFTMarketplaceInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "getListingsByNFTContract",
-    values: [PromiseOrValue<string>]
+    values: [
+      PromiseOrValue<string>,
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<BigNumberish>
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "getListingsBySeller",
-    values: [PromiseOrValue<string>]
+    values: [
+      PromiseOrValue<string>,
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<BigNumberish>
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "isTokenListed",
@@ -219,6 +233,10 @@ export interface NFTMarketplaceInterface extends utils.Interface {
   ): string;
 
   decodeFunctionResult(functionFragment: "MIN_PRICE", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "buyFromCollection",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "buyNFT", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "delistNFT", data: BytesLike): Result;
   decodeFunctionResult(
@@ -449,6 +467,12 @@ export interface NFTMarketplace extends BaseContract {
   functions: {
     MIN_PRICE(overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    buyFromCollection(
+      collectionId: PromiseOrValue<BigNumberish>,
+      tokenURI: PromiseOrValue<string>,
+      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     buyNFT(
       nftAddress: PromiseOrValue<string>,
       tokenId: PromiseOrValue<BigNumberish>,
@@ -488,11 +512,15 @@ export interface NFTMarketplace extends BaseContract {
 
     getListingsByNFTContract(
       nftAddress: PromiseOrValue<string>,
+      page: PromiseOrValue<BigNumberish>,
+      pageSize: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[NFTMarketplace.ListingStructOutput[]]>;
 
     getListingsBySeller(
       seller: PromiseOrValue<string>,
+      page: PromiseOrValue<BigNumberish>,
+      pageSize: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[NFTMarketplace.ListingStructOutput[]]>;
 
@@ -592,6 +620,12 @@ export interface NFTMarketplace extends BaseContract {
 
   MIN_PRICE(overrides?: CallOverrides): Promise<BigNumber>;
 
+  buyFromCollection(
+    collectionId: PromiseOrValue<BigNumberish>,
+    tokenURI: PromiseOrValue<string>,
+    overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   buyNFT(
     nftAddress: PromiseOrValue<string>,
     tokenId: PromiseOrValue<BigNumberish>,
@@ -631,11 +665,15 @@ export interface NFTMarketplace extends BaseContract {
 
   getListingsByNFTContract(
     nftAddress: PromiseOrValue<string>,
+    page: PromiseOrValue<BigNumberish>,
+    pageSize: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<NFTMarketplace.ListingStructOutput[]>;
 
   getListingsBySeller(
     seller: PromiseOrValue<string>,
+    page: PromiseOrValue<BigNumberish>,
+    pageSize: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<NFTMarketplace.ListingStructOutput[]>;
 
@@ -735,6 +773,12 @@ export interface NFTMarketplace extends BaseContract {
   callStatic: {
     MIN_PRICE(overrides?: CallOverrides): Promise<BigNumber>;
 
+    buyFromCollection(
+      collectionId: PromiseOrValue<BigNumberish>,
+      tokenURI: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     buyNFT(
       nftAddress: PromiseOrValue<string>,
       tokenId: PromiseOrValue<BigNumberish>,
@@ -774,11 +818,15 @@ export interface NFTMarketplace extends BaseContract {
 
     getListingsByNFTContract(
       nftAddress: PromiseOrValue<string>,
+      page: PromiseOrValue<BigNumberish>,
+      pageSize: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<NFTMarketplace.ListingStructOutput[]>;
 
     getListingsBySeller(
       seller: PromiseOrValue<string>,
+      page: PromiseOrValue<BigNumberish>,
+      pageSize: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<NFTMarketplace.ListingStructOutput[]>;
 
@@ -954,6 +1002,12 @@ export interface NFTMarketplace extends BaseContract {
   estimateGas: {
     MIN_PRICE(overrides?: CallOverrides): Promise<BigNumber>;
 
+    buyFromCollection(
+      collectionId: PromiseOrValue<BigNumberish>,
+      tokenURI: PromiseOrValue<string>,
+      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     buyNFT(
       nftAddress: PromiseOrValue<string>,
       tokenId: PromiseOrValue<BigNumberish>,
@@ -993,11 +1047,15 @@ export interface NFTMarketplace extends BaseContract {
 
     getListingsByNFTContract(
       nftAddress: PromiseOrValue<string>,
+      page: PromiseOrValue<BigNumberish>,
+      pageSize: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     getListingsBySeller(
       seller: PromiseOrValue<string>,
+      page: PromiseOrValue<BigNumberish>,
+      pageSize: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1091,6 +1149,12 @@ export interface NFTMarketplace extends BaseContract {
   populateTransaction: {
     MIN_PRICE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    buyFromCollection(
+      collectionId: PromiseOrValue<BigNumberish>,
+      tokenURI: PromiseOrValue<string>,
+      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
     buyNFT(
       nftAddress: PromiseOrValue<string>,
       tokenId: PromiseOrValue<BigNumberish>,
@@ -1130,11 +1194,15 @@ export interface NFTMarketplace extends BaseContract {
 
     getListingsByNFTContract(
       nftAddress: PromiseOrValue<string>,
+      page: PromiseOrValue<BigNumberish>,
+      pageSize: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     getListingsBySeller(
       seller: PromiseOrValue<string>,
+      page: PromiseOrValue<BigNumberish>,
+      pageSize: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

@@ -19,6 +19,13 @@ interface IERC721Collections is IERC721 {
         uint256 _tokenId,
         uint256 _salePrice
     ) external view returns (address receiver, uint256 royaltyAmount);
+
+    function mintToCollection(
+        uint256 collectionId,
+        address to,
+        string memory tokenURI,
+        uint256 price
+    ) external returns (uint256 tokenId, address collectionOwner);
 }
 
 /**
@@ -137,20 +144,24 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
      * @return A dynamic array containing all listings of the seller.
      */
     function getListingsBySeller(
-        address seller
+        address seller,
+        uint256 page,
+        uint256 pageSize
     ) public view returns (Listing[] memory) {
+        uint256 totalListings = listingsKeys.length;
+        Listing[] memory sellerListings = new Listing[](
+            Math.min(pageSize, totalListings - page * pageSize)
+        );
         uint256 count = 0;
-        for (uint256 i = 0; i < listingsKeys.length; i++) {
-            if (listings[listingsKeys[i]].seller == seller) {
+        for (
+            uint256 i = page * pageSize;
+            i < totalListings && count < pageSize;
+            i++
+        ) {
+            Listing storage listing = listings[listingsKeys[i]];
+            if (listing.seller == seller) {
+                sellerListings[count] = listing;
                 count++;
-            }
-        }
-        Listing[] memory sellerListings = new Listing[](count);
-        uint256 index = 0;
-        for (uint256 i = 0; i < listingsKeys.length; i++) {
-            if (listings[listingsKeys[i]].seller == seller) {
-                sellerListings[index] = listings[listingsKeys[i]];
-                index++;
             }
         }
         return sellerListings;
@@ -162,7 +173,9 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
      * @return A dynamic array containing all listings of the NFT contract.
      */
     function getListingsByNFTContract(
-        address nftAddress
+        address nftAddress,
+        uint256 page,
+        uint256 pageSize
     ) public view returns (Listing[] memory) {
         uint256 count = 0;
         for (uint256 i = 0; i < listingsKeys.length; i++) {
@@ -170,12 +183,21 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
                 count++;
             }
         }
-        Listing[] memory contractListings = new Listing[](count);
+
+        uint256 start = page * pageSize;
+        uint256 end = Math.min(start + pageSize, count);
+        Listing[] memory contractListings = new Listing[](end - start);
 
         uint256 index = 0;
-        for (uint256 i = 0; i < listingsKeys.length; i++) {
+        for (
+            uint256 i = 0;
+            i < listingsKeys.length && index < end - start;
+            i++
+        ) {
             if (listings[listingsKeys[i]].nftAddress == nftAddress) {
-                contractListings[index] = listings[listingsKeys[i]];
+                if (index >= start) {
+                    contractListings[index - start] = listings[listingsKeys[i]];
+                }
                 index++;
             }
         }
@@ -368,6 +390,23 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
             listing.seller,
             msg.sender,
             listing.nftAddress
+        );
+    }
+
+    function buyFromCollection(
+        uint256 collectionId,
+        string memory tokenURI
+    ) public payable {
+        (uint256 tokenId, address collectionOwner) = _nftContract
+            .mintToCollection(collectionId, msg.sender, tokenURI, msg.value);
+        (bool success, ) = payable(collectionOwner).call{value: msg.value}("");
+        require(success, "Transfer to Collection owner failed.");
+        emit NFTSold(
+            tokenId,
+            msg.value,
+            collectionOwner,
+            msg.sender,
+            address(_nftContract)
         );
     }
 }
