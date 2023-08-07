@@ -396,7 +396,7 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
     function buyFromCollection(
         uint256 collectionId,
         string memory tokenURI
-    ) public payable {
+    ) public payable nonReentrant {
         (uint256 tokenId, address collectionOwner) = _nftContract
             .mintToCollection(collectionId, msg.sender, tokenURI, msg.value);
         (bool success, ) = payable(collectionOwner).call{value: msg.value}("");
