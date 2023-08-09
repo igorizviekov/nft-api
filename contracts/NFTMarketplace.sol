@@ -405,7 +405,7 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
         (uint256 tokenId, address collectionOwner) = _nftContract
             .mintToCollection(collectionId, msg.sender, tokenURI, msg.value);
 
-        uint256 sellerAmount = listing.price - marketplaceRoyaltiesAmount;
+        uint256 sellerAmount = msg.value - marketplaceRoyaltiesAmount;
         (bool success, ) = payable(collectionOwner).call{value: sellerAmount}(
             ""
         );

@@ -43,8 +43,8 @@
       ]
     },
     "/Users/igorizviekov/Desktop/Projects/NFT-api/nft-api/contracts/NFTMarketplace.sol": {
-      "lastModificationDate": 1691418434456,
-      "contentHash": "25eefb4de8ef83c0816ba866a764d533",
+      "lastModificationDate": 1691569567918,
+      "contentHash": "c3be4bf6b824f0660b90fc3d1990ba7e",
       "sourceName": "contracts/NFTMarketplace.sol",
       "solcConfig": {
         "version": "0.8.1",
@@ -85,6 +85,41 @@
         "NFTMarketplace"
       ]
     },
+    "/Users/igorizviekov/Desktop/Projects/NFT-api/nft-api/node_modules/@openzeppelin/contracts/utils/Counters.sol": {
+      "lastModificationDate": 1686429912208,
+      "contentHash": "74654e3ae5d7f39555055dfe244dab7a",
+      "sourceName": "@openzeppelin/contracts/utils/Counters.sol",
+      "solcConfig": {
+        "version": "0.8.1",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "Counters"
+      ]
+    },
     "/Users/igorizviekov/Desktop/Projects/NFT-api/nft-api/node_modules/@openzeppelin/contracts/access/Ownable.sol": {
       "lastModificationDate": 1686429912201,
       "contentHash": "5a20b2cad87ddb61c7a3a6af21289e28",
@@ -120,41 +155,6 @@
       ],
       "artifacts": [
         "Ownable"
-      ]
-    },
-    "/Users/igorizviekov/Desktop/Projects/NFT-api/nft-api/node_modules/@openzeppelin/contracts/utils/Counters.sol": {
-      "lastModificationDate": 1686429912208,
-      "contentHash": "74654e3ae5d7f39555055dfe244dab7a",
-      "sourceName": "@openzeppelin/contracts/utils/Counters.sol",
-      "solcConfig": {
-        "version": "0.8.1",
-        "settings": {
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "Counters"
       ]
     },
     "/Users/igorizviekov/Desktop/Projects/NFT-api/nft-api/node_modules/@openzeppelin/contracts/interfaces/IERC2981.sol": {
@@ -349,41 +349,6 @@
         "ERC721"
       ]
     },
-    "/Users/igorizviekov/Desktop/Projects/NFT-api/nft-api/node_modules/@openzeppelin/contracts/utils/math/SafeMath.sol": {
-      "lastModificationDate": 1686429914376,
-      "contentHash": "f6f4fda16c536e57069af40a245c985e",
-      "sourceName": "@openzeppelin/contracts/utils/math/SafeMath.sol",
-      "solcConfig": {
-        "version": "0.8.1",
-        "settings": {
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "SafeMath"
-      ]
-    },
     "/Users/igorizviekov/Desktop/Projects/NFT-api/nft-api/node_modules/@openzeppelin/contracts/utils/Context.sol": {
       "lastModificationDate": 1686429912207,
       "contentHash": "5f2c5c4b6af2dd4551027144797bc8be",
@@ -561,6 +526,41 @@
       ],
       "artifacts": [
         "IERC20Permit"
+      ]
+    },
+    "/Users/igorizviekov/Desktop/Projects/NFT-api/nft-api/node_modules/@openzeppelin/contracts/utils/introspection/IERC165.sol": {
+      "lastModificationDate": 1686429914377,
+      "contentHash": "03e6768535ac4da0e9756f1d8a4a018a",
+      "sourceName": "@openzeppelin/contracts/utils/introspection/IERC165.sol",
+      "solcConfig": {
+        "version": "0.8.1",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IERC165"
       ]
     },
     "/Users/igorizviekov/Desktop/Projects/NFT-api/nft-api/node_modules/@openzeppelin/contracts/utils/Strings.sol": {
@@ -815,41 +815,6 @@
       ],
       "artifacts": [
         "Math"
-      ]
-    },
-    "/Users/igorizviekov/Desktop/Projects/NFT-api/nft-api/node_modules/@openzeppelin/contracts/utils/introspection/IERC165.sol": {
-      "lastModificationDate": 1686429914377,
-      "contentHash": "03e6768535ac4da0e9756f1d8a4a018a",
-      "sourceName": "@openzeppelin/contracts/utils/introspection/IERC165.sol",
-      "solcConfig": {
-        "version": "0.8.1",
-        "settings": {
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "IERC165"
       ]
     },
     "/Users/igorizviekov/Desktop/Projects/NFT-api/nft-api/node_modules/@openzeppelin/contracts/interfaces/IERC4906.sol": {
