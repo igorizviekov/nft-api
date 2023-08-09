@@ -397,9 +397,19 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
         uint256 collectionId,
         string memory tokenURI
     ) public payable nonReentrant {
+        uint256 marketplaceRoyaltiesAmount = (msg.value * _royalties) / 100;
+        require(
+            msg.value > marketplaceRoyaltiesAmount,
+            "Price should be higher than total royalties"
+        );
         (uint256 tokenId, address collectionOwner) = _nftContract
             .mintToCollection(collectionId, msg.sender, tokenURI, msg.value);
-        (bool success, ) = payable(collectionOwner).call{value: msg.value}("");
+
+        uint256 sellerAmount = listing.price - marketplaceRoyaltiesAmount;
+        (bool success, ) = payable(collectionOwner).call{value: sellerAmount}(
+            ""
+        );
+
         require(success, "Transfer to Collection owner failed.");
         emit NFTSold(
             tokenId,
