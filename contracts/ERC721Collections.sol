@@ -51,6 +51,7 @@ contract ERC721Collections is ERC721URIStorage, IERC2981, Ownable {
     event CollectionCreated(uint256 id, string uri);
     event TokenMinted(uint256 tokenId, uint256 collectionId);
     event PriceSet(uint256 tokenId, uint256 price);
+    event MintPriceChanged(uint256 collectionId, uint256 newMintPrice);
 
     constructor(
         string memory publicCollectionURI
@@ -152,6 +153,27 @@ contract ERC721Collections is ERC721URIStorage, IERC2981, Ownable {
         emit CollectionCreated(_collectionIdTracker.current(), uri);
 
         return _collectionIdTracker.current();
+    }
+
+    function changeMintPrice(
+        uint256 collectionId,
+        uint256 newMintPrice
+    ) public {
+        require(
+            _collections[collectionId].id != 0,
+            "Collection does not exist"
+        );
+        require(
+            msg.sender == _collections[collectionId].owner,
+            "Not the owner of the collection"
+        );
+        require(
+            newMintPrice >= MIN_PRICE,
+            "New mint price must be at least MIN_PRICE"
+        );
+
+        _collections[collectionId].mintPrice = newMintPrice;
+        emit MintPriceChanged(collectionId, newMintPrice);
     }
 
     function mint(

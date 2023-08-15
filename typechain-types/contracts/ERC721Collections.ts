@@ -59,6 +59,7 @@ export interface ERC721CollectionsInterface extends utils.Interface {
     "MIN_PRICE()": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
+    "changeMintPrice(uint256,uint256)": FunctionFragment;
     "collectionsCreated(address)": FunctionFragment;
     "createCollection(string,uint256,uint256,uint256)": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
@@ -91,6 +92,7 @@ export interface ERC721CollectionsInterface extends utils.Interface {
       | "MIN_PRICE"
       | "approve"
       | "balanceOf"
+      | "changeMintPrice"
       | "collectionsCreated"
       | "createCollection"
       | "getApproved"
@@ -126,6 +128,10 @@ export interface ERC721CollectionsInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "balanceOf",
     values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "changeMintPrice",
+    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
     functionFragment: "collectionsCreated",
@@ -256,6 +262,10 @@ export interface ERC721CollectionsInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "changeMintPrice",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "collectionsCreated",
     data: BytesLike
   ): Result;
@@ -344,6 +354,7 @@ export interface ERC721CollectionsInterface extends utils.Interface {
     "BatchMetadataUpdate(uint256,uint256)": EventFragment;
     "CollectionCreated(uint256,string)": EventFragment;
     "MetadataUpdate(uint256)": EventFragment;
+    "MintPriceChanged(uint256,uint256)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
     "PriceSet(uint256,uint256)": EventFragment;
     "TokenMinted(uint256,uint256)": EventFragment;
@@ -355,6 +366,7 @@ export interface ERC721CollectionsInterface extends utils.Interface {
   getEvent(nameOrSignatureOrTopic: "BatchMetadataUpdate"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "CollectionCreated"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "MetadataUpdate"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "MintPriceChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "PriceSet"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TokenMinted"): EventFragment;
@@ -418,6 +430,18 @@ export type MetadataUpdateEvent = TypedEvent<
 >;
 
 export type MetadataUpdateEventFilter = TypedEventFilter<MetadataUpdateEvent>;
+
+export interface MintPriceChangedEventObject {
+  collectionId: BigNumber;
+  newMintPrice: BigNumber;
+}
+export type MintPriceChangedEvent = TypedEvent<
+  [BigNumber, BigNumber],
+  MintPriceChangedEventObject
+>;
+
+export type MintPriceChangedEventFilter =
+  TypedEventFilter<MintPriceChangedEvent>;
 
 export interface OwnershipTransferredEventObject {
   previousOwner: string;
@@ -504,6 +528,12 @@ export interface ERC721Collections extends BaseContract {
       owner: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
+
+    changeMintPrice(
+      collectionId: PromiseOrValue<BigNumberish>,
+      newMintPrice: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
 
     collectionsCreated(
       arg0: PromiseOrValue<string>,
@@ -658,6 +688,12 @@ export interface ERC721Collections extends BaseContract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
+  changeMintPrice(
+    collectionId: PromiseOrValue<BigNumberish>,
+    newMintPrice: PromiseOrValue<BigNumberish>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   collectionsCreated(
     arg0: PromiseOrValue<string>,
     overrides?: CallOverrides
@@ -810,6 +846,12 @@ export interface ERC721Collections extends BaseContract {
       owner: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    changeMintPrice(
+      collectionId: PromiseOrValue<BigNumberish>,
+      newMintPrice: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     collectionsCreated(
       arg0: PromiseOrValue<string>,
@@ -992,6 +1034,15 @@ export interface ERC721Collections extends BaseContract {
     "MetadataUpdate(uint256)"(_tokenId?: null): MetadataUpdateEventFilter;
     MetadataUpdate(_tokenId?: null): MetadataUpdateEventFilter;
 
+    "MintPriceChanged(uint256,uint256)"(
+      collectionId?: null,
+      newMintPrice?: null
+    ): MintPriceChangedEventFilter;
+    MintPriceChanged(
+      collectionId?: null,
+      newMintPrice?: null
+    ): MintPriceChangedEventFilter;
+
     "OwnershipTransferred(address,address)"(
       previousOwner?: PromiseOrValue<string> | null,
       newOwner?: PromiseOrValue<string> | null
@@ -1037,6 +1088,12 @@ export interface ERC721Collections extends BaseContract {
     balanceOf(
       owner: PromiseOrValue<string>,
       overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    changeMintPrice(
+      collectionId: PromiseOrValue<BigNumberish>,
+      newMintPrice: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
     collectionsCreated(
@@ -1189,6 +1246,12 @@ export interface ERC721Collections extends BaseContract {
     balanceOf(
       owner: PromiseOrValue<string>,
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    changeMintPrice(
+      collectionId: PromiseOrValue<BigNumberish>,
+      newMintPrice: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     collectionsCreated(
