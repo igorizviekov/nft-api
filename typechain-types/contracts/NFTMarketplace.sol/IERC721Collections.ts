@@ -297,8 +297,8 @@ export interface IERC721Collections extends BaseContract {
     ): Promise<[string] & { owner: string }>;
 
     royaltyInfo(
-      _tokenId: PromiseOrValue<BigNumberish>,
-      _salePrice: PromiseOrValue<BigNumberish>,
+      tokenId: PromiseOrValue<BigNumberish>,
+      salePrice: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<
       [string, BigNumber] & { receiver: string; royaltyAmount: BigNumber }
@@ -381,8 +381,8 @@ export interface IERC721Collections extends BaseContract {
   ): Promise<string>;
 
   royaltyInfo(
-    _tokenId: PromiseOrValue<BigNumberish>,
-    _salePrice: PromiseOrValue<BigNumberish>,
+    tokenId: PromiseOrValue<BigNumberish>,
+    salePrice: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<
     [string, BigNumber] & { receiver: string; royaltyAmount: BigNumber }
@@ -467,8 +467,8 @@ export interface IERC721Collections extends BaseContract {
     ): Promise<string>;
 
     royaltyInfo(
-      _tokenId: PromiseOrValue<BigNumberish>,
-      _salePrice: PromiseOrValue<BigNumberish>,
+      tokenId: PromiseOrValue<BigNumberish>,
+      salePrice: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<
       [string, BigNumber] & { receiver: string; royaltyAmount: BigNumber }
@@ -587,8 +587,8 @@ export interface IERC721Collections extends BaseContract {
     ): Promise<BigNumber>;
 
     royaltyInfo(
-      _tokenId: PromiseOrValue<BigNumberish>,
-      _salePrice: PromiseOrValue<BigNumberish>,
+      tokenId: PromiseOrValue<BigNumberish>,
+      salePrice: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -670,8 +670,8 @@ export interface IERC721Collections extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     royaltyInfo(
-      _tokenId: PromiseOrValue<BigNumberish>,
-      _salePrice: PromiseOrValue<BigNumberish>,
+      tokenId: PromiseOrValue<BigNumberish>,
+      salePrice: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

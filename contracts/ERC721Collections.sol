@@ -183,15 +183,9 @@ contract ERC721Collections is ERC721URIStorage, IERC2981, Ownable {
         uint256 royaltyPercentage,
         bool isMintToMarketplace
     ) public returns (uint256) {
-        require(
-            block.timestamp >= _collections[collectionId].mintDate,
-            "Collection is not yet available for minting"
-        );
-        require(price >= MIN_PRICE, "Price must be at least MIN_PRICE");
-        require(
-            _collections[collectionId].id != 0,
-            "Collection does not exist"
-        );
+        if (isMintToMarketplace) {
+            require(price >= MIN_PRICE, "Price must be at least MIN_PRICE");
+        }
         require(
             royaltyPercentage <= 100,
             "Royalties percentage should be less than 100"
@@ -200,6 +194,15 @@ contract ERC721Collections is ERC721URIStorage, IERC2981, Ownable {
             collectionId == 1 || _collections[collectionId].owner == msg.sender,
             "Not the owner of the collection"
         );
+        require(
+            block.timestamp >= _collections[collectionId].mintDate,
+            "Collection is not yet available for minting"
+        );
+        require(
+            _collections[collectionId].id != 0,
+            "Collection does not exist"
+        );
+
         setApprovalForAll(address(_marketplace), true);
         uint256 newTokenId = _tokenIdTracker.current();
         _tokenIdTracker.increment();
@@ -254,11 +257,11 @@ contract ERC721Collections is ERC721URIStorage, IERC2981, Ownable {
     }
 
     function royaltyInfo(
-        uint256 _tokenId,
-        uint256 _salePrice
+        uint256 tokenId,
+        uint256 salePrice
     ) external view override returns (address receiver, uint256 royaltyAmount) {
-        uint256 royaltyPercentage = _creatorRoyalties[_tokenId];
-        uint256 royaltyAmount = (_salePrice * royaltyPercentage) / 100;
-        return (_creators[_tokenId], royaltyAmount);
+        uint256 royaltyPercentage = _creatorRoyalties[tokenId];
+        uint256 royaltyAmount = (salePrice * royaltyPercentage) / 100;
+        return (_creators[tokenId], royaltyAmount);
     }
 }

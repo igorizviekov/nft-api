@@ -16,8 +16,8 @@ interface IERC721Collections is IERC721 {
     ) external view returns (uint256[] memory);
 
     function royaltyInfo(
-        uint256 _tokenId,
-        uint256 _salePrice
+        uint256 tokenId,
+        uint256 salePrice
     ) external view returns (address receiver, uint256 royaltyAmount);
 
     function mintToCollection(
@@ -40,7 +40,9 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
      * @dev The percentage of the sale price that will be kept as royalties
      */
     uint256 private _royalties;
-    uint256 public constant MIN_PRICE = 0.01 ether;
+    uint256 public constant MIN_PRICE = 0.001 ether;
+
+    address private _nftContractAddress;
 
     /**
      * @dev IERC721Collections - an interface to interact with the NFT Collections contract.
@@ -58,23 +60,23 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
         uint256 tokenId;
         uint256 price;
         address seller;
-        address nftAddress;
+        address collection;
     }
 
     event NFTListed(
         uint256 indexed tokenId,
         uint256 price,
         address indexed seller,
-        address indexed nftAddress
+        address indexed collection
     );
 
-    event NFTDelisted(uint256 indexed tokenId, address indexed nftAddress);
+    event NFTDelisted(uint256 indexed tokenId, address indexed collection);
     event NFTSold(
         uint256 indexed tokenId,
         uint256 price,
         address indexed seller,
         address indexed buyer,
-        address nftAddress
+        address collection
     );
 
     constructor(
@@ -89,21 +91,22 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
             "Payees and shares length must match"
         );
         _nftContract = IERC721Collections(nftContractAddress);
+        _nftContractAddress = nftContractAddress;
         _royalties = royalties;
     }
 
     function getKeyForToken(
-        address nftAddress,
+        address collection,
         uint256 tokenId
     ) public pure returns (bytes32) {
-        return keccak256(abi.encodePacked(nftAddress, tokenId));
+        return keccak256(abi.encodePacked(collection, tokenId));
     }
 
     function isTokenListed(
-        address nftAddress,
+        address collection,
         uint256 tokenId
     ) public view returns (bool) {
-        bytes32 key = getKeyForToken(nftAddress, tokenId);
+        bytes32 key = getKeyForToken(collection, tokenId);
         return listings[key].seller != address(0);
     }
 
@@ -119,6 +122,10 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
         uint256 end = start + PAGE_SIZE > totalListings
             ? totalListings
             : start + PAGE_SIZE;
+
+        if (end <= start) {
+            return new Listing[](0);
+        }
 
         Listing[] memory pageListings = new Listing[](end - start);
 
@@ -149,43 +156,49 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
         uint256 pageSize
     ) public view returns (Listing[] memory) {
         uint256 totalListings = listingsKeys.length;
-        Listing[] memory sellerListings = new Listing[](
-            Math.min(pageSize, totalListings - page * pageSize)
-        );
+        uint256 start = page * pageSize;
+        uint256 end = Math.min(start + pageSize, totalListings);
+
+        if (end <= start) {
+            return new Listing[](0);
+        }
+
+        Listing[] memory sellerListings = new Listing[](end - start);
         uint256 count = 0;
-        for (
-            uint256 i = page * pageSize;
-            i < totalListings && count < pageSize;
-            i++
-        ) {
+
+        for (uint256 i = start; i < end; i++) {
             Listing storage listing = listings[listingsKeys[i]];
             if (listing.seller == seller) {
                 sellerListings[count] = listing;
                 count++;
             }
         }
+
         return sellerListings;
     }
 
     /**
      * @dev Gets all listings of a specific NFT contract.
-     * @param nftAddress The address of the NFT contract.
+     * @param collection The address of the NFT contract.
      * @return A dynamic array containing all listings of the NFT contract.
      */
     function getListingsByNFTContract(
-        address nftAddress,
+        address collection,
         uint256 page,
         uint256 pageSize
     ) public view returns (Listing[] memory) {
         uint256 count = 0;
         for (uint256 i = 0; i < listingsKeys.length; i++) {
-            if (listings[listingsKeys[i]].nftAddress == nftAddress) {
+            if (listings[listingsKeys[i]].collection == collection) {
                 count++;
             }
         }
 
         uint256 start = page * pageSize;
         uint256 end = Math.min(start + pageSize, count);
+        if (end <= start) {
+            return new Listing[](0);
+        }
         Listing[] memory contractListings = new Listing[](end - start);
 
         uint256 index = 0;
@@ -194,7 +207,7 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
             i < listingsKeys.length && index < end - start;
             i++
         ) {
-            if (listings[listingsKeys[i]].nftAddress == nftAddress) {
+            if (listings[listingsKeys[i]].collection == collection) {
                 if (index >= start) {
                     contractListings[index - start] = listings[listingsKeys[i]];
                 }
@@ -208,17 +221,17 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
     /**
      * @dev Gets the listing associated with a specific token ID and contract address.
      * @param tokenId The token ID.
-     * @param nftAddress The address of the NFT contract.
+     * @param collection The address of the NFT contract.
      * @return The listing associated with the specific token ID and contract address.
      */
     function getListingByTokenIdAndAddress(
         uint256 tokenId,
-        address nftAddress
+        address collection
     ) public view returns (Listing memory) {
-        bytes32 key = getKeyForToken(nftAddress, tokenId);
+        bytes32 key = getKeyForToken(collection, tokenId);
         require(
             listings[key].seller != address(0),
-            "No listing found for this tokenId and nftAddress"
+            "No listing found for this tokenId and collection"
         );
         return listings[key];
     }
@@ -230,7 +243,7 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
         uint256 collectionId,
         uint256 startIndex,
         uint256 pageSize,
-        address nftAddress
+        address collection
     ) public view returns (uint256[] memory) {
         uint256[] memory listedNFTs = new uint256[](pageSize);
         uint256 count = 0;
@@ -246,7 +259,7 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
 
         for (uint256 i = 0; i < collectionTokens.length; i++) {
             uint256 tokenId = collectionTokens[i];
-            bytes32 key = getKeyForToken(nftAddress, tokenId);
+            bytes32 key = getKeyForToken(collection, tokenId);
             if (listings[key].seller != address(0)) {
                 listedNFTs[count] = tokenId;
                 count++;
@@ -269,56 +282,57 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
      * - The NFT must not be already listed for sale.
      * - The price must be greater than 0.
      */
-
     function listNFT(
         uint256 tokenId,
         uint256 price,
-        address nftAddress
+        address collection
     ) public nonReentrant {
-        IERC721 nftContract = IERC721(nftAddress);
-        IERC165 checker = IERC165(nftAddress);
+        IERC721 nftContract = IERC721(collection);
+        IERC165 checker = IERC165(collection);
         require(
             checker.supportsInterface(type(IERC721).interfaceId),
             "The NFT contract does not support the ERC721 interface"
         );
+        require(!isTokenListed(collection, tokenId), "Token is already listed");
+        require(price >= MIN_PRICE, "Price must be greater than MIN_PRICE");
         require(
-            checker.supportsInterface(type(IERC2981).interfaceId),
-            "The NFT contract does not support the ERC2981 interface"
-        );
-        require(
-            nftContract.ownerOf(tokenId) == msg.sender,
+            nftContract.ownerOf(tokenId) == msg.sender ||
+                (msg.sender == _nftContractAddress &&
+                    collection == _nftContractAddress),
             "You don't own this NFT"
         );
-        require(price >= MIN_PRICE, "Price must be greater than MIN_PRICE");
-        require(!isTokenListed(nftAddress, tokenId), "Token is already listed");
-        require(
-            nftContract.isApprovedForAll(msg.sender, address(this)),
-            "Marketplace not approved to transfer this NFT"
-        );
-        bytes32 key = getKeyForToken(nftAddress, tokenId);
-        nftContract.transferFrom(msg.sender, address(this), tokenId);
+        //   require(
+        //             checker.supportsInterface(type(IERC2981).interfaceId),
+        //             "The NFT contract does not support the IERC2981 interface"
+        //         );
+        bytes32 key = getKeyForToken(collection, tokenId);
         listings[key] = Listing({
             tokenId: tokenId,
             price: price,
-            seller: msg.sender,
-            nftAddress: nftAddress
+            seller: nftContract.ownerOf(tokenId),
+            collection: collection
         });
+        nftContract.transferFrom(
+            nftContract.ownerOf(tokenId),
+            address(this),
+            tokenId
+        );
         _totalListings.increment();
         listingsKeys.push(key);
-        emit NFTListed(tokenId, price, msg.sender, nftAddress);
+        emit NFTListed(tokenId, price, msg.sender, collection);
     }
 
     function delistNFT(
-        address nftAddress,
+        address collection,
         uint256 tokenId
     ) public nonReentrant {
-        bytes32 key = getKeyForToken(nftAddress, tokenId);
+        bytes32 key = getKeyForToken(collection, tokenId);
         Listing storage listing = listings[key];
         require(listing.seller == msg.sender, "You don't own this NFT");
 
-        IERC721 nftContract = IERC721(listing.nftAddress);
+        IERC721 nftContract = IERC721(listing.collection);
         delete listings[key];
-        nftContract.transferFrom(address(this), msg.sender, tokenId);
+        // nftContract.transferFrom(address(this), msg.sender, tokenId);
         _totalListings.decrement();
         for (uint256 i = 0; i < listingsKeys.length; i++) {
             if (listingsKeys[i] == key) {
@@ -327,21 +341,26 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
                 break;
             }
         }
-        emit NFTDelisted(tokenId, nftAddress);
+        emit NFTDelisted(tokenId, collection);
     }
 
     function buyNFT(
-        address nftAddress,
+        address collection,
         uint256 tokenId
     ) public payable nonReentrant {
-        bytes32 key = getKeyForToken(nftAddress, tokenId);
+        bytes32 key = getKeyForToken(collection, tokenId);
         Listing storage listing = listings[key];
         require(
             msg.value == listing.price,
             "Sent value does not match the NFT price"
         );
+        require(
+            listing.price >= MIN_PRICE,
+            "Listing price must be greater than MIN_PRICE"
+        );
+
         require(listing.seller != msg.sender, "Owner cannot buy their own NFT");
-        IERC165 checker = IERC165(nftAddress);
+        IERC165 checker = IERC165(collection);
         require(
             checker.supportsInterface(type(IERC721).interfaceId),
             "The NFT contract does not support the ERC721 interface"
@@ -350,8 +369,8 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
             checker.supportsInterface(type(IERC2981).interfaceId),
             "The NFT contract does not support the ERC2981 interface"
         );
-        IERC2981 nftContractRoyalties = IERC2981(nftAddress);
-        IERC721 nftContract = IERC721(nftAddress);
+        IERC2981 nftContractRoyalties = IERC2981(collection);
+        IERC721 nftContract = IERC721(collection);
         (address receiver, uint256 royaltyAmount) = nftContractRoyalties
             .royaltyInfo(listing.tokenId, listing.price);
 
@@ -389,7 +408,7 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
             listing.price,
             listing.seller,
             msg.sender,
-            listing.nftAddress
+            listing.collection
         );
     }
 
@@ -416,7 +435,7 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
             msg.value,
             collectionOwner,
             msg.sender,
-            address(_nftContract)
+            _nftContractAddress
         );
     }
 }

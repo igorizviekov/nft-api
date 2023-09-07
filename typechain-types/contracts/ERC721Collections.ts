@@ -617,8 +617,8 @@ export interface ERC721Collections extends BaseContract {
     ): Promise<ContractTransaction>;
 
     royaltyInfo(
-      _tokenId: PromiseOrValue<BigNumberish>,
-      _salePrice: PromiseOrValue<BigNumberish>,
+      tokenId: PromiseOrValue<BigNumberish>,
+      salePrice: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<
       [string, BigNumber] & { receiver: string; royaltyAmount: BigNumber }
@@ -776,8 +776,8 @@ export interface ERC721Collections extends BaseContract {
   ): Promise<ContractTransaction>;
 
   royaltyInfo(
-    _tokenId: PromiseOrValue<BigNumberish>,
-    _salePrice: PromiseOrValue<BigNumberish>,
+    tokenId: PromiseOrValue<BigNumberish>,
+    salePrice: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<
     [string, BigNumber] & { receiver: string; royaltyAmount: BigNumber }
@@ -935,8 +935,8 @@ export interface ERC721Collections extends BaseContract {
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
 
     royaltyInfo(
-      _tokenId: PromiseOrValue<BigNumberish>,
-      _salePrice: PromiseOrValue<BigNumberish>,
+      tokenId: PromiseOrValue<BigNumberish>,
+      salePrice: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<
       [string, BigNumber] & { receiver: string; royaltyAmount: BigNumber }
@@ -1178,8 +1178,8 @@ export interface ERC721Collections extends BaseContract {
     ): Promise<BigNumber>;
 
     royaltyInfo(
-      _tokenId: PromiseOrValue<BigNumberish>,
-      _salePrice: PromiseOrValue<BigNumberish>,
+      tokenId: PromiseOrValue<BigNumberish>,
+      salePrice: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1336,8 +1336,8 @@ export interface ERC721Collections extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     royaltyInfo(
-      _tokenId: PromiseOrValue<BigNumberish>,
-      _salePrice: PromiseOrValue<BigNumberish>,
+      tokenId: PromiseOrValue<BigNumberish>,
+      salePrice: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

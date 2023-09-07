@@ -16,7 +16,9 @@ const config: HardhatUserConfig = {
       accounts: [process.env.SHIMMER_TEST_ACCOUNT_KEY],
     },
   },
-  solidity: "0.8.1",
+  solidity: {
+    version: "0.8.1",
+  },
 };
 
 //production
