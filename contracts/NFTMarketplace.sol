@@ -316,8 +316,8 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
             ""
         );
         require(royaltySuccess, "Transfer of royalty to the receiver failed.");
-        delete listings[key];
         nftContract.transferFrom(address(this), msg.sender, listing.tokenId);
+        delete listings[key];
         _totalListings.decrement();
         for (uint256 i = 0; i < listingsKeys.length; i++) {
             if (listingsKeys[i] == key) {
@@ -351,7 +351,6 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
             value: sellerAmount
         }("");
         require(sellerSuccess, "Transfer to NFT owner failed.");
-        _nftContract.transferFrom(_nftContractAddress, msg.sender, tokenId);
         emit NFTSold(
             tokenId,
             msg.value,

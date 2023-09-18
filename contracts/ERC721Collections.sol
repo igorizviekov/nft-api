@@ -269,7 +269,10 @@ contract ERC721Collections is ERC721URIStorage, IERC2981, Ownable {
             price == _collections[collectionId].mintPrice,
             "Price should be equal to collections mint price"
         );
-        setApprovalForAll(address(_marketplace), true);
+        require(
+            to != _collections[collectionId].owner,
+            "Owner can not buy from collection"
+        );
         uint256 newTokenId = _tokenIdTracker.current();
         _tokenIdTracker.increment();
         _mint(to, newTokenId);

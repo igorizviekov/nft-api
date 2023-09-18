@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/Users/igorizviekov/Desktop/Projects/NFT-api/nft-api/contracts/ERC721Collections.sol": {
-      "lastModificationDate": 1694769087739,
-      "contentHash": "aecffd8e7dbcbf2f6f3c248702d05e3f",
+      "lastModificationDate": 1695043168595,
+      "contentHash": "8b341627437b36bac91c86548f9d5fc3",
       "sourceName": "contracts/ERC721Collections.sol",
       "solcConfig": {
         "version": "0.8.1",
@@ -43,8 +43,8 @@
       ]
     },
     "/Users/igorizviekov/Desktop/Projects/NFT-api/nft-api/contracts/NFTMarketplace.sol": {
-      "lastModificationDate": 1694779934507,
-      "contentHash": "15c71694887ed60add4f464edd58fc4d",
+      "lastModificationDate": 1695043146172,
+      "contentHash": "17f6cf11c410704dd6b073175fae69a1",
       "sourceName": "contracts/NFTMarketplace.sol",
       "solcConfig": {
         "version": "0.8.1",
