@@ -54,8 +54,8 @@ export interface NFTMarketplaceInterface extends utils.Interface {
     "getKeyForToken(address,uint256)": FunctionFragment;
     "getListedTokensInCollection(uint256,uint256,uint256,address)": FunctionFragment;
     "getListingByTokenIdAndAddress(uint256,address)": FunctionFragment;
-    "getListingsByNFTContract(address,uint256,uint256)": FunctionFragment;
-    "getListingsBySeller(address,uint256,uint256)": FunctionFragment;
+    "getListingsByNFTContract(address,uint256)": FunctionFragment;
+    "getListingsBySeller(address,uint256)": FunctionFragment;
     "isTokenListed(address,uint256)": FunctionFragment;
     "listNFT(uint256,uint256,address)": FunctionFragment;
     "listings(bytes32)": FunctionFragment;
@@ -144,19 +144,11 @@ export interface NFTMarketplaceInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "getListingsByNFTContract",
-    values: [
-      PromiseOrValue<string>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>
-    ]
+    values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
     functionFragment: "getListingsBySeller",
-    values: [
-      PromiseOrValue<string>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>
-    ]
+    values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
     functionFragment: "isTokenListed",
@@ -323,8 +315,6 @@ export interface NFTMarketplaceInterface extends utils.Interface {
 
   events: {
     "ERC20PaymentReleased(address,address,uint256)": EventFragment;
-    "NFTDelisted(uint256,address)": EventFragment;
-    "NFTListed(uint256,uint256,address,address)": EventFragment;
     "NFTSold(uint256,uint256,address,address,address)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
     "PayeeAdded(address,uint256)": EventFragment;
@@ -333,8 +323,6 @@ export interface NFTMarketplaceInterface extends utils.Interface {
   };
 
   getEvent(nameOrSignatureOrTopic: "ERC20PaymentReleased"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "NFTDelisted"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "NFTListed"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "NFTSold"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "PayeeAdded"): EventFragment;
@@ -354,30 +342,6 @@ export type ERC20PaymentReleasedEvent = TypedEvent<
 
 export type ERC20PaymentReleasedEventFilter =
   TypedEventFilter<ERC20PaymentReleasedEvent>;
-
-export interface NFTDelistedEventObject {
-  tokenId: BigNumber;
-  collection: string;
-}
-export type NFTDelistedEvent = TypedEvent<
-  [BigNumber, string],
-  NFTDelistedEventObject
->;
-
-export type NFTDelistedEventFilter = TypedEventFilter<NFTDelistedEvent>;
-
-export interface NFTListedEventObject {
-  tokenId: BigNumber;
-  price: BigNumber;
-  seller: string;
-  collection: string;
-}
-export type NFTListedEvent = TypedEvent<
-  [BigNumber, BigNumber, string, string],
-  NFTListedEventObject
->;
-
-export type NFTListedEventFilter = TypedEventFilter<NFTListedEvent>;
 
 export interface NFTSoldEventObject {
   tokenId: BigNumber;
@@ -513,14 +477,12 @@ export interface NFTMarketplace extends BaseContract {
     getListingsByNFTContract(
       collection: PromiseOrValue<string>,
       page: PromiseOrValue<BigNumberish>,
-      pageSize: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[NFTMarketplace.ListingStructOutput[]]>;
 
     getListingsBySeller(
       seller: PromiseOrValue<string>,
       page: PromiseOrValue<BigNumberish>,
-      pageSize: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[NFTMarketplace.ListingStructOutput[]]>;
 
@@ -666,14 +628,12 @@ export interface NFTMarketplace extends BaseContract {
   getListingsByNFTContract(
     collection: PromiseOrValue<string>,
     page: PromiseOrValue<BigNumberish>,
-    pageSize: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<NFTMarketplace.ListingStructOutput[]>;
 
   getListingsBySeller(
     seller: PromiseOrValue<string>,
     page: PromiseOrValue<BigNumberish>,
-    pageSize: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<NFTMarketplace.ListingStructOutput[]>;
 
@@ -819,14 +779,12 @@ export interface NFTMarketplace extends BaseContract {
     getListingsByNFTContract(
       collection: PromiseOrValue<string>,
       page: PromiseOrValue<BigNumberish>,
-      pageSize: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<NFTMarketplace.ListingStructOutput[]>;
 
     getListingsBySeller(
       seller: PromiseOrValue<string>,
       page: PromiseOrValue<BigNumberish>,
-      pageSize: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<NFTMarketplace.ListingStructOutput[]>;
 
@@ -934,28 +892,6 @@ export interface NFTMarketplace extends BaseContract {
       amount?: null
     ): ERC20PaymentReleasedEventFilter;
 
-    "NFTDelisted(uint256,address)"(
-      tokenId?: PromiseOrValue<BigNumberish> | null,
-      collection?: PromiseOrValue<string> | null
-    ): NFTDelistedEventFilter;
-    NFTDelisted(
-      tokenId?: PromiseOrValue<BigNumberish> | null,
-      collection?: PromiseOrValue<string> | null
-    ): NFTDelistedEventFilter;
-
-    "NFTListed(uint256,uint256,address,address)"(
-      tokenId?: PromiseOrValue<BigNumberish> | null,
-      price?: null,
-      seller?: PromiseOrValue<string> | null,
-      collection?: PromiseOrValue<string> | null
-    ): NFTListedEventFilter;
-    NFTListed(
-      tokenId?: PromiseOrValue<BigNumberish> | null,
-      price?: null,
-      seller?: PromiseOrValue<string> | null,
-      collection?: PromiseOrValue<string> | null
-    ): NFTListedEventFilter;
-
     "NFTSold(uint256,uint256,address,address,address)"(
       tokenId?: PromiseOrValue<BigNumberish> | null,
       price?: null,
@@ -1048,14 +984,12 @@ export interface NFTMarketplace extends BaseContract {
     getListingsByNFTContract(
       collection: PromiseOrValue<string>,
       page: PromiseOrValue<BigNumberish>,
-      pageSize: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     getListingsBySeller(
       seller: PromiseOrValue<string>,
       page: PromiseOrValue<BigNumberish>,
-      pageSize: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1195,14 +1129,12 @@ export interface NFTMarketplace extends BaseContract {
     getListingsByNFTContract(
       collection: PromiseOrValue<string>,
       page: PromiseOrValue<BigNumberish>,
-      pageSize: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     getListingsBySeller(
       seller: PromiseOrValue<string>,
       page: PromiseOrValue<BigNumberish>,
-      pageSize: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

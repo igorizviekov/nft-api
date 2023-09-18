@@ -21,16 +21,13 @@ contract ERC721Collections is ERC721URIStorage, IERC2981, Ownable {
     uint256 constant TIME_BETWEEN_COLLECTIONS = 1 minutes;
     uint256 public constant MIN_PRICE = 0.01 ether;
 
-    mapping(uint256 => address) private _creators;
-    mapping(uint256 => uint256) private _creatorRoyalties;
-
     struct Collection {
         string uri;
         uint256 id;
         address owner;
         uint256 mintDate;
         uint256 mintPrice;
-        uint256 royaltyPercentage;
+        uint256 royaltyPercent;
     }
 
     NFTMarketplace private _marketplace;
@@ -73,6 +70,37 @@ contract ERC721Collections is ERC721URIStorage, IERC2981, Ownable {
 
     function getCollection(uint256 id) public view returns (Collection memory) {
         return _collections[id];
+    }
+
+    function getAllCollections(
+        uint256 offset,
+        uint256 limit
+    ) external view returns (Collection[] memory) {
+        uint256 startIndex = offset + 1;
+
+        require(
+            startIndex >= 1 && startIndex <= _collectionIdTracker.current(),
+            "Invalid offset"
+        );
+
+        uint256 actualLimit = 0;
+        uint256[] memory collectionIds = new uint256[](limit);
+
+        for (uint256 i = 0; i < limit; i++) {
+            uint256 collectionId = startIndex + i;
+            if (collectionId <= _collectionIdTracker.current()) {
+                collectionIds[actualLimit] = collectionId;
+                actualLimit++;
+            }
+        }
+
+        Collection[] memory collections = new Collection[](actualLimit);
+
+        for (uint256 i = 0; i < actualLimit; i++) {
+            collections[i] = _collections[collectionIds[i]];
+        }
+
+        return collections;
     }
 
     function getCollectionOfToken(
@@ -121,7 +149,7 @@ contract ERC721Collections is ERC721URIStorage, IERC2981, Ownable {
         string memory uri,
         uint256 mintDate,
         uint256 mintPrice,
-        uint256 royaltyPercentage
+        uint256 royaltyPercent
     ) public returns (uint256) {
         require(
             collectionsCreated[msg.sender] < MAX_COLLECTIONS_PER_ADDRESS,
@@ -133,9 +161,10 @@ contract ERC721Collections is ERC721URIStorage, IERC2981, Ownable {
             "Must wait before creating another collection"
         );
         require(
-            royaltyPercentage <= 100,
-            "Royalties percentage should be less than 100"
+            royaltyPercent <= 10,
+            "Royalties percentage should be less than 10"
         );
+
         _collectionIdTracker.increment();
 
         _collections[_collectionIdTracker.current()] = Collection({
@@ -144,7 +173,7 @@ contract ERC721Collections is ERC721URIStorage, IERC2981, Ownable {
             owner: msg.sender,
             mintDate: mintDate,
             mintPrice: mintPrice,
-            royaltyPercentage: royaltyPercentage
+            royaltyPercent: royaltyPercent
         });
 
         collectionsCreated[msg.sender]++;
@@ -180,16 +209,15 @@ contract ERC721Collections is ERC721URIStorage, IERC2981, Ownable {
         uint256 collectionId,
         string memory tokenURI,
         uint256 price,
-        uint256 royaltyPercentage,
         bool isMintToMarketplace
     ) public returns (uint256) {
+        require(
+            _collections[collectionId].id != 0,
+            "Collection does not exist"
+        );
         if (isMintToMarketplace) {
             require(price >= MIN_PRICE, "Price must be at least MIN_PRICE");
         }
-        require(
-            royaltyPercentage <= 100,
-            "Royalties percentage should be less than 100"
-        );
         require(
             collectionId == 1 || _collections[collectionId].owner == msg.sender,
             "Not the owner of the collection"
@@ -197,10 +225,6 @@ contract ERC721Collections is ERC721URIStorage, IERC2981, Ownable {
         require(
             block.timestamp >= _collections[collectionId].mintDate,
             "Collection is not yet available for minting"
-        );
-        require(
-            _collections[collectionId].id != 0,
-            "Collection does not exist"
         );
 
         setApprovalForAll(address(_marketplace), true);
@@ -210,8 +234,6 @@ contract ERC721Collections is ERC721URIStorage, IERC2981, Ownable {
         _setTokenURI(newTokenId, tokenURI);
         _nftToCollection[newTokenId] = collectionId;
         _nftCollections[collectionId].push(newTokenId);
-        _creators[newTokenId] = msg.sender;
-        _creatorRoyalties[newTokenId] = royaltyPercentage;
         if (isMintToMarketplace) {
             _marketplace.listNFT(newTokenId, price, address(this));
         }
@@ -227,12 +249,17 @@ contract ERC721Collections is ERC721URIStorage, IERC2981, Ownable {
         uint256 price
     )
         public
+        payable
         onlyMarketplace
         returns (uint256 tokenId, address collectionOwner)
     {
         require(
             _collections[collectionId].id != 0,
             "Collection does not exist"
+        );
+        require(
+            _collections[collectionId].id != 1,
+            "Can not mint to public Collection"
         );
         require(
             block.timestamp >= _collections[collectionId].mintDate,
@@ -249,19 +276,24 @@ contract ERC721Collections is ERC721URIStorage, IERC2981, Ownable {
         _setTokenURI(newTokenId, tokenURI);
         _nftToCollection[newTokenId] = collectionId;
         _nftCollections[collectionId].push(newTokenId);
-        _creators[newTokenId] = _collections[collectionId].owner;
-        _creatorRoyalties[newTokenId] = _collections[collectionId]
-            .royaltyPercentage;
         emit TokenMinted(newTokenId, collectionId);
         return (newTokenId, _collections[collectionId].owner);
+    }
+
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view override(IERC165, ERC721URIStorage) returns (bool) {
+        return
+            interfaceId == type(IERC2981).interfaceId ||
+            super.supportsInterface(interfaceId);
     }
 
     function royaltyInfo(
         uint256 tokenId,
         uint256 salePrice
     ) external view override returns (address receiver, uint256 royaltyAmount) {
-        uint256 royaltyPercentage = _creatorRoyalties[tokenId];
-        uint256 royaltyAmount = (salePrice * royaltyPercentage) / 100;
-        return (_creators[tokenId], royaltyAmount);
+        Collection memory collection = getCollectionOfToken(tokenId);
+        uint256 royaltyAmount = (salePrice * collection.royaltyPercent) / 100;
+        return (collection.owner, royaltyAmount);
     }
 }

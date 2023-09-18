@@ -27,7 +27,7 @@ async function main() {
    * @param {string} collectionsContractAddress - The address of the NFT collections contract.
    * @param {Array.<string>} royaltyRecipients - Array of recipient addresses to receive royalty payments.
    * @param {Array.<number>} shares - Array of share percentages corresponding to each recipient.
-   * @param {number} royalties - The total royalties percentage (0-100).
+   * @param {number} royalties - The total royalties percentage (0-50).
    *
    * @returns {Promise<Contract>} Returns a promise that resolves to a Contract. This represents the deployed NFTMarketplace contract.
    *
