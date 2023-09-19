@@ -56,15 +56,6 @@ export class UserDto {
   })
   website: string;
 
-  @IsOptional()
-  @IsBoolean()
-  @ApiProperty({
-    type: Boolean,
-    description:
-      "Flag which indicates that user approved marketplace contract top transfer tokens",
-    required: false,
-  })
-  isApprovedMarketplace?: boolean;
   @IsUrl()
   @ApiProperty({
     type: String,

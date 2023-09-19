@@ -99,9 +99,6 @@ export class UsersService {
   async update(id: string, UserToUpdate: UserDto): Promise<IResponse> {
     const { data } = await this.getById(id);
     Object.keys(UserToUpdate).forEach((key) => {
-      if (key === "isApprovedMarketplace") {
-        return;
-      }
       data[key] = UserToUpdate[key];
     });
 
@@ -121,12 +118,5 @@ export class UsersService {
     } catch (e) {
       throw new NotFoundException(`User with ${id} not found.`);
     }
-  }
-
-  async approve(id: string): Promise<IResponse> {
-    const { data } = await this.getById(id);
-    data.isApprovedMarketplace = true;
-    await this.usersRepo.update(id, data as User);
-    return { status: "success", data };
   }
 }

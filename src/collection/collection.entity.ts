@@ -38,7 +38,4 @@ export class Collection extends BaseEntity {
 
   @Column("text", { array: true, nullable: true })
   nfts?: string[];
-
-  @Column("integer", { array: true, nullable: true })
-  mintRequests?: number[];
 }

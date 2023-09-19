@@ -39,12 +39,6 @@ export class User {
     nullable: true,
     unique: false,
   })
-  isApprovedMarketplace?: boolean;
-
-  @Column({
-    nullable: true,
-    unique: false,
-  })
   image: string;
 
   @Column({

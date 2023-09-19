@@ -64,8 +64,4 @@ export class CollectionDto {
   @ApiProperty({ description: "Uploaded NFTs to IPFS", required: false })
   @IsOptional()
   nfts?: string[];
-
-  @ApiProperty({ description: "Mint requests IDs", required: false })
-  @IsOptional()
-  mintRequests?: number[];
 }
