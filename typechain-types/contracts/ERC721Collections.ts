@@ -380,7 +380,6 @@ export interface ERC721CollectionsInterface extends utils.Interface {
     "MetadataUpdate(uint256)": EventFragment;
     "MintPriceChanged(uint256,uint256)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
-    "PriceSet(uint256,uint256)": EventFragment;
     "TokenMinted(uint256,uint256)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
   };
@@ -392,7 +391,6 @@ export interface ERC721CollectionsInterface extends utils.Interface {
   getEvent(nameOrSignatureOrTopic: "MetadataUpdate"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "MintPriceChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "PriceSet"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TokenMinted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
 }
@@ -478,17 +476,6 @@ export type OwnershipTransferredEvent = TypedEvent<
 
 export type OwnershipTransferredEventFilter =
   TypedEventFilter<OwnershipTransferredEvent>;
-
-export interface PriceSetEventObject {
-  tokenId: BigNumber;
-  price: BigNumber;
-}
-export type PriceSetEvent = TypedEvent<
-  [BigNumber, BigNumber],
-  PriceSetEventObject
->;
-
-export type PriceSetEventFilter = TypedEventFilter<PriceSetEvent>;
 
 export interface TokenMintedEventObject {
   tokenId: BigNumber;
@@ -1111,12 +1098,6 @@ export interface ERC721Collections extends BaseContract {
       previousOwner?: PromiseOrValue<string> | null,
       newOwner?: PromiseOrValue<string> | null
     ): OwnershipTransferredEventFilter;
-
-    "PriceSet(uint256,uint256)"(
-      tokenId?: null,
-      price?: null
-    ): PriceSetEventFilter;
-    PriceSet(tokenId?: null, price?: null): PriceSetEventFilter;
 
     "TokenMinted(uint256,uint256)"(
       tokenId?: null,
