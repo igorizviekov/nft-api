@@ -47,7 +47,6 @@ contract ERC721Collections is ERC721URIStorage, IERC2981, Ownable {
 
     event CollectionCreated(uint256 id, string uri);
     event TokenMinted(uint256 tokenId, uint256 collectionId);
-    event PriceSet(uint256 tokenId, uint256 price);
     event MintPriceChanged(uint256 collectionId, uint256 newMintPrice);
 
     constructor(
