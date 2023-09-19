@@ -34,7 +34,6 @@ import { User } from "src/users/users.entity";
 import { NotAuthorizedDto } from "src/users/dto/unauthorized-error.dto";
 import { UpdateCollectionDto } from "./dto/update-collection.dto";
 import { Collection } from "./collection.entity";
-import { AddMintRequestDto } from "./dto/mint-request.dto";
 @ApiTags("Collections")
 @Controller("collection")
 export class CollectionController {
@@ -180,49 +179,5 @@ export class CollectionController {
     @Param("id") id: string
   ): Promise<IResponse> {
     return this.collectionService.update(id, collection);
-  }
-
-  @UseGuards(AuthGuard())
-  @ApiBearerAuth("access-token")
-  @ApiOkResponse({
-    description: "Open Mint Request",
-    type: Collection,
-  })
-  @ApiUnauthorizedResponse({
-    description: "Invalid credentials",
-    type: NotAuthorizedDto,
-  })
-  @ApiNotFoundResponse({
-    description: "Collection does not exist",
-  })
-  @ApiBody({ type: AddMintRequestDto })
-  @Post("/mint-request/:id")
-  async addMintRequest(
-    @Param("id") id: string,
-    @Body("requestId") requestId: number
-  ): Promise<IResponse> {
-    return this.collectionService.addMintRequest(id, requestId);
-  }
-
-  @UseGuards(AuthGuard())
-  @ApiBearerAuth("access-token")
-  @ApiOkResponse({
-    description: "Mint Request",
-    type: Collection,
-  })
-  @ApiUnauthorizedResponse({
-    description: "Invalid credentials",
-    type: NotAuthorizedDto,
-  })
-  @ApiNotFoundResponse({
-    description: "Collection does not exist",
-  })
-  @ApiBody({ type: AddMintRequestDto })
-  @Post("/mint-request/close/:id")
-  async closeMintRequest(
-    @Param("id") id: string,
-    @Body("requestId") requestId: number
-  ): Promise<IResponse> {
-    return this.collectionService.closeMintRequest(id, requestId);
   }
 }

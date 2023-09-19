@@ -1,11 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import {
-  IsBoolean,
-  IsEmail,
-  IsOptional,
-  IsString,
-  IsUrl,
-} from "class-validator";
+import { IsEmail, IsOptional, IsString, IsUrl } from "class-validator";
 
 export class UserDto {
   @ApiProperty({ type: String, description: "User id", required: false })
@@ -55,14 +49,4 @@ export class UserDto {
     required: false,
   })
   website: string;
-
-  @IsOptional()
-  @IsBoolean()
-  @ApiProperty({
-    type: Boolean,
-    description:
-      "Flag which indicates that user approved marketplace contract top transfer tokens",
-    required: false,
-  })
-  isApprovedMarketplace?: boolean;
 }

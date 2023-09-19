@@ -198,7 +198,7 @@ export class CollectionService {
       throw new NotFoundException(`Collection with id ${id} not found.`);
     }
     Object.keys(collectionData).forEach((key) => {
-      if (key === "tokenId" || key === "nfts" || key === "mintRequests") {
+      if (key === "tokenId" || key === "nfts") {
         return;
       }
       collection[key] = collectionData[key];
@@ -227,33 +227,5 @@ export class CollectionService {
       category
     );
     return { status: "success", data: collections };
-  }
-
-  async addMintRequest(id: string, requestId: number): Promise<IResponse> {
-    const collection = await this.collectionRepo.findOne(id);
-    if (!collection) {
-      throw new Error(`Collection with id ${id} not found.`);
-    }
-    if (collection.mintRequests) {
-      collection.mintRequests.push(requestId);
-    } else {
-      collection.mintRequests = [requestId];
-    }
-    await this.collectionRepo.save(collection);
-    return { status: "success", data: collection };
-  }
-
-  async closeMintRequest(id: string, requestId: number): Promise<IResponse> {
-    const collection = await this.collectionRepo.findOne(id);
-    if (!collection) {
-      throw new Error(`Collection with id ${id} not found.`);
-    }
-    if (collection.mintRequests) {
-      collection.mintRequests = collection.mintRequests.filter(
-        (req) => req !== requestId
-      );
-    }
-    await this.collectionRepo.save(collection);
-    return { status: "success", data: collection };
   }
 }
