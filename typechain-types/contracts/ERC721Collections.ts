@@ -68,6 +68,7 @@ export interface ERC721CollectionsInterface extends utils.Interface {
     "getCollection(uint256)": FunctionFragment;
     "getCollectionOfToken(uint256)": FunctionFragment;
     "getCollectionOwner(uint256)": FunctionFragment;
+    "getCollectionsForOwner(address,uint256,uint256)": FunctionFragment;
     "getNFTsInCollection(uint256,uint256,uint256)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
     "lastCollectionTimestamp(address)": FunctionFragment;
@@ -102,6 +103,7 @@ export interface ERC721CollectionsInterface extends utils.Interface {
       | "getCollection"
       | "getCollectionOfToken"
       | "getCollectionOwner"
+      | "getCollectionsForOwner"
       | "getNFTsInCollection"
       | "isApprovedForAll"
       | "lastCollectionTimestamp"
@@ -168,6 +170,14 @@ export interface ERC721CollectionsInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "getCollectionOwner",
     values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getCollectionsForOwner",
+    values: [
+      PromiseOrValue<string>,
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<BigNumberish>
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "getNFTsInCollection",
@@ -297,6 +307,10 @@ export interface ERC721CollectionsInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "getCollectionOwner",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getCollectionsForOwner",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -584,6 +598,13 @@ export interface ERC721Collections extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
+    getCollectionsForOwner(
+      owner: PromiseOrValue<string>,
+      offset: PromiseOrValue<BigNumberish>,
+      limit: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<[ERC721Collections.CollectionStructOutput[]]>;
+
     getNFTsInCollection(
       collectionId: PromiseOrValue<BigNumberish>,
       startIndex: PromiseOrValue<BigNumberish>,
@@ -748,6 +769,13 @@ export interface ERC721Collections extends BaseContract {
     overrides?: CallOverrides
   ): Promise<string>;
 
+  getCollectionsForOwner(
+    owner: PromiseOrValue<string>,
+    offset: PromiseOrValue<BigNumberish>,
+    limit: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides
+  ): Promise<ERC721Collections.CollectionStructOutput[]>;
+
   getNFTsInCollection(
     collectionId: PromiseOrValue<BigNumberish>,
     startIndex: PromiseOrValue<BigNumberish>,
@@ -911,6 +939,13 @@ export interface ERC721Collections extends BaseContract {
       collectionId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<string>;
+
+    getCollectionsForOwner(
+      owner: PromiseOrValue<string>,
+      offset: PromiseOrValue<BigNumberish>,
+      limit: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<ERC721Collections.CollectionStructOutput[]>;
 
     getNFTsInCollection(
       collectionId: PromiseOrValue<BigNumberish>,
@@ -1160,6 +1195,13 @@ export interface ERC721Collections extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getCollectionsForOwner(
+      owner: PromiseOrValue<string>,
+      offset: PromiseOrValue<BigNumberish>,
+      limit: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     getNFTsInCollection(
       collectionId: PromiseOrValue<BigNumberish>,
       startIndex: PromiseOrValue<BigNumberish>,
@@ -1320,6 +1362,13 @@ export interface ERC721Collections extends BaseContract {
 
     getCollectionOwner(
       collectionId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getCollectionsForOwner(
+      owner: PromiseOrValue<string>,
+      offset: PromiseOrValue<BigNumberish>,
+      limit: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

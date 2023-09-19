@@ -103,6 +103,39 @@ contract ERC721Collections is ERC721URIStorage, IERC2981, Ownable {
         return collections;
     }
 
+    function getCollectionsForOwner(
+        address owner,
+        uint256 offset,
+        uint256 limit
+    ) public view returns (Collection[] memory) {
+        uint256 count = 0;
+        for (uint256 i = 1; i <= _collectionIdTracker.current(); i++) {
+            if (_collections[i].owner == owner) {
+                count++;
+            }
+        }
+        if (offset >= count) {
+            return new Collection[](0);
+        }
+        uint256 actualLimit = count - offset > limit ? limit : count - offset;
+        Collection[] memory ownerCollections = new Collection[](actualLimit);
+        uint256 index = 0;
+        uint256 iterCount = 0;
+        for (uint256 i = 1; i <= _collectionIdTracker.current(); i++) {
+            if (_collections[i].owner == owner) {
+                if (iterCount >= offset && index < actualLimit) {
+                    ownerCollections[index] = _collections[i];
+                    index++;
+                }
+                iterCount++;
+            }
+            if (index == actualLimit) {
+                break;
+            }
+        }
+        return ownerCollections;
+    }
+
     function getCollectionOfToken(
         uint256 tokenId
     ) public view returns (Collection memory) {
