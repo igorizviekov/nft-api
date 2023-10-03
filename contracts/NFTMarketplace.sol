@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/finance/PaymentSplitter.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/interfaces/IERC2981.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 
 interface IERC721Collections is IERC721 {
     function getNFTsInCollection(
@@ -28,7 +29,7 @@ interface IERC721Collections is IERC721 {
     ) external returns (uint256 tokenId, address collectionOwner);
 }
 
-contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
+contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter, Pausable {
     using Counters for Counters.Counter;
     uint256 private _royalties;
     uint256 public constant MIN_PRICE = 0.001 ether;
@@ -70,6 +71,31 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
         _royalties = royalties;
     }
 
+    function _performPagination(
+        uint256 totalItems,
+        uint256 page
+    ) internal pure returns (uint256, uint256) {
+        require(page > 0, "Page number should be greater than 0");
+        uint256 start = (page - 1) * PAGE_SIZE;
+        uint256 end = start + PAGE_SIZE > totalItems
+            ? totalItems
+            : start + PAGE_SIZE;
+        require(end > start, "Invalid pagination range");
+        return (start, end);
+    }
+
+    function _checkCollectionContract(address collection) internal {
+        IERC165 checker = IERC165(collection);
+        require(
+            checker.supportsInterface(type(IERC721).interfaceId),
+            "The NFT contract does not support the ERC721 interface"
+        );
+        require(
+            checker.supportsInterface(type(IERC2981).interfaceId),
+            "The NFT contract does not support the ERC2981 interface"
+        );
+    }
+
     function getKeyForToken(
         address collection,
         uint256 tokenId
@@ -88,15 +114,10 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
     function getAllListings(
         uint256 page
     ) public view returns (Listing[] memory) {
-        require(page > 0, "Page number should be greater than 0");
-        uint256 totalListings = _totalListings.current();
-        uint256 start = (page - 1) * PAGE_SIZE;
-        uint256 end = start + PAGE_SIZE > totalListings
-            ? totalListings
-            : start + PAGE_SIZE;
-        if (end <= start) {
-            return new Listing[](0);
-        }
+        (uint256 start, uint256 end) = _performPagination(
+            _totalListings.current(),
+            page
+        );
         Listing[] memory pageListings = new Listing[](end - start);
         uint256 counter = 0;
         for (uint256 i = start; i < end; i++) {
@@ -117,15 +138,10 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
         address seller,
         uint256 page
     ) public view returns (Listing[] memory) {
-        require(page > 0, "Page number should be greater than 0");
-        uint256 totalListings = listingsKeys.length;
-        uint256 start = (page - 1) * PAGE_SIZE;
-        uint256 end = start + PAGE_SIZE > totalListings
-            ? totalListings
-            : start + PAGE_SIZE;
-        if (end <= start) {
-            return new Listing[](0);
-        }
+        (uint256 start, uint256 end) = _performPagination(
+            listingsKeys.length,
+            page
+        );
         Listing[] memory sellerListings = new Listing[](end - start);
         uint256 count = 0;
         for (uint256 i = start; i < end; i++) {
@@ -146,15 +162,10 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
         address collection,
         uint256 page
     ) public view returns (Listing[] memory) {
-        require(page > 0, "Page number should be greater than 0");
-        uint256 totalListings = listingsKeys.length;
-        uint256 start = (page - 1) * PAGE_SIZE;
-        uint256 end = start + PAGE_SIZE > totalListings
-            ? totalListings
-            : start + PAGE_SIZE;
-        if (end <= start) {
-            return new Listing[](0);
-        }
+        (uint256 start, uint256 end) = _performPagination(
+            listingsKeys.length,
+            page
+        );
         Listing[] memory contractListings = new Listing[](end - start);
         uint256 count = 0;
         for (uint256 i = start; i < end; i++) {
@@ -219,13 +230,9 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
         uint256 tokenId,
         uint256 price,
         address collection
-    ) public nonReentrant {
+    ) public nonReentrant whenNotPaused {
         IERC721 nftContract = IERC721(collection);
-        IERC165 checker = IERC165(collection);
-        require(
-            checker.supportsInterface(type(IERC721).interfaceId),
-            "The NFT contract does not support the ERC721 interface"
-        );
+        _checkCollectionContract(collection);
         require(!isTokenListed(collection, tokenId), "Token is already listed");
         require(price >= MIN_PRICE, "Price must be greater than MIN_PRICE");
         require(
@@ -233,11 +240,6 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
                 (msg.sender == _nftContractAddress &&
                     collection == _nftContractAddress),
             "You don't own this NFT"
-        );
-
-        require(
-            checker.supportsInterface(type(IERC2981).interfaceId),
-            "The NFT contract does not support the IERC2981 interface"
         );
         bytes32 key = getKeyForToken(collection, tokenId);
         listings[key] = Listing({
@@ -258,11 +260,10 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
     function delistNFT(
         address collection,
         uint256 tokenId
-    ) public nonReentrant {
+    ) public nonReentrant whenNotPaused {
         bytes32 key = getKeyForToken(collection, tokenId);
         Listing storage listing = listings[key];
         require(listing.seller == msg.sender, "You don't own this NFT");
-
         IERC721 nftContract = IERC721(listing.collection);
         nftContract.transferFrom(address(this), listing.seller, tokenId);
         delete listings[key];
@@ -279,7 +280,7 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
     function buyNFT(
         address collection,
         uint256 tokenId
-    ) public payable nonReentrant {
+    ) public payable nonReentrant whenNotPaused {
         bytes32 key = getKeyForToken(collection, tokenId);
         Listing storage listing = listings[key];
         require(
@@ -287,15 +288,7 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
             "Sent value does not match the NFT price"
         );
         require(listing.seller != msg.sender, "Owner cannot buy their own NFT");
-        IERC165 checker = IERC165(collection);
-        require(
-            checker.supportsInterface(type(IERC721).interfaceId),
-            "The NFT contract does not support the ERC721 interface"
-        );
-        require(
-            checker.supportsInterface(type(IERC2981).interfaceId),
-            "The NFT contract does not support the ERC2981 interface"
-        );
+        _checkCollectionContract(collection);
         IERC2981 nftContractRoyalties = IERC2981(collection);
         IERC721 nftContract = IERC721(collection);
         (address receiver, uint256 royaltyAmount) = nftContractRoyalties
@@ -338,7 +331,7 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
     function buyFromCollection(
         uint256 collectionId,
         string memory tokenURI
-    ) public payable nonReentrant {
+    ) public payable nonReentrant whenNotPaused {
         uint256 marketplaceRoyaltiesAmount = (msg.value * _royalties) / 100;
         require(
             msg.value > marketplaceRoyaltiesAmount,
@@ -358,5 +351,13 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, PaymentSplitter {
             msg.sender,
             _nftContractAddress
         );
+    }
+
+    function pause() public onlyOwner {
+        _pause();
+    }
+
+    function unpause() public onlyOwner {
+        _unpause();
     }
 }

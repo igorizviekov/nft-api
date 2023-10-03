@@ -13,14 +13,11 @@ import "./NFTMarketplace.sol";
  */
 contract ERC721Collections is ERC721URIStorage, IERC2981, Ownable {
     using Counters for Counters.Counter;
-
     Counters.Counter private _tokenIdTracker;
     Counters.Counter private _collectionIdTracker;
-
     uint256 constant MAX_COLLECTIONS_PER_ADDRESS = 999;
     uint256 constant TIME_BETWEEN_COLLECTIONS = 1 minutes;
     uint256 public constant MIN_PRICE = 0.01 ether;
-
     struct Collection {
         string uri;
         uint256 id;
@@ -29,7 +26,6 @@ contract ERC721Collections is ERC721URIStorage, IERC2981, Ownable {
         uint256 mintPrice;
         uint256 royaltyPercent;
     }
-
     NFTMarketplace private _marketplace;
     modifier onlyMarketplace() {
         require(
@@ -39,12 +35,10 @@ contract ERC721Collections is ERC721URIStorage, IERC2981, Ownable {
         _;
     }
     mapping(uint256 => Collection) private _collections;
-    mapping(uint256 => uint256[]) private _nftCollections; // Mapping from collection ID to list of token IDs
-    mapping(uint256 => uint256) private _nftToCollection; // Mapping from token ID to collection ID
-
+    mapping(uint256 => uint256[]) private _nftCollections;
+    mapping(uint256 => uint256) private _nftToCollection;
     mapping(address => uint256) public collectionsCreated;
     mapping(address => uint256) public lastCollectionTimestamp;
-
     event CollectionCreated(uint256 id, string uri);
     event TokenMinted(uint256 tokenId, uint256 collectionId);
     event MintPriceChanged(uint256 collectionId, uint256 newMintPrice);
@@ -76,15 +70,12 @@ contract ERC721Collections is ERC721URIStorage, IERC2981, Ownable {
         uint256 limit
     ) external view returns (Collection[] memory) {
         uint256 startIndex = offset + 1;
-
         require(
             startIndex >= 1 && startIndex <= _collectionIdTracker.current(),
             "Invalid offset"
         );
-
         uint256 actualLimit = 0;
         uint256[] memory collectionIds = new uint256[](limit);
-
         for (uint256 i = 0; i < limit; i++) {
             uint256 collectionId = startIndex + i;
             if (collectionId <= _collectionIdTracker.current()) {
@@ -92,13 +83,10 @@ contract ERC721Collections is ERC721URIStorage, IERC2981, Ownable {
                 actualLimit++;
             }
         }
-
         Collection[] memory collections = new Collection[](actualLimit);
-
         for (uint256 i = 0; i < actualLimit; i++) {
             collections[i] = _collections[collectionIds[i]];
         }
-
         return collections;
     }
 
@@ -162,12 +150,10 @@ contract ERC721Collections is ERC721URIStorage, IERC2981, Ownable {
         if (endIndex > allTokens.length) {
             endIndex = allTokens.length;
         }
-
         uint256[] memory tokens = new uint256[](endIndex - startIndex);
         for (uint256 i = startIndex; i < endIndex; i++) {
             tokens[i - startIndex] = allTokens[i];
         }
-
         return tokens;
     }
 
@@ -196,9 +182,7 @@ contract ERC721Collections is ERC721URIStorage, IERC2981, Ownable {
             royaltyPercent <= 10,
             "Royalties percentage should be less than 10"
         );
-
         _collectionIdTracker.increment();
-
         _collections[_collectionIdTracker.current()] = Collection({
             uri: uri,
             id: _collectionIdTracker.current(),
@@ -207,12 +191,9 @@ contract ERC721Collections is ERC721URIStorage, IERC2981, Ownable {
             mintPrice: mintPrice,
             royaltyPercent: royaltyPercent
         });
-
         collectionsCreated[msg.sender]++;
         lastCollectionTimestamp[msg.sender] = block.timestamp;
-
         emit CollectionCreated(_collectionIdTracker.current(), uri);
-
         return _collectionIdTracker.current();
     }
 
@@ -232,7 +213,6 @@ contract ERC721Collections is ERC721URIStorage, IERC2981, Ownable {
             newMintPrice >= MIN_PRICE,
             "New mint price must be at least MIN_PRICE"
         );
-
         _collections[collectionId].mintPrice = newMintPrice;
         emit MintPriceChanged(collectionId, newMintPrice);
     }
@@ -241,28 +221,36 @@ contract ERC721Collections is ERC721URIStorage, IERC2981, Ownable {
         uint256 collectionId,
         string memory tokenURI,
         uint256 price,
-        bool isMintToMarketplace
+        bool isMintToMarketplace,
+        address airdropAddress
     ) public returns (uint256) {
         require(
             _collections[collectionId].id != 0,
             "Collection does not exist"
         );
+        require(
+            !(airdropAddress != address(0) && isMintToMarketplace),
+            "Cannot mint to marketplace when airdrop address is provided"
+        );
         if (isMintToMarketplace) {
             require(price >= MIN_PRICE, "Price must be at least MIN_PRICE");
         }
         require(
-            collectionId == 1 || _collections[collectionId].owner == msg.sender,
+            (collectionId == 1 && airdropAddress == address(0)) ||
+                _collections[collectionId].owner == msg.sender,
             "Not the owner of the collection"
         );
         require(
             block.timestamp >= _collections[collectionId].mintDate,
             "Collection is not yet available for minting"
         );
-
         setApprovalForAll(address(_marketplace), true);
         uint256 newTokenId = _tokenIdTracker.current();
         _tokenIdTracker.increment();
-        _mint(msg.sender, newTokenId);
+        address mintToAddress = airdropAddress == address(0)
+            ? msg.sender
+            : airdropAddress;
+        _mint(mintToAddress, newTokenId);
         _setTokenURI(newTokenId, tokenURI);
         _nftToCollection[newTokenId] = collectionId;
         _nftCollections[collectionId].push(newTokenId);
@@ -270,7 +258,6 @@ contract ERC721Collections is ERC721URIStorage, IERC2981, Ownable {
             _marketplace.listNFT(newTokenId, price, address(this));
         }
         emit TokenMinted(newTokenId, collectionId);
-
         return newTokenId;
     }
 
